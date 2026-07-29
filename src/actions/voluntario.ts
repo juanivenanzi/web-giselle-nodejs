@@ -3,24 +3,40 @@
 import { z } from "zod";
 import { google } from "googleapis";
 
-// --- Esquema de validación ---
+// --- Esquema de validación mejorado ---
 const voluntarioSchema = z.object({
   nombre: z
     .string()
     .min(2, "El nombre es requerido (mínimo 2 caracteres)")
-    .max(100, "Nombre demasiado largo"),
-  email: z.string().email("Email inválido"),
+    .max(100, "Nombre demasiado largo")
+    .regex(
+      /^[a-zA-ZáéíóúñÑüÜ\s]+$/,
+      "El nombre solo puede contener letras y espacios",
+    ), // ✅ Validación específica
+  email: z.string().email("Email inválido. Usá formato: nombre@dominio.com"),
   telefono: z
     .string()
     .optional()
     .refine(
-      (val) => !val || /^[\d\s\-+()]{7,20}$/.test(val),
-      "Teléfono inválido (mínimo 7 dígitos)",
+      (val) =>
+        !val ||
+        /^(?:(?:\(?(?:0?11|0?[1-9][0-9]{2})\)?[\s-]?)?(?:15)?[\s-]?[0-9]{7,8}|[0-9]{7,10})$/.test(
+          val.replace(/\s/g, ""),
+        ),
+      "Teléfono inválido. Usá formato: 11 1234-5678 o similar",
     ),
   mensaje: z
     .string()
     .max(500, "El mensaje no puede superar los 500 caracteres")
-    .optional(),
+    .optional()
+    .refine(
+      (val) =>
+        !val ||
+        !/(http[s]?:\/\/|www\.|gana\s+dinero|oferta\s+limitada|click\s+aquí|visita\s+mi\s+sitio)/i.test(
+          val,
+        ),
+      "El mensaje contiene contenido sospechoso. Por favor, revisá tu texto.",
+    ),
   timestamp: z.string().optional(),
 });
 

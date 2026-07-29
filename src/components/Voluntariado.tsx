@@ -3,18 +3,15 @@
 import { useState, useEffect, useTransition, useRef } from "react";
 import { enviarVoluntario, type VoluntarioState } from "@/actions/voluntario";
 
-// ✅ Constantes de validación
+// ✅ Constantes de validación mejoradas y centralizadas
 const VALIDACIONES = {
   // 📧 Email
   email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-
-  // 📞 Teléfono argentino
+  // 📞 Teléfono argentino (con formato flexible)
   telefono:
     /^(?:(?:\(?(?:0?11|0?[1-9][0-9]{2})\)?[\s-]?)?(?:15)?[\s-]?[0-9]{7,8}|[0-9]{7,10})$/,
-
   // 👤 Nombre (solo letras y espacios)
   nombre: /^[a-zA-ZáéíóúñÑüÜ\s]+$/,
-
   // 🛡️ Patrones de spam
   spam: [
     /http[s]?:\/\//i,

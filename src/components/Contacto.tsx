@@ -10,25 +10,56 @@ import {
 import { enviarContacto, type ContactoState } from "@/actions/contacto";
 import { z } from "zod";
 
-// --- Esquema de validación ---
+// ✅ Constantes de validación (compartidas con Voluntariado)
+const VALIDACIONES = {
+  // 📧 Email
+  email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+  // 📞 Teléfono argentino (con formato flexible)
+  telefono:
+    /^(?:(?:\(?(?:0?11|0?[1-9][0-9]{2})\)?[\s-]?)?(?:15)?[\s-]?[0-9]{7,8}|[0-9]{7,10})$/,
+  // 👤 Nombre (solo letras y espacios)
+  nombre: /^[a-zA-ZáéíóúñÑüÜ\s]+$/,
+  // 🛡️ Patrones de spam
+  spam: [
+    /http[s]?:\/\//i,
+    /www\./i,
+    /gana\s+dinero/i,
+    /oferta\s+limitada/i,
+    /click\s+aquí/i,
+    /visita\s+mi\s+sitio/i,
+  ],
+};
+
+// --- Esquema de validación en cliente (usando Zod) ---
 const contactoSchema = z.object({
   nombre: z
     .string()
     .min(2, "El nombre es requerido (mínimo 2 caracteres)")
-    .max(100),
-  email: z.string().email("Email inválido"),
+    .max(100, "El nombre no puede superar los 100 caracteres")
+    .regex(
+      VALIDACIONES.nombre,
+      "El nombre solo puede contener letras y espacios",
+    ),
+  email: z.string().email("Email inválido. Usá formato: nombre@dominio.com"),
   telefono: z
     .string()
     .optional()
     .refine(
-      (val) => !val || /^[\d\s\-+()]{7,20}$/.test(val),
-      "Teléfono inválido",
+      (val) =>
+        !val ||
+        VALIDACIONES.telefono.test(val.replace(/\s/g, "")) ||
+        val === "",
+      "Teléfono inválido. Usá formato: 11 1234-5678 o similar",
     ),
   asunto: z.string().min(1, "Debes seleccionar un asunto"),
   mensaje: z
     .string()
     .min(10, "El mensaje debe tener al menos 10 caracteres")
-    .max(1000),
+    .max(1000, "El mensaje no puede superar los 1000 caracteres")
+    .refine(
+      (val) => !VALIDACIONES.spam.some((pattern) => pattern.test(val)),
+      "El mensaje contiene contenido sospechoso. Por favor, revisá tu texto.",
+    ),
 });
 
 const initialState: ContactoState = {
@@ -59,13 +90,14 @@ export default function Contacto() {
   // ✅ useTransition para manejar el envío
   const [isTransitioning, startTransition] = useTransition();
 
-  // Eliminar "Quiero ser voluntario/a" del dropdown
+  // Opciones del dropdown (sin "Quiero ser voluntario/a")
   const asuntos = [
     { valor: "consulta-general", label: "Consulta general" },
     { valor: "propuesta", label: "Propuesta" },
     { valor: "reclamo", label: "Reclamo" },
   ];
 
+  // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -77,6 +109,7 @@ export default function Contacto() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
+  // Resetear formulario después de envío exitoso
   useEffect(() => {
     if (state.success) {
       setAsunto("");
@@ -92,7 +125,7 @@ export default function Contacto() {
     setLocalErrors((prev) => ({ ...prev, asunto: "" }));
   };
 
-  // ✅ Función corregida con tipado seguro
+  // ✅ Función para obtener errores con tipado seguro
   const getFieldError = (field: ContactFormFields): string | undefined => {
     if (localErrors[field]) {
       return localErrors[field];
@@ -118,7 +151,7 @@ export default function Contacto() {
     // 1. Honeypot básico
     if (formData.get("website")) return;
 
-    // 2. Validación en cliente
+    // 2. Validación en cliente con Zod
     const rawData = {
       nombre: formData.get("nombre")?.toString().trim() || "",
       email: formData.get("email")?.toString().trim() || "",
@@ -333,7 +366,9 @@ export default function Contacto() {
                 <button
                   type="button"
                   onClick={toggleDropdown}
-                  className={`w-full py-3.5 px-4 rounded-xl border-2 text-sm text-left t-modo transition-all duration-300 flex items-center justify-between focus:outline-none bg-transparent ${asunto ? "text-(--color-texto)" : "text-(--color-texto-sec)"}`}
+                  className={`w-full py-3.5 px-4 rounded-xl border-2 text-sm text-left t-modo transition-all duration-300 flex items-center justify-between focus:outline-none bg-transparent ${
+                    asunto ? "text-(--color-texto)" : "text-(--color-texto-sec)"
+                  }`}
                   style={{
                     backgroundColor: "var(--color-fondo)",
                     borderColor: getFieldError("asunto")
@@ -345,7 +380,9 @@ export default function Contacto() {
                 >
                   <span>{asunto || "Seleccionar asunto"}</span>
                   <i
-                    className={`fas fa-chevron-down text-xs transition-transform duration-300 ${asuntoOpen ? "rotate-180" : ""}`}
+                    className={`fas fa-chevron-down text-xs transition-transform duration-300 ${
+                      asuntoOpen ? "rotate-180" : ""
+                    }`}
                   ></i>
                 </button>
                 <label
@@ -433,7 +470,11 @@ export default function Contacto() {
                       ? "#94a3b8"
                       : "var(--color-texto)",
                   color: "#ffffff",
-                  border: `2px solid ${isPending || isTransitioning ? "#94a3b8" : "var(--color-texto)"}`,
+                  border: `2px solid ${
+                    isPending || isTransitioning
+                      ? "#94a3b8"
+                      : "var(--color-texto)"
+                  }`,
                 }}
               >
                 <span className="relative z-10 flex items-center gap-2">
@@ -477,7 +518,9 @@ export default function Contacto() {
 
             {state.message && (
               <p
-                className={`text-center text-sm font-medium ${state.success ? "text-green-600" : "text-red-600"}`}
+                className={`text-center text-sm font-medium ${
+                  state.success ? "text-green-600" : "text-red-600"
+                }`}
               >
                 {state.message}
               </p>
