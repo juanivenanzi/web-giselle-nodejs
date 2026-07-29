@@ -65,7 +65,7 @@ function TarjetaGestion({ item }: { item: GestionItem }) {
       </div>
       <div className="titulo">{item.titulo}</div>
       <div className="descripcion">{item.descripcion}</div>
-      {tieneEnlace && (
+      {tieneEnlace ? (
         <a
           href={item.enlacePdf}
           target="_blank"
@@ -74,117 +74,45 @@ function TarjetaGestion({ item }: { item: GestionItem }) {
         >
           <i className="fas fa-file-pdf"></i> Ver expediente
         </a>
+      ) : (
+        <span className="btn-expediente-disabled">
+          <i className="fas fa-file-pdf"></i> No disponible
+        </span>
       )}
     </article>
-  );
-}
-
-// ✅ Variante 1: Filtros Minimalistas y Flotantes
-function FiltrosMinimalistas({ filtro, setFiltro, años, tipos, estados }: any) {
-  return (
-    <div className="filtros-flotantes sticky top-20 z-10 backdrop-blur-md bg-(--color-fondo)/70 rounded-2xl p-4 mb-8 border border-(--color-borde) shadow-sm transition-all duration-300">
-      <div className="flex flex-wrap items-center gap-4 justify-center">
-        {/* Filtro de Año */}
-        <div className="flex items-center gap-2 flex-wrap justify-center">
-          <i className="fas fa-calendar-alt text-(--color-texto-sec) text-xs"></i>
-          <span className="text-xs font-semibold text-(--color-texto-sec)">
-            Año
-          </span>
-          <div className="flex gap-1 flex-wrap">
-            <span
-              className={`pastilla-color text-xs ${filtro.anio === "todos" ? "activa" : ""}`}
-              onClick={() => setFiltro({ ...filtro, anio: "todos" })}
-            >
-              Todos
-            </span>
-            {años.map((a: number) => (
-              <span
-                key={a}
-                className={`pastilla-color text-xs ${filtro.anio === String(a) ? "activa" : ""}`}
-                onClick={() => setFiltro({ ...filtro, anio: String(a) })}
-              >
-                {a}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <div className="hidden sm:block w-px h-8 bg-(--color-borde)"></div>
-
-        {/* Filtro de Tipo */}
-        <div className="flex items-center gap-2 flex-wrap justify-center">
-          <i className="fas fa-folder-open text-(--color-texto-sec) text-xs"></i>
-          <span className="text-xs font-semibold text-(--color-texto-sec)">
-            Tipo
-          </span>
-          <div className="flex gap-1 flex-wrap">
-            <span
-              className={`pastilla-color text-xs ${filtro.tipo === "todos" ? "activa" : ""}`}
-              onClick={() => setFiltro({ ...filtro, tipo: "todos" })}
-            >
-              Todos
-            </span>
-            {tipos.map((t: string) => (
-              <span
-                key={t}
-                className={`pastilla-color text-xs ${filtro.tipo === t ? "activa" : ""}`}
-                onClick={() => setFiltro({ ...filtro, tipo: t })}
-              >
-                {tipoLabel[t] || t}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <div className="hidden sm:block w-px h-8 bg-(--color-borde)"></div>
-
-        {/* Filtro de Estado */}
-        <div className="flex items-center gap-2 flex-wrap justify-center">
-          <i className="fas fa-tag text-(--color-texto-sec) text-xs"></i>
-          <span className="text-xs font-semibold text-(--color-texto-sec)">
-            Estado
-          </span>
-          <div className="flex gap-1 flex-wrap">
-            <span
-              className={`pastilla-color text-xs ${filtro.estado === "todos" ? "activa" : ""}`}
-              onClick={() => setFiltro({ ...filtro, estado: "todos" })}
-            >
-              Todos
-            </span>
-            {estados.map((e: string) => (
-              <span
-                key={e}
-                className={`pastilla-color text-xs ${filtro.estado === e ? "activa" : ""}`}
-                onClick={() => setFiltro({ ...filtro, estado: e })}
-              >
-                {estadoLabel[e] || e}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Contador de resultados integrado */}
-      <div className="text-center text-xs text-(--color-texto-sec) mt-3 pt-2 border-t border-(--color-borde)/50">
-        <i className="fas fa-file-alt mr-1"></i>
-        <span className="font-bold text-(--color-texto)">
-          {/* Contador se muestra afuera */}
-        </span>{" "}
-        resultados encontrados
-      </div>
-    </div>
   );
 }
 
 export default function ProyectosPage() {
   const [proyectos, setProyectos] = useState<GestionItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filtro, setFiltro] = useState({
-    anio: "todos",
-    tipo: "todos",
-    estado: "todos",
-  });
+  const [modo, setModo] = useState("institucional");
+  const [vistaGrid, setVistaGrid] = useState(true);
+  
+  // ✅ Filtros del panel
+  const [filtroAño, setFiltroAño] = useState("Todos");
+  const [filtroTipo, setFiltroTipo] = useState("Todos");
+  const [filtroEstado, setFiltroEstado] = useState("Todos");
+  const [busqueda, setBusqueda] = useState("");
 
+  // Detectar modo
+  useEffect(() => {
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
+    setModo(modoGuardado);
+
+    const observer = new MutationObserver(() => {
+      const nuevoModo =
+        document.documentElement.getAttribute("data-modo") || "institucional";
+      setModo(nuevoModo);
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-modo"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  // Cargar datos
   useEffect(() => {
     async function cargarDatos() {
       try {
@@ -196,7 +124,6 @@ export default function ProyectosPage() {
         setProyectos(data);
       } catch (error) {
         console.error("Error cargando datos:", error);
-        // Datos de ejemplo para desarrollo
         setProyectos([]);
       } finally {
         setLoading(false);
@@ -205,22 +132,36 @@ export default function ProyectosPage() {
     cargarDatos();
   }, []);
 
-  const tipos = [...new Set(proyectos.map((p) => p.tipo))].filter(
-    (t) => t !== "sin-tipo",
+  // Obtener opciones únicas para filtros
+  const años = ["Todos", ...new Set(proyectos.map((p) => p.año).filter(a => a > 0))].sort((a, b) => 
+    a === "Todos" ? -1 : b === "Todos" ? 1 : Number(b) - Number(a)
   );
-  const estados = [...new Set(proyectos.map((p) => p.estado))].filter(
-    (e) => e !== "sin-estado",
-  );
-  const años = [...new Set(proyectos.map((p) => p.año))]
-    .filter((a) => a > 0)
-    .sort((a, b) => b - a);
+  
+  const tipos = ["Todos", ...new Set(proyectos.map((p) => p.tipo).filter(t => t && t !== "sin-tipo"))];
+  const estados = ["Todos", ...new Set(proyectos.map((p) => p.estado).filter(e => e && e !== "sin-estado"))];
 
-  const filtrados = proyectos.filter((p) => {
-    const matchAnio = filtro.anio === "todos" || p.año === Number(filtro.anio);
-    const matchTipo = filtro.tipo === "todos" || p.tipo === filtro.tipo;
-    const matchEstado = filtro.estado === "todos" || p.estado === filtro.estado;
-    return matchAnio && matchTipo && matchEstado;
+  // Filtrar proyectos
+  const proyectosFiltrados = proyectos.filter((proyecto) => {
+    const matchAño = filtroAño === "Todos" || proyecto.año === Number(filtroAño);
+    const matchTipo = filtroTipo === "Todos" || proyecto.tipo === filtroTipo;
+    const matchEstado = filtroEstado === "Todos" || proyecto.estado === filtroEstado;
+    const matchBusqueda =
+      proyecto.titulo.toLowerCase().includes(busqueda.toLowerCase()) ||
+      proyecto.descripcion.toLowerCase().includes(busqueda.toLowerCase());
+    return matchAño && matchTipo && matchEstado && matchBusqueda;
   });
+
+  // Obtener color del estado para badges
+  const getEstadoBadge = (estado: string) => {
+    switch (estado) {
+      case "aprobada": return "bg-green-100 text-green-700";
+      case "en-tratamiento": return "bg-yellow-100 text-yellow-700";
+      case "no-aprobada": return "bg-red-100 text-red-700";
+      case "en-comision": return "bg-blue-100 text-blue-700";
+      case "vetada": return "bg-purple-100 text-purple-700";
+      default: return "bg-gray-100 text-gray-600";
+    }
+  };
 
   if (loading) {
     return (
@@ -240,12 +181,12 @@ export default function ProyectosPage() {
 
   return (
     <section
-      className="pt-36 pb-25 px-8 t-modo"
+      className="pt-36 pb-25 px-4 sm:px-8 t-modo"
       style={{ backgroundColor: "var(--color-fondo)" }}
     >
-      <div className="max-w-300 mx-auto">
-        {/* Contenido Institucional */}
-        <div className="contenido-institucional">
+      <div className="max-w-7xl mx-auto">
+        {/* Título y subtítulo */}
+        {modo === "institucional" ? (
           <div className="text-center mb-10">
             <div className="pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-3">
               Gestión
@@ -264,48 +205,8 @@ export default function ProyectosPage() {
               Probá combinar los filtros para encontrar lo que buscás.
             </p>
           </div>
-
-          {/* Filtros Minimalistas */}
-          <FiltrosMinimalistas
-            filtro={filtro}
-            setFiltro={setFiltro}
-            años={años}
-            tipos={tipos}
-            estados={estados}
-          />
-
-          {/* Contador de resultados */}
-          <div className="contador-resultados mb-6">
-            <i className="fas fa-file-alt"></i>{" "}
-            <strong>{filtrados.length}</strong> proyectos encontrados
-          </div>
-
-          {/* Grid de tarjetas */}
-          {filtrados.length > 0 ? (
-            <div className="grid-tarjetas">
-              {filtrados.map((item, i) => (
-                <TarjetaGestion key={i} item={item} />
-              ))}
-            </div>
-          ) : (
-            <div
-              className="text-center py-12"
-              style={{ color: "var(--color-texto-sec)" }}
-            >
-              <i className="fas fa-search text-4xl mb-4 opacity-50"></i>
-              <p className="text-lg font-medium">
-                No se encontraron proyectos con esos filtros
-              </p>
-              <p className="text-sm mt-2">
-                Probá cambiando los criterios de búsqueda
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Contenido Campaña */}
-        <div className="contenido-campaña">
-          <div className="text-center mb-14">
+        ) : (
+          <div className="text-center mb-10">
             <div className="pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-3">
               Propuestas
             </div>
@@ -322,75 +223,311 @@ export default function ProyectosPage() {
               Conocé nuestras propuestas para construir la ciudad que queremos.
             </p>
           </div>
+        )}
 
-          <div className="grid-tarjetas">
-            {[
-              {
-                titulo: "Municipio transparente",
-                descripcion:
-                  "Acceso total a los gastos públicos y contrataciones a través de una plataforma digital.",
-                tipo: "Transparencia",
-              },
-              {
-                titulo: "Menos impuestos, más desarrollo",
-                descripcion:
-                  "Reducción de tasas municipales para pequeños comerciantes y emprendedores.",
-                tipo: "Libertad",
-              },
-              {
-                titulo: "Santo Tomé participativo",
-                descripcion:
-                  "Presupuesto participativo donde los vecinos deciden en qué se invierten los recursos.",
-                tipo: "Territorio",
-              },
-              {
-                titulo: "Plan de ordenamiento urbano",
-                descripcion:
-                  "Desarrollo planificado con ordenanzas claras y previsibles para el crecimiento de la ciudad.",
-                tipo: "Orden",
-              },
-            ].map((propuesta, i) => (
-              <article
-                key={i}
-                className="gestion-card"
-                style={{
-                  backgroundColor: "var(--color-fondo-alt)",
-                  borderColor: "var(--color-borde)",
-                }}
+        {/* ✅ Panel optimizado: filtros horizontales en móvil, laterales en PC */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* ✅ Filtros: en móvil se convierten en barra horizontal compacta */}
+          <aside
+            className="lg:w-72 shrink-0 p-4 rounded-xl"
+            style={{ backgroundColor: "var(--color-fondo-alt)" }}
+          >
+            <div className="flex flex-col lg:block">
+              <h3
+                className="font-semibold mb-4 text-sm hidden lg:block"
+                style={{ color: "var(--color-texto)" }}
               >
-                <div className="cabecera">
-                  <span
-                    className="tipo"
+                Filtros
+              </h3>
+              
+              {/* En móvil: filtros en línea */}
+              <div className="flex flex-wrap lg:flex-col gap-3 lg:gap-4">
+                {/* Búsqueda */}
+                <div className="flex-1 min-w-30 lg:w-full">
+                  <label className="text-xs hidden lg:block" style={{ color: "var(--color-texto-sec)" }}>
+                    Buscar
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Buscar..."
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                    className="w-full mt-0 lg:mt-1 p-2 rounded-lg text-sm"
                     style={{
-                      backgroundColor: "var(--color-destacado)",
-                      color: "#000000",
+                      backgroundColor: "var(--color-fondo)",
+                      border: "1px solid var(--color-borde)",
+                      color: "var(--color-texto)",
+                    }}
+                  />
+                </div>
+
+                {/* Filtro de año */}
+                <div className="flex-1 min-w-20 lg:w-full">
+                  <label className="text-xs hidden lg:block" style={{ color: "var(--color-texto-sec)" }}>
+                    Año
+                  </label>
+                  <select
+                    value={filtroAño}
+                    onChange={(e) => setFiltroAño(e.target.value)}
+                    className="w-full mt-0 lg:mt-1 p-2 rounded-lg text-sm"
+                    style={{
+                      backgroundColor: "var(--color-fondo)",
+                      border: "1px solid var(--color-borde)",
+                      color: "var(--color-texto)",
                     }}
                   >
-                    {propuesta.tipo}
-                  </span>
-                  <span className="estado estado-aprobada">
-                    <i className="fas fa-check text-white text-[0.75rem]"></i>{" "}
-                    Activa
-                  </span>
+                    {años.map((año) => (
+                      <option key={año} value={año}>
+                        {año}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <div className="fecha">
-                  <i className="fas fa-calendar-day"></i> 2025
-                </div>
-                <div className="titulo">{propuesta.titulo}</div>
-                <div className="descripcion">{propuesta.descripcion}</div>
-              </article>
-            ))}
-          </div>
-        </div>
 
-        {/* Botón de regreso */}
-        <div className="flex justify-center mt-12">
-          <a
-            href="/"
-            className="btn-enviar inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold shadow-md t-modo transition-all duration-300 hover:scale-105 hover:shadow-xl"
-          >
-            <i className="fas fa-arrow-left"></i> <span>Volver al inicio</span>
-          </a>
+                {/* Filtro de tipo */}
+                <div className="flex-1 min-w-20 lg:w-full">
+                  <label className="text-xs hidden lg:block" style={{ color: "var(--color-texto-sec)" }}>
+                    Tipo
+                  </label>
+                  <select
+                    value={filtroTipo}
+                    onChange={(e) => setFiltroTipo(e.target.value)}
+                    className="w-full mt-0 lg:mt-1 p-2 rounded-lg text-sm"
+                    style={{
+                      backgroundColor: "var(--color-fondo)",
+                      border: "1px solid var(--color-borde)",
+                      color: "var(--color-texto)",
+                    }}
+                  >
+                    {tipos.map((tipo) => (
+                      <option key={tipo} value={tipo}>
+                        {tipoLabel[tipo] || tipo}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Filtro de estado */}
+                <div className="flex-1 min-w-20 lg:w-full">
+                  <label className="text-xs hidden lg:block" style={{ color: "var(--color-texto-sec)" }}>
+                    Estado
+                  </label>
+                  <select
+                    value={filtroEstado}
+                    onChange={(e) => setFiltroEstado(e.target.value)}
+                    className="w-full mt-0 lg:mt-1 p-2 rounded-lg text-sm"
+                    style={{
+                      backgroundColor: "var(--color-fondo)",
+                      border: "1px solid var(--color-borde)",
+                      color: "var(--color-texto)",
+                    }}
+                  >
+                    {estados.map((estado) => (
+                      <option key={estado} value={estado}>
+                        {estadoLabel[estado] || estado}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Botón limpiar - visible siempre */}
+                <button
+                  onClick={() => {
+                    setFiltroAño("Todos");
+                    setFiltroTipo("Todos");
+                    setFiltroEstado("Todos");
+                    setBusqueda("");
+                  }}
+                  className="w-full py-2 rounded-lg text-sm font-medium mt-1 lg:mt-2"
+                  style={{ backgroundColor: "var(--color-primario)", color: "white" }}
+                >
+                  Limpiar filtros
+                </button>
+              </div>
+            </div>
+          </aside>
+
+          {/* Contenido principal */}
+          <div className="flex-1 min-w-0">
+            {/* Control de vista y resultados */}
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
+              <p className="text-sm" style={{ color: "var(--color-texto-sec)" }}>
+                Mostrando <strong className="text-(--color-texto)">{proyectosFiltrados.length}</strong> proyectos
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setVistaGrid(true)}
+                  className={`p-2 rounded-lg border transition-all ${vistaGrid ? "shadow-sm" : ""}`}
+                  style={{
+                    borderColor: "var(--color-borde)",
+                    color: vistaGrid ? "var(--color-primario)" : "var(--color-texto-sec)",
+                    backgroundColor: vistaGrid ? "var(--color-fondo-alt)" : "transparent",
+                  }}
+                >
+                  ⊞ Grid
+                </button>
+                <button
+                  onClick={() => setVistaGrid(false)}
+                  className={`p-2 rounded-lg border transition-all ${!vistaGrid ? "shadow-sm" : ""}`}
+                  style={{
+                    borderColor: "var(--color-borde)",
+                    color: !vistaGrid ? "var(--color-primario)" : "var(--color-texto-sec)",
+                    backgroundColor: !vistaGrid ? "var(--color-fondo-alt)" : "transparent",
+                  }}
+                >
+                  ☰ Lista
+                </button>
+              </div>
+            </div>
+
+            {/* ✅ Vista Grid optimizada con Expediente consistente */}
+            {vistaGrid && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                {proyectosFiltrados.map((proyecto) => {
+                  const tieneEnlace = proyecto.enlacePdf && proyecto.enlacePdf !== "" && proyecto.enlacePdf !== "#";
+                  return (
+                    <div
+                      key={`${proyecto.titulo}-${proyecto.fecha}`}
+                      className="p-4 rounded-xl border flex flex-col gap-1 transition-all hover:shadow-sm"
+                      style={{
+                        backgroundColor: "var(--color-fondo-alt)",
+                        borderColor: "var(--color-borde)",
+                      }}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ${getEstadoBadge(proyecto.estado)}`}
+                        >
+                          {estadoLabel[proyecto.estado] || proyecto.estado}
+                        </span>
+                        <span className="text-xs whitespace-nowrap" style={{ color: "var(--color-texto-sec)" }}>
+                          {proyecto.fecha}
+                        </span>
+                      </div>
+                      <h4
+                        className="font-head font-medium text-base"
+                        style={{ color: "var(--color-texto)" }}
+                      >
+                        {proyecto.titulo}
+                      </h4>
+                      <p
+                        className="text-sm line-clamp-3"
+                        style={{ color: "var(--color-texto-sec)" }}
+                      >
+                        {proyecto.descripcion}
+                      </p>
+                      <div
+                        className="flex items-center justify-between mt-2 pt-2 border-t flex-wrap gap-1"
+                        style={{ borderColor: "var(--color-borde)" }}
+                      >
+                        <span className="text-xs" style={{ color: "var(--color-texto-sec)" }}>
+                          {tipoLabel[proyecto.tipo] || proyecto.tipo}
+                        </span>
+                        {/* ✅ Expediente con el mismo estilo que en la lista */}
+                        {tieneEnlace ? (
+                          <a
+                            href={proyecto.enlacePdf}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs font-medium hover:underline whitespace-nowrap"
+                            style={{ color: "var(--color-primario)" }}
+                          >
+                            <i className="fas fa-file-pdf mr-1"></i> Ver
+                          </a>
+                        ) : (
+                          <span className="text-xs whitespace-nowrap" style={{ color: "var(--color-texto-sec)" }}>
+                            <i className="fas fa-file-pdf mr-1"></i> No disponible
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* ✅ Vista Lista optimizada con columnas adaptables */}
+            {!vistaGrid && (
+              <div className="rounded-xl border overflow-x-auto" style={{ borderColor: "var(--color-borde)" }}>
+                <table className="w-full text-sm min-w-150">
+                  <thead style={{ backgroundColor: "var(--color-fondo-alt)" }}>
+                    <tr>
+                      <th className="text-left p-3 font-medium" style={{ color: "var(--color-texto-sec)", width: "35%" }}>
+                        Título
+                      </th>
+                      <th className="text-left p-3 font-medium hidden sm:table-cell" style={{ color: "var(--color-texto-sec)", width: "20%" }}>
+                        Tipo
+                      </th>
+                      <th className="text-left p-3 font-medium hidden md:table-cell" style={{ color: "var(--color-texto-sec)", width: "15%" }}>
+                        Fecha
+                      </th>
+                      <th className="text-left p-3 font-medium" style={{ color: "var(--color-texto-sec)", width: "20%" }}>
+                        Estado
+                      </th>
+                      <th className="text-left p-3 font-medium" style={{ color: "var(--color-texto-sec)", width: "20%" }}>
+                        Expediente
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {proyectosFiltrados.map((proyecto, index) => {
+                      const tieneEnlace = proyecto.enlacePdf && proyecto.enlacePdf !== "" && proyecto.enlacePdf !== "#";
+                      return (
+                        <tr
+                          key={`${proyecto.titulo}-${proyecto.fecha}`}
+                          className="border-t transition-colors hover:brightness-95"
+                          style={{
+                            borderColor: "var(--color-borde)",
+                            backgroundColor: index % 2 === 0 ? "var(--color-fondo)" : "var(--color-fondo-alt)",
+                          }}
+                        >
+                          <td className="p-3 font-medium wrap-break-word" style={{ color: "var(--color-texto)" }}>
+                            {proyecto.titulo}
+                          </td>
+                          <td className="p-3 hidden sm:table-cell" style={{ color: "var(--color-texto-sec)" }}>
+                            {tipoLabel[proyecto.tipo] || proyecto.tipo}
+                          </td>
+                          <td className="p-3 hidden md:table-cell" style={{ color: "var(--color-texto-sec)" }}>
+                            {proyecto.fecha}
+                          </td>
+                          <td className="p-3">
+                            <span
+                              className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ${getEstadoBadge(proyecto.estado)}`}
+                            >
+                              {estadoLabel[proyecto.estado] || proyecto.estado}
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            {tieneEnlace ? (
+                              <a
+                                href={proyecto.enlacePdf}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs font-medium hover:underline whitespace-nowrap"
+                                style={{ color: "var(--color-primario)" }}
+                              >
+                                <i className="fas fa-file-pdf mr-1"></i> Ver
+                              </a>
+                            ) : (
+                              <span className="text-xs whitespace-nowrap" style={{ color: "var(--color-texto-sec)" }}>
+                                No disponible
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {proyectosFiltrados.length === 0 && (
+              <p className="text-center py-10" style={{ color: "var(--color-texto-sec)" }}>
+                No se encontraron proyectos con los filtros seleccionados.
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </section>
