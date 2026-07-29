@@ -1,9 +1,32 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
-import { submitVoluntario } from "@/app/actions/voluntario";
+import { useState, useEffect, useTransition, useRef } from "react";
+import { enviarVoluntario, type VoluntarioState } from "@/actions/voluntario";
 
-// Función de validación en cliente
+// ✅ Constantes de validación
+const VALIDACIONES = {
+  // 📧 Email
+  email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+
+  // 📞 Teléfono argentino
+  telefono:
+    /^(?:(?:\(?(?:0?11|0?[1-9][0-9]{2})\)?[\s-]?)?(?:15)?[\s-]?[0-9]{7,8}|[0-9]{7,10})$/,
+
+  // 👤 Nombre (solo letras y espacios)
+  nombre: /^[a-zA-ZáéíóúñÑüÜ\s]+$/,
+
+  // 🛡️ Patrones de spam
+  spam: [
+    /http[s]?:\/\//i,
+    /www\./i,
+    /gana\s+dinero/i,
+    /oferta\s+limitada/i,
+    /click\s+aquí/i,
+    /visita\s+mi\s+sitio/i,
+  ],
+};
+
+// Función de validación en cliente mejorada
 const validateForm = (formData: FormData) => {
   const nombre = formData.get("nombre")?.toString().trim() || "";
   const email = formData.get("email")?.toString().trim() || "";
@@ -12,29 +35,60 @@ const validateForm = (formData: FormData) => {
 
   const errors: Record<string, string> = {};
 
+  // 👤 Validación de nombre
   if (!nombre || nombre.length < 2) {
     errors.nombre = "El nombre es requerido (mínimo 2 caracteres)";
+  } else if (!VALIDACIONES.nombre.test(nombre)) {
+    errors.nombre = "El nombre solo puede contener letras y espacios";
+  } else if (nombre.length > 100) {
+    errors.nombre = "El nombre no puede superar los 100 caracteres";
   }
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errors.email = "Email inválido";
+
+  // 📧 Validación de email
+  if (!email) {
+    errors.email = "El email es requerido";
+  } else if (!VALIDACIONES.email.test(email)) {
+    errors.email = "Email inválido. Usá formato: nombre@dominio.com";
   }
-  if (telefono && !/^[\d\s\-+()]{7,20}$/.test(telefono)) {
-    errors.telefono = "Teléfono inválido";
+
+  // 📞 Validación de teléfono (opcional pero con formato)
+  if (telefono) {
+    const telefonoLimpio = telefono.replace(/\s/g, "");
+    if (!VALIDACIONES.telefono.test(telefonoLimpio)) {
+      errors.telefono =
+        "Teléfono inválido. Usá formato: 11 1234-5678 o similar";
+    }
   }
-  if (mensaje && mensaje.length > 500) {
-    errors.mensaje = "El mensaje no puede superar los 500 caracteres";
+
+  // 💬 Validación de mensaje
+  if (mensaje) {
+    if (mensaje.length > 500) {
+      errors.mensaje = "El mensaje no puede superar los 500 caracteres";
+    } else if (VALIDACIONES.spam.some((pattern) => pattern.test(mensaje))) {
+      errors.mensaje =
+        "El mensaje contiene contenido sospechoso. Por favor, revisá tu texto.";
+    }
   }
 
   return errors;
 };
 
+const initialState: VoluntarioState = {
+  errors: {},
+  message: "",
+  success: false,
+};
+
 export default function Voluntariado() {
-  // Estados del componente
+  // ✅ Todos los estados declarados correctamente
   const [enviando, setEnviando] = useState(false);
   const [mensaje, setMensaje] = useState("");
   const [modo, setModo] = useState("institucional");
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
+
+  // ✅ Referencia al formulario
+  const formRef = useRef<HTMLFormElement>(null);
 
   // Detectar cambios de modo (institucional/campaña)
   useEffect(() => {
@@ -60,7 +114,7 @@ export default function Voluntariado() {
 
     const formData = new FormData(e.currentTarget);
 
-    // Validación en cliente
+    // ✅ Validación en cliente
     const validationErrors = validateForm(formData);
     if (Object.keys(validationErrors).length > 0) {
       setErrores(validationErrors);
@@ -71,17 +125,35 @@ export default function Voluntariado() {
 
     startTransition(async () => {
       try {
-        const result = await submitVoluntario(formData);
+        // ✅ Usar la función correcta con estado inicial
+        const result = await enviarVoluntario(initialState, formData);
 
         if (result.success) {
           setMensaje(
             `✅ ${result.message || "¡Gracias por sumarte! Tus datos fueron enviados correctamente."}`,
           );
-          e.currentTarget.reset();
+
+          // ✅ Usar la referencia al formulario para resetear
+          if (formRef.current) {
+            formRef.current.reset();
+          }
+
           setTimeout(() => setMensaje(""), 5000);
         } else {
+          // ✅ Mostrar errores del servidor si existen
+          if (result.errors) {
+            const serverErrors: Record<string, string> = {};
+            Object.keys(result.errors).forEach((key) => {
+              const errorMessages =
+                result.errors?.[key as keyof typeof result.errors];
+              if (Array.isArray(errorMessages) && errorMessages.length > 0) {
+                serverErrors[key] = errorMessages[0];
+              }
+            });
+            setErrores(serverErrors);
+          }
           setMensaje(
-            `❌ ${result.error || "No se pudo enviar. Intentá nuevamente."}`,
+            `❌ ${result.message || "No se pudo enviar. Intentá nuevamente."}`,
           );
         }
       } catch (error) {
@@ -131,6 +203,7 @@ export default function Voluntariado() {
           {/* Columna derecha: formulario */}
           <div className="lg:col-span-3">
             <form
+              ref={formRef} // ✅ Asignar la referencia al formulario
               onSubmit={handleSubmit}
               className="reveal reveal-delay-1 flex flex-col gap-4 relative bg-(--color-fondo-alt) p-6 md:p-8 rounded-2xl shadow-lg border border-(--color-borde) t-modo"
             >
@@ -155,7 +228,7 @@ export default function Voluntariado() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="form-group flex flex-col gap-1.5">
+                <div className="form-group flex flex-col gap-1.5 relative">
                   <input
                     type="text"
                     id="volNombre"
@@ -168,8 +241,7 @@ export default function Voluntariado() {
                   />
                   <label
                     htmlFor="volNombre"
-                    className="text-xs font-medium px-1 -mt-1"
-                    style={{ color: "var(--color-texto-sec)" }}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-(--color-texto-sec) transition-all duration-300 pointer-events-none peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-[0.65rem] peer-focus:font-semibold peer-focus:text-(--color-destacado) peer-focus:bg-(--color-fondo) peer-focus:px-1 peer-not-placeholder-shown:top-0 peer-not-placeholder-shown:-translate-y-1/2 peer-not-placeholder-shown:text-[0.65rem] peer-not-placeholder-shown:font-semibold peer-not-placeholder-shown:text-(--color-destacado) peer-not-placeholder-shown:bg-(--color-fondo) peer-not-placeholder-shown:px-1"
                   >
                     Nombre completo *
                   </label>
@@ -179,7 +251,7 @@ export default function Voluntariado() {
                     </p>
                   )}
                 </div>
-                <div className="form-group flex flex-col gap-1.5">
+                <div className="form-group flex flex-col gap-1.5 relative">
                   <input
                     type="email"
                     id="volEmail"
@@ -191,8 +263,7 @@ export default function Voluntariado() {
                   />
                   <label
                     htmlFor="volEmail"
-                    className="text-xs font-medium px-1 -mt-1"
-                    style={{ color: "var(--color-texto-sec)" }}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-(--color-texto-sec) transition-all duration-300 pointer-events-none peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-[0.65rem] peer-focus:font-semibold peer-focus:text-(--color-destacado) peer-focus:bg-(--color-fondo) peer-focus:px-1 peer-not-placeholder-shown:top-0 peer-not-placeholder-shown:-translate-y-1/2 peer-not-placeholder-shown:text-[0.65rem] peer-not-placeholder-shown:font-semibold peer-not-placeholder-shown:text-(--color-destacado) peer-not-placeholder-shown:bg-(--color-fondo) peer-not-placeholder-shown:px-1"
                   >
                     Email *
                   </label>
@@ -204,7 +275,7 @@ export default function Voluntariado() {
                 </div>
               </div>
 
-              <div className="form-group flex flex-col gap-1.5">
+              <div className="form-group flex flex-col gap-1.5 relative">
                 <input
                   type="tel"
                   id="volTelefono"
@@ -216,8 +287,7 @@ export default function Voluntariado() {
                 />
                 <label
                   htmlFor="volTelefono"
-                  className="text-xs font-medium px-1 -mt-1"
-                  style={{ color: "var(--color-texto-sec)" }}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-(--color-texto-sec) transition-all duration-300 pointer-events-none peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-[0.65rem] peer-focus:font-semibold peer-focus:text-(--color-destacado) peer-focus:bg-(--color-fondo) peer-focus:px-1 peer-not-placeholder-shown:top-0 peer-not-placeholder-shown:-translate-y-1/2 peer-not-placeholder-shown:text-[0.65rem] peer-not-placeholder-shown:font-semibold peer-not-placeholder-shown:text-(--color-destacado) peer-not-placeholder-shown:bg-(--color-fondo) peer-not-placeholder-shown:px-1"
                 >
                   Teléfono
                 </label>
@@ -228,7 +298,7 @@ export default function Voluntariado() {
                 )}
               </div>
 
-              <div className="form-group flex flex-col gap-1.5">
+              <div className="form-group flex flex-col gap-1.5 relative">
                 <textarea
                   id="volMensaje"
                   name="mensaje"
@@ -240,8 +310,7 @@ export default function Voluntariado() {
                 />
                 <label
                   htmlFor="volMensaje"
-                  className="text-xs font-medium px-1 -mt-1"
-                  style={{ color: "var(--color-texto-sec)" }}
+                  className="absolute left-4 top-4 text-sm text-(--color-texto-sec) transition-all duration-300 pointer-events-none peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-[0.65rem] peer-focus:font-semibold peer-focus:text-(--color-destacado) peer-focus:bg-(--color-fondo) peer-focus:px-1 peer-not-placeholder-shown:top-0 peer-not-placeholder-shown:-translate-y-1/2 peer-not-placeholder-shown:text-[0.65rem] peer-not-placeholder-shown:font-semibold peer-not-placeholder-shown:text-(--color-destacado) peer-not-placeholder-shown:bg-(--color-fondo) peer-not-placeholder-shown:px-1"
                 >
                   ¿En qué actividad te gustaría participar? (máx. 500
                   caracteres)

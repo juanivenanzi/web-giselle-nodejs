@@ -4,7 +4,7 @@ import { z } from "zod";
 import { google } from "googleapis";
 
 // --- Esquema de validación ---
-const contactoSchema = z.object({
+const voluntarioSchema = z.object({
   nombre: z
     .string()
     .min(2, "El nombre es requerido (mínimo 2 caracteres)")
@@ -17,20 +17,19 @@ const contactoSchema = z.object({
       (val) => !val || /^[\d\s\-+()]{7,20}$/.test(val),
       "Teléfono inválido (mínimo 7 dígitos)",
     ),
-  asunto: z.string().min(1, "Debes seleccionar un asunto"),
   mensaje: z
     .string()
-    .min(10, "El mensaje debe tener al menos 10 caracteres")
-    .max(1000, "El mensaje no puede superar los 1000 caracteres"),
+    .max(500, "El mensaje no puede superar los 500 caracteres")
+    .optional(),
   timestamp: z.string().optional(),
 });
 
 // ✅ Tipo inferido del esquema (EXPORTADO)
-export type ContactoData = z.infer<typeof contactoSchema>;
+export type VoluntarioData = z.infer<typeof voluntarioSchema>;
 
 // --- Tipo de respuesta (EXPORTADO) ---
-export type ContactoState = {
-  errors?: Partial<Record<keyof ContactoData, string[]>>;
+export type VoluntarioState = {
+  errors?: Partial<Record<keyof VoluntarioData, string[]>>;
   message?: string;
   success?: boolean;
 };
@@ -80,8 +79,8 @@ async function autoResizeColumns(
   }
 }
 
-// --- Función para guardar en Google Sheets (Contactos) ---
-async function saveContactoToSheets(data: ContactoData) {
+// --- Función para guardar en Google Sheets (Voluntarios) ---
+async function saveVoluntarioToSheets(data: VoluntarioData) {
   try {
     const auth = new google.auth.JWT({
       email: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
@@ -102,7 +101,7 @@ async function saveContactoToSheets(data: ContactoData) {
     // 1. Escribir los datos (con columna de estado)
     const response = await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: "Contactos!A:H",
+      range: "Voluntarios!A:G",
       valueInputOption: "USER_ENTERED",
       insertDataOption: "INSERT_ROWS",
       requestBody: {
@@ -113,8 +112,7 @@ async function saveContactoToSheets(data: ContactoData) {
             data.nombre,
             data.email,
             data.telefono || "",
-            data.asunto,
-            data.mensaje,
+            data.mensaje || "",
             "Pendiente", // Estado inicial
           ],
         ],
@@ -125,16 +123,16 @@ async function saveContactoToSheets(data: ContactoData) {
       throw new Error("No se recibió respuesta de Google Sheets");
     }
 
-    // 2. Ajustar automáticamente el ancho de las columnas (8 columnas: A-H)
-    await autoResizeColumns(sheets, spreadsheetId, "Contactos", 8);
+    // 2. Ajustar automáticamente el ancho de las columnas (7 columnas: A-G)
+    await autoResizeColumns(sheets, spreadsheetId, "Voluntarios", 7);
 
     console.log(
-      "✅ Datos de contacto guardados en Google Sheets:",
+      "✅ Datos de voluntario guardados en Google Sheets:",
       response.data,
     );
     return response.data;
   } catch (error) {
-    console.error("Error guardando contacto en Google Sheets:", error);
+    console.error("Error guardando voluntario en Google Sheets:", error);
     throw new Error(
       `Error al guardar en Google Sheets: ${error instanceof Error ? error.message : "Error desconocido"}`,
     );
@@ -142,10 +140,10 @@ async function saveContactoToSheets(data: ContactoData) {
 }
 
 // --- Server Action (EXPORTADA) ---
-export async function enviarContacto(
-  prevState: ContactoState,
+export async function enviarVoluntario(
+  prevState: VoluntarioState,
   formData: FormData,
-): Promise<ContactoState> {
+): Promise<VoluntarioState> {
   try {
     // 1. Validar honeypot (anti-spam)
     const website = formData.get("website");
@@ -161,15 +159,14 @@ export async function enviarContacto(
       nombre: formData.get("nombre")?.toString().trim() || "",
       email: formData.get("email")?.toString().trim() || "",
       telefono: formData.get("telefono")?.toString().trim() || "",
-      asunto: formData.get("asunto")?.toString().trim() || "",
       mensaje: formData.get("mensaje")?.toString().trim() || "",
       timestamp: formData.get("timestamp")?.toString() || "",
     };
 
     // 3. Validar con Zod
-    let validatedData: ContactoData;
+    let validatedData: VoluntarioData;
     try {
-      validatedData = contactoSchema.parse(rawData);
+      validatedData = voluntarioSchema.parse(rawData);
     } catch (parseError) {
       if (parseError instanceof z.ZodError) {
         const errors: Record<string, string[]> = {};
@@ -200,14 +197,14 @@ export async function enviarContacto(
     }
 
     // 5. Guardar en Google Sheets
-    await saveContactoToSheets(validatedData);
+    await saveVoluntarioToSheets(validatedData);
 
     return {
       success: true,
-      message: "¡Tu mensaje fue enviado correctamente!",
+      message: "¡Tus datos fueron enviados correctamente!",
     };
   } catch (error) {
-    console.error("Error en enviarContacto:", error);
+    console.error("Error en enviarVoluntario:", error);
 
     if (error instanceof Error && error.message.includes("Google Sheets")) {
       return {
