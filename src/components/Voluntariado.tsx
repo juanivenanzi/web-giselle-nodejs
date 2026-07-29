@@ -128,7 +128,11 @@ export default function Voluntariado() {
               disabled={enviando}
               className="btn-voluntario inline-flex items-center justify-center px-8 py-3.5 rounded-full text-sm font-semibold shadow-md t-modo transition-all duration-300 hover:scale-105 hover:shadow-xl shrink-0"
             >
-              {enviando ? "Enviando..." : "Quiero ser voluntario/a"}
+              {enviando
+                ? "Enviando..."
+                : modo === "institucional"
+                  ? "Quiero ser voluntario/a"
+                  : "Enviar datos"}
             </button>
           </div>
           {mensaje && (

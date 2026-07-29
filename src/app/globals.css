@@ -970,7 +970,7 @@ html[data-tema="oscuro"] .gestion-card .btn-expediente {
 }
 
 /* ============================================================
-   BOTÓN VOLUNTARIADO - ESTILOS CORREGIDOS
+   BOTÓN VOLUNTARIADO - ESTILOS CORRECTOS
    ============================================================ */
 
 .btn-voluntario {
@@ -999,41 +999,6 @@ html[data-tema="oscuro"] .btn-voluntario {
 }
 
 html[data-tema="oscuro"] .btn-voluntario:hover {
-  background-color: var(--color-destacado) !important;
-  color: #ffffff !important;
-  border-color: var(--color-destacado) !important;
-}
-
-/* ============================================================
-   BOTÓN ENVIAR - ESTILOS CORREGIDOS
-   ============================================================ */
-
-.btn-enviar {
-  background-color: var(--color-texto);
-  color: #ffffff;
-  border: 2px solid var(--color-texto);
-  transition: all 0.3s ease;
-}
-
-.btn-enviar:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
-}
-
-.btn-enviar:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none !important;
-}
-
-/* Dark Mode: fondo blanco, borde blanco, texto azul */
-html[data-tema="oscuro"] .btn-enviar {
-  background-color: #ffffff !important;
-  color: var(--color-destacado) !important;
-  border: 2px solid #ffffff !important;
-}
-
-html[data-tema="oscuro"] .btn-enviar:hover {
   background-color: var(--color-destacado) !important;
   color: #ffffff !important;
   border-color: var(--color-destacado) !important;
