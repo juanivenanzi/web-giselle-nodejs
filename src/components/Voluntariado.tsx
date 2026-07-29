@@ -53,7 +53,7 @@ const validateForm = (formData: FormData) => {
     const telefonoLimpio = telefono.replace(/\s/g, "");
     if (!VALIDACIONES.telefono.test(telefonoLimpio)) {
       errors.telefono =
-        "Teléfono inválido. Usá formato: 11 1234-5678 o similar";
+        "Teléfono inválido. Usá solo números (Ejemplo: 3425478996)";
     }
   }
 
@@ -286,7 +286,7 @@ export default function Voluntariado() {
                   htmlFor="volTelefono"
                   className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-(--color-texto-sec) transition-all duration-300 pointer-events-none peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-[0.65rem] peer-focus:font-semibold peer-focus:text-(--color-destacado) peer-focus:bg-(--color-fondo) peer-focus:px-1 peer-not-placeholder-shown:top-0 peer-not-placeholder-shown:-translate-y-1/2 peer-not-placeholder-shown:text-[0.65rem] peer-not-placeholder-shown:font-semibold peer-not-placeholder-shown:text-(--color-destacado) peer-not-placeholder-shown:bg-(--color-fondo) peer-not-placeholder-shown:px-1"
                 >
-                  Teléfono
+                  Teléfono (Ejemplo: 3425478996)
                 </label>
                 {errores.telefono && (
                   <p id="telefono-error" className="text-xs text-red-500 mt-1">
