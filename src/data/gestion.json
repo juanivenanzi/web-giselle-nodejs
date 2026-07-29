@@ -1,0 +1,298 @@
+[
+  {
+    "fecha": "25/03/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Mejorado petreo y abobedado calle Azcuenaga y Obispo Gelabert",
+    "descripcion": "Pedido de reparación.",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "25/03/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Desmalezado, limpieza, recoleccion de microbasurales calles Valdez y Roveran",
+    "descripcion": "Solicitud de desmalezado.",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "25/03/2022",
+    "año": 2022,
+    "tipo": "pedido-informes",
+    "titulo": "Pedido de informe sobre camaras de videovigilancia",
+    "descripcion": "Solicitud de información sobre las camaras de seguridad",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "25/03/2022",
+    "año": 2022,
+    "tipo": "ordenanza",
+    "titulo": "Ojos en alerta",
+    "descripcion": "Ojos en alerta es un proyecto de seguridad donde se busca prevenir situaciones de violencia a traves de la participación vecinal, donde los vecinos pueden denunciar a travesde whatsapp",
+    "estado": "no-aprobada",
+    "enlacePdf": "https://drive.google.com/file/d/1SmGwam4n62SPcWAmWh8Us5jOvbW1IEE_/view?usp=sharing"
+  },
+  {
+    "fecha": "25/03/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Mural Conmemorativo a los Caidos y Veteranos de Malvinas",
+    "descripcion": "Se pide al ejecutivo la realización de un mural en Honor a los Heroes de Malvinas",
+    "estado": "aprobada",
+    "enlacePdf": "https://drive.google.com/file/d/6example_res_2026"
+  },
+  {
+    "fecha": "24/05/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Diversas tareas en Calle Cordoba, Gral. Lopez. Calle Derqui 2685",
+    "descripcion": "Tareas de arreglo en la ciudad.",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "24/05/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Cerramiento de la pista Municipal de examen de conducir . Tucuman y 4 de enero.",
+    "descripcion": "",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "24/05/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Diversas tareas en Pasaje Misiones entre Centenario e H. Irigoyen",
+    "descripcion": "",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "24/05/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Diversas tareas en calle Gaboto entre Av. Lujan e H. Irigoyen",
+    "descripcion": "",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "24/05/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Factibilidad tecnica. Talleres de capacitacion para merenderos y copas de leche.",
+    "descripcion": "",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "24/05/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Mesa de trabajo para abordar Ojos en Alerta.",
+    "descripcion": "",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "22/04/2022",
+    "año": 2022,
+    "tipo": "pedido-informes",
+    "titulo": "Pedido de informe respecto Canje Ecologico",
+    "descripcion": "Se solicitó información al ejecutivo sobre el uso de fondos en el programa «Eco Canje»",
+    "estado": "aprobada",
+    "enlacePdf": "https://docs.google.com/document/d/1B3YhBKIspTpnsjo2SSmxN436EvznkGoCsr-ov4hlyKE/edit?usp=sharing"
+  },
+  {
+    "fecha": "22/04/2022",
+    "año": 2022,
+    "tipo": "ordenanza",
+    "titulo": "Crease Sistema de Videovigilancia denominado Anillo Digital",
+    "descripcion": "El Programa Anillo Digital se centra en camaras lectoras de patentes en los accesos a la ciudad y las principales vias de circulacón.",
+    "estado": "no-aprobada",
+    "enlacePdf": "https://docs.google.com/document/d/1aAPqP0ItOOUcZTw0i_GksAWewi6ZJF9Kho225ciGyNM/edit?usp=sharing"
+  },
+  {
+    "fecha": "22/04/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Reparacion de reductores de velocidad Candiotti entre Rioja y Hernandarias",
+    "descripcion": "Arreglo de la ciudad",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "22/04/2022",
+    "año": 2022,
+    "tipo": "pedido-informes",
+    "titulo": "Pedido de informe respecto Bomberos Zapadores de Nuestra Ciudad",
+    "descripcion": "Se solicita información al ejecutivo en relación a la dotación de bomberos zapadores asentada en nuestra ciudad",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "22/04/2022",
+    "año": 2022,
+    "tipo": "pedido-informes",
+    "titulo": "Pedido de informe sobre Cunetas Malvinas Arg, Gaboto Vecinal San Martin",
+    "descripcion": "Se solicita información al ejecutivo en relación al estado de las cunetas de calle Malvinas Argentinas",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "22/04/2022",
+    "año": 2022,
+    "tipo": "pedido-informes",
+    "titulo": "Pedido de informe respecto a tanques de Almacenamiento de Agua d la Ciudad",
+    "descripcion": "Se solicita información sobre los resultados de salubridad del agua de los tanques",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "12/04/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Trabajos de mantenimiento calles abovedado y nivelado Cibils y Mosconi",
+    "descripcion": "Tareas de reparación en la ciudad",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "12/04/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Reparacion de portones y accesos, Estacion Elevadora Liq Cloa. Est. Zaspe",
+    "descripcion": "Tareas de reparación de un porton en un edificio municipal",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "12/04/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Rep de puerta de acceso y predio Tanque de almac de agua H.Irig/Maletti",
+    "descripcion": "Tareas de reparación de un porton en un edificio municipal",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "12/04/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Pintura y arreglo reductor de vel + colocacion sem Mitre entre Mena y Gral Lopez",
+    "descripcion": "Arreglo de la ciudad",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "12/04/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Pintura y arreglo reductor de velocidad Calle Hip.Irigoyen 3998",
+    "descripcion": "Arreglo de la ciudad",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "12/04/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Instalacion estaciones solares para carga de dispositivos mobiles en la ciudad",
+    "descripcion": "Pedido al Ejecutivo para instalar estaciones solares de carga en distintos puntos de la ciudad.",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "10/05/2022",
+    "año": 2022,
+    "tipo": "declaracion",
+    "titulo": "Declaracion por Aniversario de Club Alianza de nuestra Ciudad",
+    "descripcion": "Se declara de interés municipal un nuevo aniversario del Club Alianza",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "10/05/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Reparacion del Pavimento Flexible en el Acceso Norte",
+    "descripcion": "Se solicita al ejecutivo que repare un tramo del Acceso Norte",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "10/05/2022",
+    "año": 2022,
+    "tipo": "ordenanza",
+    "titulo": "Programa de Talleres de Preparacion al Parto y Primeros Auxilios Pediatricos",
+    "descripcion": "El objetivo del Programa es brindar charlas informativas a embarazadas y a su\ngrupo de apoyo sobre las instancias del trabajo de parto, alumbramiento, puerperio y primeros\ncuidados y auxilios del recién nacido, preparando y acompañando a la mujer para el momento de\nla maternidad",
+    "estado": "aprobada",
+    "enlacePdf": "https://digesto.concejosantotome.gob.ar/normas/3555-2022%2012.214%20Programa%20Talleres%20Preparación%20Parto%20y%20Primeros%20Auxilios%20Pediátricos.pdf"
+  },
+  {
+    "fecha": "10/05/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Traslado de la Oficina de Zoonosis Urbana y Rural. Uni Movil. Sto, Tomas Aquino",
+    "descripcion": "",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "10/05/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Tareas en el sector comprendido Calles Rep, de Chile, V. Sarsfiel, J.J. Paso",
+    "descripcion": "Tareas de arreglo en la ciudad.",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "10/05/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Diversos Trabajos en Calle Rep. de Chile entre Acceso Norte y Azcuenaga",
+    "descripcion": "Tareas de arreglo en la ciudad.",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "10/03/2022",
+    "año": 2022,
+    "tipo": "resolucion",
+    "titulo": "Mujeres que hicieron historia",
+    "descripcion": "Reconocimiento a distintas mujeres que fueron importantes para la historia del pais.",
+    "estado": "aprobada",
+    "enlacePdf": "https://docs.google.com/document/d/14fqPeowrUXAhua2jY5dt_emLSmsv-peFwmGrkHis5oQ/edit?usp=sharing"
+  },
+  {
+    "fecha": "07/06/2022",
+    "año": 2022,
+    "tipo": "ordenanza",
+    "titulo": "Crea Registro de Promocion de Emprendedores Alimentarios Locales",
+    "descripcion": "",
+    "estado": "aprobada",
+    "enlacePdf": "https://digesto.concejosantotome.gob.ar/normas/3527-2022%20Registro%20de%20Promoción%20de%20Emprendimientos%20Locales%20Expte%2012.303%20Modifica%20Ord%202667-08.pdf"
+  },
+  {
+    "fecha": "07/06/2022",
+    "año": 2022,
+    "tipo": "resolucion",
+    "titulo": "Cumplimiento a la ordenanza 3293/18 recipientes con bolsas para mascotas",
+    "descripcion": "",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "07/06/2022",
+    "año": 2022,
+    "tipo": "ordenanza",
+    "titulo": "Mapa Mascotero para infomar establecimientos amigos de mascotas",
+    "descripcion": "",
+    "estado": "aprobada",
+    "enlacePdf": "https://digesto.concejosantotome.gob.ar/normas/3523-2022%20Locales%20Amigos%20de%20tus%20Mascotas%20-%20Expte%2012.305.pdf"
+  },
+  {
+    "fecha": "07/06/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Permiso para extraccion de tierras en inmuebles de privados",
+    "descripcion": "",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "07/06/2022",
+    "año": 2022,
+    "tipo": "comunicacion",
+    "titulo": "Mejoramiento Calle Baleares",
+    "descripcion": "",
+    "estado": "aprobada"
+  },
+  {
+    "fecha": "07/06/2022",
+    "año": 2022,
+    "tipo": "pedido-informes",
+    "titulo": "Datos sobre depositos Fitosanitarios de la ciudad",
+    "descripcion": "",
+    "estado": "aprobada"
+  }
+]

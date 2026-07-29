@@ -1,0 +1,721 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Setup automático para Next.js + Tailwind CSS + TypeScript + Google Sheets API
+Proyecto: Giselle Miravete - Concejal de Santo Tomé
+"""
+
+import os
+import subprocess
+import sys
+import shutil
+from pathlib import Path
+
+# ============================================================
+# CONFIGURACIÓN
+# ============================================================
+
+PROJECT_NAME = "giselle-miravete"
+PROJECT_DIR = Path(__file__).parent.absolute()
+
+# ============================================================
+# FUNCIONES DE AYUDA
+# ============================================================
+
+def run_command(cmd, cwd=None):
+    """Ejecuta un comando en la terminal y muestra la salida"""
+    print(f"\n🔄 Ejecutando: {cmd}")
+    result = subprocess.run(cmd, shell=True, cwd=cwd, text=True)
+    if result.returncode != 0:
+        print(f"⚠️  El comando tuvo un error (código {result.returncode})")
+        return False
+    return True
+
+def create_file(filepath, content):
+    """Crea un archivo con el contenido especificado"""
+    filepath = PROJECT_DIR / filepath
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write(content)
+    print(f"✅ Creado: {filepath}")
+
+def copy_env_file():
+    """Copia el archivo .env desde la carpeta anterior si existe"""
+    old_env = Path("E:/giselle/web-giselle1 (2)/.env")
+    new_env = PROJECT_DIR / ".env"
+    
+    if old_env.exists():
+        shutil.copy2(old_env, new_env)
+        print(f"✅ .env copiado desde: {old_env}")
+        return True
+    else:
+        print(f"⚠️  No se encontró .env en {old_env}")
+        print("💡 Creando .env de ejemplo...")
+        create_file(".env", """# Google Sheets API
+GOOGLE_SHEETS_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASC...\n-----END PRIVATE KEY-----\n"
+GOOGLE_SHEETS_CLIENT_EMAIL="giselle-gestion-sa@giselle-miravete-web.iam.gserviceaccount.com"
+GOOGLE_SHEETS_SPREADSHEET_ID="1cb4H4nc5Y9LRCmrtO80tlo4iR7ocmEbMcs-s5SL7TPQ"
+GOOGLE_SHEETS_RANGE="Gestion!A:G"
+""")
+        return False
+
+# ============================================================
+# CREACIÓN DE ARCHIVOS
+# ============================================================
+
+def create_package_json():
+    content = """{
+  "name": "giselle-miravete",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "fetch-data": "tsx scripts/fetch-gestion-data.ts",
+    "update-data": "tsx scripts/update-gestion-data.ts"
+  },
+  "dependencies": {
+    "next": "15.1.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "googleapis": "^173.0.0",
+    "dotenv": "^16.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "tailwindcss": "^3.4.17",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0",
+    "typescript": "^5.0.0",
+    "tsx": "^4.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "15.1.4"
+  }
+}"""
+    create_file("package.json", content)
+
+def create_tsconfig():
+    content = """{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}"""
+    create_file("tsconfig.json", content)
+
+def create_tailwind_config():
+    content = """/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}"""
+    create_file("tailwind.config.js", content)
+
+def create_postcss_config():
+    content = """module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}"""
+    create_file("postcss.config.js", content)
+
+def create_next_config():
+    content = """/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  images: {
+    domains: ['picsum.photos'],
+  },
+}
+
+module.exports = nextConfig"""
+    create_file("next.config.js", content)
+
+def create_global_css():
+    content = """@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   PALETAS DE COLORES
+   ============================================================ */
+
+:root {
+  --color-primario: #1e3a5f;
+  --color-primario-dark: #0f2744;
+  --color-destacado: #74acdf;
+  --color-fondo: #ffffff;
+  --color-fondo-alt: #f8f9fa;
+  --color-texto: #1a1a2e;
+  --color-texto-sec: #374151;
+  --color-borde: #cbd5e1;
+}
+
+[data-tema="oscuro"] {
+  --color-fondo: #0f172a;
+  --color-fondo-alt: #1e293b;
+  --color-texto: #f1f5f9;
+  --color-texto-sec: #cbd5e1;
+  --color-borde: #475569;
+}
+
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
+
+.t-modo {
+  transition: background-color 0.6s ease, color 0.6s ease, border-color 0.6s ease;
+}
+
+.font-head {
+  font-family: "DM Serif Display", Georgia, serif;
+}
+
+.font-body {
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* ============================================================
+   BASE GLOBAL
+   ============================================================ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* ============================================================
+   SKIP LINK - ACCESIBILIDAD
+   ============================================================ */
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  background-color: var(--color-primario);
+  color: #ffffff;
+  z-index: 9999;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}"""
+    create_file("src/app/globals.css", content)
+
+def create_layout():
+    content = """import type { Metadata } from 'next'
+import { Inter, DM_Serif_Display } from 'next/font/google'
+import './globals.css'
+import Nav from '@/components/Nav'
+import Footer from '@/components/Footer'
+
+const inter = Inter({ subsets: ['latin'] })
+const dmSerif = DM_Serif_Display({ subsets: ['latin'], weight: ['400'] })
+
+export const metadata: Metadata = {
+  title: 'La Libertad Avanza — Santo Tomé',
+  description: 'Sitio oficial de Giselle Miravete, Concejal de Santo Tomé, Santa Fe.',
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="es" data-modo="institucional" data-tema="claro">
+      <body className={`${inter.className} bg-(--color-fondo) text-(--color-texto)`}>
+        <a href="#inicio" className="skip-link">Saltar al contenido</a>
+        <Nav />
+        <main>{children}</main>
+        <Footer />
+      </body>
+    </html>
+  )
+}"""
+    create_file("src/app/layout.tsx", content)
+
+def create_page():
+    content = """import Hero from '@/components/Hero'
+import SobreMi from '@/components/SobreMi'
+import Equipo from '@/components/Equipo'
+import Pilares from '@/components/Pilares'
+import Voluntariado from '@/components/Voluntariado'
+import Contacto from '@/components/Contacto'
+
+export default function Home() {
+  return (
+    <>
+      <Hero />
+      <SobreMi />
+      <Equipo />
+      <Pilares />
+      <Voluntariado />
+      <Contacto />
+    </>
+  )
+}"""
+    create_file("src/app/page.tsx", content)
+
+def create_proyectos_page():
+    content = """'use client'
+
+import { useState, useEffect } from 'react'
+
+type GestionItem = {
+  fecha: string
+  año: number
+  tipo: string
+  titulo: string
+  descripcion: string
+  estado: string
+  enlacePdf?: string
+}
+
+export default function ProyectosPage() {
+  const [proyectos, setProyectos] = useState<GestionItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [filtro, setFiltro] = useState({
+    anio: 'todos',
+    tipo: 'todos',
+    estado: 'todos'
+  })
+
+  useEffect(() => {
+    async function cargarDatos() {
+      try {
+        const res = await fetch('/api/gestion')
+        const data = await res.json()
+        setProyectos(data)
+      } catch (error) {
+        console.error('Error cargando proyectos:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    cargarDatos()
+  }, [])
+
+  const tipos = [...new Set(proyectos.map(p => p.tipo))].filter(t => t !== 'sin-tipo')
+  const estados = [...new Set(proyectos.map(p => p.estado))].filter(e => e !== 'sin-estado')
+  const años = [...new Set(proyectos.map(p => p.año))].filter(a => a > 0).sort((a,b) => b-a)
+
+  const proyectosFiltrados = proyectos.filter(p => {
+    const matchAnio = filtro.anio === 'todos' || p.año === Number(filtro.anio)
+    const matchTipo = filtro.tipo === 'todos' || p.tipo === filtro.tipo
+    const matchEstado = filtro.estado === 'todos' || p.estado === filtro.estado
+    return matchAnio && matchTipo && matchEstado
+  })
+
+  return (
+    <section className="pt-36 pb-25 px-8 t-modo" style={{ backgroundColor: 'var(--color-fondo)' }}>
+      <div className="max-w-300 mx-auto">
+        <div className="text-center mb-14">
+          <div className="pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-[0.1em] uppercase mb-3">
+            Gestión
+          </div>
+          <h1 className="font-head text-4xl lg:text-5xl font-semibold" style={{ color: 'var(--color-texto)' }}>
+            Mi trabajo en el Concejo
+          </h1>
+          <p className="text-(--color-texto-sec) max-w-xl mx-auto mt-3">
+            Probá combinar los filtros para encontrar lo que buscás.
+          </p>
+        </div>
+
+        {/* Filtros */}
+        <div className="filtros-container">
+          <div className="filtro-grupo">
+            <span className="filtro-label"><i className="fas fa-calendar-alt"></i> Año</span>
+            <div className="filtro-opciones">
+              <button className={`filtro-btn ${filtro.anio === 'todos' ? 'active' : ''}`} onClick={() => setFiltro({...filtro, anio: 'todos'})}>Todos</button>
+              {años.map(a => (
+                <button key={a} className={`filtro-btn ${filtro.anio === String(a) ? 'active' : ''}`} onClick={() => setFiltro({...filtro, anio: String(a)})}>{a}</button>
+              ))}
+            </div>
+          </div>
+
+          <div className="filtro-grupo">
+            <span className="filtro-label"><i className="fas fa-folder-open"></i> Tipo</span>
+            <div className="filtro-opciones">
+              <button className={`filtro-btn ${filtro.tipo === 'todos' ? 'active' : ''}`} onClick={() => setFiltro({...filtro, tipo: 'todos'})}>Todos</button>
+              {tipos.map(t => (
+                <button key={t} className={`filtro-btn ${filtro.tipo === t ? 'active' : ''}`} onClick={() => setFiltro({...filtro, tipo: t})}>{t}</button>
+              ))}
+            </div>
+          </div>
+
+          <div className="filtro-grupo">
+            <span className="filtro-label"><i className="fas fa-tag"></i> Estado</span>
+            <div className="filtro-opciones">
+              <button className={`filtro-btn ${filtro.estado === 'todos' ? 'active' : ''}`} onClick={() => setFiltro({...filtro, estado: 'todos'})}>Todos</button>
+              {estados.map(e => (
+                <button key={e} className={`filtro-btn ${filtro.estado === e ? 'active' : ''}`} onClick={() => setFiltro({...filtro, estado: e})}>{e}</button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="contador-resultados">
+          <i className="fas fa-file-alt"></i>
+          <strong>{proyectosFiltrados.length}</strong> proyectos encontrados
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+          {proyectosFiltrados.map((item, i) => (
+            <TarjetaGestion key={i} {...item} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ============================================================
+// COMPONENTE TARJETA
+// ============================================================
+
+function TarjetaGestion({ tipo, titulo, descripcion, estado, fecha, enlacePdf }: GestionItem) {
+  const tieneEnlace = enlacePdf && enlacePdf !== '' && enlacePdf !== '#'
+
+  return (
+    <article className="gestion-card" style={{ backgroundColor: 'var(--color-fondo-alt)', borderColor: 'var(--color-borde)' }}>
+      <div className="flex items-center justify-between mb-3 gap-2">
+        <span className="gestion-tipo text-[0.6rem] font-semibold px-3 py-1 rounded-full tracking-wider uppercase" style={{ backgroundColor: 'var(--color-primario)', color: '#ffffff' }}>
+          {tipo}
+        </span>
+        <span className="gestion-estado text-[0.68rem] font-semibold px-3 py-1 rounded-full tracking-wider uppercase flex items-center gap-1.5">
+          <i className={`fas fa-check text-white text-[1rem]`}></i>
+          {estado}
+        </span>
+      </div>
+      <p className="text-sm mb-3 font-bold tracking-wide flex items-center gap-2" style={{ color: 'var(--color-texto)' }}>
+        <i className="fas fa-calendar-day text-xs"></i> {fecha}
+      </p>
+      <h3 className="font-head text-lg font-semibold mb-2" style={{ color: 'var(--color-texto)' }}>
+        {titulo}
+      </h3>
+      <p className="text-[0.9rem] leading-relaxed font-semibold flex-1" style={{ color: 'var(--color-texto-sec)' }}>
+        {descripcion}
+      </p>
+      {tieneEnlace && (
+        <a href={enlacePdf} target="_blank" rel="noopener noreferrer" className="btn-expediente inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-semibold shadow-md t-modo transition-all duration-300 hover:scale-105 hover:shadow-xl w-fit mt-4" style={{ backgroundColor: 'var(--color-texto)', color: '#ffffff' }}>
+          <i className="fas fa-file-pdf" /> Ver expediente
+        </a>
+      )}
+    </article>
+  )
+}
+"""
+    create_file("src/app/proyectos/page.tsx", content)
+
+def create_api_route():
+    content = """import { NextResponse } from 'next/server'
+import { google } from 'googleapis'
+
+// ============================================================
+// CONFIGURACIÓN
+// ============================================================
+
+const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_SPREADSHEET_ID
+const RANGE = process.env.GOOGLE_SHEETS_RANGE || 'Gestion!A:G'
+const CLIENT_EMAIL = process.env.GOOGLE_SHEETS_CLIENT_EMAIL
+const PRIVATE_KEY = process.env.GOOGLE_SHEETS_PRIVATE_KEY
+
+// ============================================================
+// API ROUTE
+// ============================================================
+
+export async function GET() {
+  try {
+    // Validar variables de entorno
+    if (!SPREADSHEET_ID || !CLIENT_EMAIL || !PRIVATE_KEY) {
+      return NextResponse.json(
+        { error: 'Faltan variables de entorno' },
+        { status: 500 }
+      )
+    }
+
+    // Autenticación con Google Sheets
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email: CLIENT_EMAIL,
+        private_key: PRIVATE_KEY.replace(/\\\\n/g, '\\n'),
+      },
+      scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+    })
+
+    const sheets = google.sheets({ version: 'v4', auth })
+    
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: RANGE,
+    })
+
+    const rows = response.data.values || []
+    
+    if (rows.length < 2) {
+      return NextResponse.json(
+        { error: 'No hay datos disponibles' },
+        { status: 404 }
+      )
+    }
+
+    // Procesar datos
+    const data = rows.slice(1)
+      .filter(row => row.length > 0 && row.some(cell => cell?.toString().trim()))
+      .map(row => ({
+        fecha: row[0]?.toString().trim() || '',
+        año: parseInt(row[1]) || 0,
+        tipo: row[2]?.toString().trim().toLowerCase() || 'sin-tipo',
+        titulo: row[3]?.toString().trim() || 'Sin título',
+        descripcion: row[4]?.toString().trim() || '',
+        estado: row[5]?.toString().trim().toLowerCase() || 'sin-estado',
+        enlacePdf: row[6]?.toString().trim() || undefined,
+      }))
+      .filter(item => item.año > 0 && item.titulo !== 'Sin título')
+      .sort((a, b) => b.año - a.año || b.fecha.localeCompare(a.fecha))
+
+    // Cache con stale-while-revalidate
+    return NextResponse.json(data, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+      },
+    })
+
+  } catch (error) {
+    console.error('❌ Error en API:', error)
+    return NextResponse.json(
+      { error: 'Error obteniendo datos' },
+      { status: 500 }
+    )
+  }
+}
+"""
+    create_file("src/app/api/gestion/route.ts", content)
+
+def create_component_nav():
+    content = """'use client'
+
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+
+export default function Nav() {
+  const [tema, setTema] = useState('claro')
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const temaGuardado = localStorage.getItem('gm-tema') || 'claro'
+    setTema(temaGuardado)
+    document.documentElement.setAttribute('data-tema', temaGuardado)
+
+    const handleScroll = () => setScrolled(window.scrollY > 60)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const toggleTema = () => {
+    const nuevo = tema === 'claro' ? 'oscuro' : 'claro'
+    setTema(nuevo)
+    localStorage.setItem('gm-tema', nuevo)
+    document.documentElement.setAttribute('data-tema', nuevo)
+  }
+
+  return (
+    <nav className={`fixed top-0 left-0 right-0 z-50 h-18 flex items-center justify-between px-8 t-modo ${scrolled ? 'scrolled' : ''}`}
+      style={{ backgroundColor: 'var(--color-nav)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--color-borde)' }}>
+      
+      <Link href="/" className="flex items-center gap-2 h-9 w-auto">
+        <Image src="/images/aguila-blanca.png" alt="Logo" width={48} height={48} className="h-12 w-auto" />
+        <div className="h-8 w-[3px] bg-current opacity-60"></div>
+        <Image src="/images/texto_blanco.png" alt="Giselle Miravete" width={120} height={32} className="h-8 w-auto" />
+      </Link>
+
+      <div className="hidden md:flex items-center gap-8">
+        <Link href="/" className="text-sm font-medium t-modo transition-colors" style={{ color: 'var(--color-texto)' }}>Inicio</Link>
+        <Link href="/#sobre-mi" className="text-sm font-medium t-modo transition-colors" style={{ color: 'var(--color-texto)' }}>Sobre Mí</Link>
+        <Link href="/proyectos" className="text-sm font-medium t-modo transition-colors" style={{ color: 'var(--color-texto)' }}>Proyectos</Link>
+        <Link href="/mapa" className="text-sm font-medium t-modo transition-colors" style={{ color: 'var(--color-texto)' }}>Mapa</Link>
+        <Link href="/#contacto" className="text-sm font-medium t-modo transition-colors" style={{ color: 'var(--color-texto)' }}>Contacto</Link>
+        <button onClick={toggleTema} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ color: 'var(--color-texto)' }}>
+          <i className={`fas ${tema === 'oscuro' ? 'fa-sun' : 'fa-moon'} text-sm`}></i>
+        </button>
+      </div>
+    </nav>
+  )
+}
+"""
+    create_file("src/components/Nav.tsx", content)
+
+def create_component_footer():
+    content = """import Image from 'next/image'
+
+export default function Footer() {
+  return (
+    <footer className="t-modo px-8 py-4" style={{ backgroundColor: 'var(--color-primario-dark)' }}>
+      <div className="max-w-300 mx-auto flex flex-col md:flex-row items-center justify-between gap-2 text-sm">
+        <p className="text-white/60 text-[11px] leading-snug text-center md:text-left">
+          © 2026 Giselle Miravete. Todos los derechos reservados.<br className="hidden md:block" />
+          Santo Tomé, Santa Fe, Argentina.
+        </p>
+        <div className="h-12 md:h-14 flex items-center overflow-hidden">
+          <Image src="/images/aguila-blanca.png" alt="La Libertad Avanza" width={56} height={56} className="h-14 md:h-15 object-contain opacity-60 md:opacity-70 -my-2 md:-my-4" />
+        </div>
+      </div>
+    </footer>
+  )
+}
+"""
+    create_file("src/components/Footer.tsx", content)
+
+def create_component_hero():
+    content = """'use client'
+
+import Link from 'next/link'
+
+export default function Hero() {
+  return (
+    <section className="relative min-h-screen flex items-center overflow-hidden pt-30 pb-28" id="inicio">
+      <div className="absolute inset-0 scale-105 hero-bg" style={{ backgroundImage: 'url(/images/hero-bg-institucional.webp)', backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
+      <div className="absolute inset-0 t-modo" style={{ backgroundColor: 'color-mix(in srgb, var(--color-primario) 88%, transparent)' }}></div>
+      
+      <div className="relative z-10 max-w-300 mx-auto px-6 pt-36 pb-20 text-center sm:text-left">
+        <h1 className="font-head text-white leading-[1.05] mb-2" style={{ fontSize: 'clamp(2.8rem, 6.5vw, 5rem)' }}>
+          Giselle<br /><span className="t-modo" style={{ color: 'var(--color-destacado)' }}>Miravete</span>
+        </h1>
+        <p className="font-head text-white/85 italic mb-5" style={{ fontSize: 'clamp(1.1rem, 2vw, 1.5rem)' }}>
+          Concejal de Santo Tomé
+        </p>
+        <p className="text-white/80 max-w-140 leading-relaxed mb-9" style={{ fontSize: 'clamp(1rem, 1.3vw, 1.15rem)' }}>
+          Trabajando por una ciudad productiva, eficiente, segura donde emprender no sea un desafío.
+        </p>
+        <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
+          <Link href="/proyectos" className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold text-white shadow-md t-modo hover:shadow-lg transition-all duration-300" style={{ backgroundColor: 'color-mix(in srgb, var(--color-destacado-fondo) 70%, transparent)' }}>
+            <i className="fas fa-clipboard-list"></i> Ver mi gestión
+          </Link>
+          <Link href="#contacto" className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold text-white border-2 border-white/60 t-modo hover:border-white/90 hover:scale-105 hover:shadow-lg transition-all">
+            <i className="fas fa-envelope"></i> Contactame
+          </Link>
+        </div>
+      </div>
+    </section>
+  )
+}
+"""
+    create_file("src/components/Hero.tsx", content)
+
+def create_component_sobre_mi():
+    content = """export default function SobreMi() {
+  return (
+    <section className="py-28 px-8 relative overflow-hidden" id="sobre-mi" style={{ background: 'linear-gradient(to bottom, transparent, var(--color-fondo-alt))' }}>
+      <div className="max-w-300 mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="relative max-w-[420px] mx-auto lg:mx-0">
+          <img src="/images/sobre-mi.webp" alt="Giselle Miravete" className="w-full aspect-[3/4] object-cover rounded-3xl shadow-2xl" />
+          <div className="absolute -bottom-4 -right-4 w-44 h-44 rounded-3xl -z-10 t-modo" style={{ border: '3px solid var(--color-destacado)', opacity: 0.6 }}></div>
+        </div>
+        <div className="text-center lg:text-left">
+          <div className="pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-[0.1em] uppercase mb-3">Sobre Mí</div>
+          <h2 className="font-head text-4xl lg:text-5xl font-semibold leading-tight" style={{ color: 'var(--color-texto)' }}>Compromiso con<br />nuestra ciudad</h2>
+          <p className="leading-relaxed mb-3.5 font-medium mt-3" style={{ color: 'var(--color-texto-sec)' }}>
+            Santotomesina por adopción hace más de 30 años, mamá de Lautaro y Micaela y abuela de dos hermosas nietas. Técnica en Saneamiento Ambiental, control bromatológico y tecnología de los alimentos; Postgrado en sistemas de control de calidad y auditorías. Profesional convencida de que la política transformadora se construye desde el territorio, escuchando a cada vecino.
+          </p>
+          <p className="leading-relaxed font-medium" style={{ color: 'var(--color-texto-sec)' }}>
+            Como concejal, mi labor se centra en legislar con responsabilidad, fiscalizar con transparencia y ser la voz de todos los Santotomesinos en el Honorable Concejo Municipal.
+          </p>
+        </div>
+      </div>
+    </section>
+  )
+}
+"""
+    create_file("src/components/SobreMi.tsx", content)
+
+def create_component_equipo():
+    content = """export default function Equipo() {
+  const miembros = [
+    { nombre: 'Nombre Apellido', rol: 'Cargo o rol', descripcion: 'Breve descripción de su rol o trayectoria.' },
+    { nombre: 'Nombre Apellido', rol: 'Cargo o rol', descripcion: 'Breve descripción de su rol o trayectoria.' },
+    { nombre: 'Nombre Apellido', rol: 'Cargo o rol', descripcion: 'Breve descripción de su rol o trayectoria.' },
+    { nombre: 'Nombre Apellido', rol: 'Cargo o rol', descripcion: 'Breve descripción de su rol o trayectoria.' },
+  ]
+
+  return (
+    <section className="py-28 px-8 t-modo" id="equipo" style={{ backgroundColor: 'var(--color-fondo-alt)' }}>
+      <div className="max-w-300 mx-auto text-center mb-14">
+        <div className="pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-[0.1em] uppercase mb-3">Equipo</div>
+        <h2 className="font-head text-4xl lg:text-5xl font-semibold" style={{ color: 'var(--color-texto)' }}>Quiénes trabajan conmigo</h2>
+        <p className="leading-relaxed mt-3 font-medium" style={{ color: 'var(--color-texto-sec)' }}>Profesionales comprometidos con Santo Tomé.</p>
+      </div>
+      <div className="max-w-300 mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {miembros.map((m, i) => (
+          <div key={i} className="text-center group">
+            <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-[3px] transition-all duration-300 group-hover:shadow-[0_6px_0_0_var(--color-destacado)]" style={{ borderColor: 'var(--color-borde)' }}>
+              <img src="/images/equipo-placeholder.webp" alt={m.nombre} className="w-full h-full object-cover" />
+            </div>
+            <h3 className="font-head text-lg font-semibold mb-0.5" style={{ color: 'var(--color-texto)' }}>{m.nombre}</h3>
+            <p className="text-sm font-medium mb-2" style={{ color: 'var(--color-destacado)' }}>{m.rol}</p>
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--color-texto-sec)' }}>{m.descripcion}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+"""
+    create_file("src/components/Equipo.tsx", content)
+
+def create_component_pilares():
+    content = """export default function Pilares() {
+  const pilares = [
+    { icono: 'fa-balance-scale', titulo: 'Transparencia', descripcion: 'Rendir cuentas, fiscalizar y garantizar que cada recurso de los santotomesinos sea utilizado con responsabilidad.' },
+    { icono: 'fa-chain-broken', titulo: 'Libertad', descripcion: 'La prioridad es un municipio que deje de poner trabas a quienes producen y regeneran la economía para nuestra sociedad.' },
+    { icono: 'fa-map-marked-alt', titulo: 'Territorio', descripcion: 'Creemos en una ciudad participativa donde el vecino es el motor para la creación de los proyectos de nuestra ciudad.' },
+    { icono: 'fa-tree-city', titulo: 'Orden', descripcion: 'Santo Tomé necesita planificación, desburocratización y previsibilidad.' },
+  ]
+
+  return (
+    <section className="py-28 px-8 t-modo" id="pilares"

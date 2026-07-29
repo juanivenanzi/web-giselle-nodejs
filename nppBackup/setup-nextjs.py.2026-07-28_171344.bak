@@ -1,0 +1,596 @@
+# setup.py
+# Script de setup para Next.js + Tailwind + TypeScript
+# Basado en documentación oficial de Next.js 14
+
+import subprocess
+import os
+import sys
+import json
+import shutil
+from pathlib import Path
+
+# ============================================================
+# CONFIGURACIÓN
+# ============================================================
+
+PROJECT_NAME = "web-giselle-nodejs"
+NEXT_VERSION = "latest"  # Usará la última versión estable
+TAILWIND_VERSION = "latest"
+
+# ============================================================
+# FUNCIONES
+# ============================================================
+
+def run_command(command, cwd=None):
+    """Ejecuta un comando en la terminal y muestra la salida"""
+    print(f"\n📌 Ejecutando: {command}")
+    result = subprocess.run(command, shell=True, cwd=cwd, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"❌ Error: {result.stderr}")
+        sys.exit(1)
+    print(result.stdout)
+    return result.stdout
+
+def create_directory(path):
+    """Crea un directorio si no existe"""
+    Path(path).mkdir(parents=True, exist_ok=True)
+
+def create_file(path, content):
+    """Crea un archivo con contenido"""
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(content)
+    print(f"✅ Archivo creado: {path}")
+
+# ============================================================
+# PASO 1: Inicializar proyecto Next.js
+# ============================================================
+
+print("\n" + "="*60)
+print("🚀 INICIANDO SETUP DE NEXT.JS")
+print("="*60)
+
+# Verificar que estamos en la carpeta correcta
+current_dir = os.getcwd()
+if os.path.basename(current_dir) != PROJECT_NAME:
+    print(f"⚠️  Estás en {current_dir}")
+    print(f"⚠️  Deberías estar en {PROJECT_NAME}")
+    print("💡 Ejecuta: cd E:\\giselle\\web-giselle-nodejs")
+    sys.exit(1)
+
+print(f"\n📁 Proyecto: {current_dir}")
+
+# ============================================================
+# PASO 2: Crear package.json inicial
+# ============================================================
+
+print("\n📦 Creando package.json...")
+
+package_json = {
+    "name": PROJECT_NAME,
+    "version": "0.1.0",
+    "private": True,
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint"
+    }
+}
+
+create_file("package.json", json.dumps(package_json, indent=2))
+
+# ============================================================
+# PASO 3: Instalar dependencias base
+# ============================================================
+
+print("\n📦 Instalando Next.js, React y TypeScript...")
+run_command("npm install next@latest react@latest react-dom@latest typescript @types/react @types/node --save")
+
+# ============================================================
+# PASO 4: Instalar Tailwind CSS
+# ============================================================
+
+print("\n🎨 Instalando Tailwind CSS...")
+run_command("npm install tailwindcss@latest postcss@latest autoprefixer@latest --save-dev")
+
+# ============================================================
+# PASO 5: Inicializar Tailwind
+# ============================================================
+
+print("\n⚙️ Inicializando Tailwind...")
+run_command("npx tailwindcss init -p")
+
+# ============================================================
+# PASO 6: Crear archivos de configuración
+# ============================================================
+
+print("\n📄 Creando archivos de configuración...")
+
+# tailwind.config.js
+tailwind_config = """/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+"""
+create_file("tailwind.config.js", tailwind_config)
+
+# postcss.config.js
+postcss_config = """module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+"""
+create_file("postcss.config.js", postcss_config)
+
+# next.config.js
+next_config = """/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    domains: ['picsum.photos'],
+  },
+  reactStrictMode: true,
+  // Para el modo híbrido (SSG + SSR)
+  // Las páginas serán estáticas por defecto
+  // Usaremos getStaticProps con revalidate para datos dinámicos
+}
+
+module.exports = nextConfig
+"""
+create_file("next.config.js", next_config)
+
+# ============================================================
+# PASO 7: Crear estructura de carpetas
+# ============================================================
+
+print("\n📁 Creando estructura de carpetas...")
+
+# Crear carpetas base
+folders = [
+    "app",
+    "app/components",
+    "app/data",
+    "app/styles",
+    "app/api",
+    "public",
+    "public/images",
+    "scripts"
+]
+
+for folder in folders:
+    create_directory(folder)
+
+# ============================================================
+# PASO 8: Crear archivos base de la aplicación
+# ============================================================
+
+print("\n📄 Creando archivos base...")
+
+# tsconfig.json
+tsconfig = """{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
+"""
+create_file("tsconfig.json", tsconfig)
+
+# app/globals.css (estilos globales)
+globals_css = """@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ══════════════════════════════════════════
+   VARIABLES CSS PERSONALIZADAS
+   ══════════════════════════════════════════ */
+:root {
+  --color-primario: #1e3a5f;
+  --color-primario-dark: #0f2744;
+  --color-destacado: #74acdf;
+  --color-fondo: #ffffff;
+  --color-fondo-alt: #f8f9fa;
+  --color-texto: #1a1a2e;
+  --color-texto-sec: #374151;
+  --color-borde: #cbd5e1;
+}
+
+/* Paletas por modo y tema */
+[data-modo="institucional"] {
+  /* ya está en :root */
+}
+
+[data-modo="institucional"][data-tema="oscuro"] {
+  --color-primario: #1a3352;
+  --color-destacado: #8fc4e8;
+  --color-fondo: #0f172a;
+  --color-fondo-alt: #1e293b;
+  --color-texto: #f1f5f9;
+  --color-texto-sec: #cbd5e1;
+  --color-borde: #475569;
+}
+
+[data-modo="campaña"] {
+  --color-primario: #6c3fa0;
+  --color-destacado: #d4a017;
+  --color-fondo-alt: #f0e8ff;
+  --color-borde: #d8b4fe;
+}
+
+[data-modo="campaña"][data-tema="oscuro"] {
+  --color-primario: #4c1d95;
+  --color-destacado: #f0c040;
+  --color-fondo: #1a1025;
+  --color-fondo-alt: #2d1b4e;
+  --color-texto: #f1f5f9;
+  --color-borde: #6d28d9;
+}
+
+/* ===== UTILIDADES ===== */
+.t-modo {
+  transition: background-color 0.6s ease, color 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease;
+}
+
+.font-head {
+  font-family: "DM Serif Display", Georgia, serif;
+}
+
+.font-body {
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* ===== BASE ===== */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  transition: background-color 0.6s ease, color 0.6s ease;
+}
+"""
+create_file("app/globals.css", globals_css)
+
+# app/layout.tsx
+layout_tsx = """import type { Metadata } from 'next'
+import { Inter, DM_Serif_Display } from 'next/font/google'
+import './globals.css'
+import Nav from '@/app/components/Nav'
+
+const inter = Inter({ subsets: ['latin'] })
+const dmSerif = DM_Serif_Display({ 
+  subsets: ['latin'], 
+  weight: ['400'],
+  variable: '--font-dm-serif'
+})
+
+export const metadata: Metadata = {
+  title: 'La Libertad Avanza — Santo Tomé',
+  description: 'Sitio oficial de Giselle Miravete, Concejal de Santo Tomé, Santa Fe.',
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="es" data-modo="institucional" data-tema="claro">
+      <body className={`${inter.className} ${dmSerif.variable} t-modo`}>
+        <Nav />
+        <main>{children}</main>
+      </body>
+    </html>
+  )
+}
+"""
+create_file("app/layout.tsx", layout_tsx)
+
+# app/page.tsx (página de inicio)
+page_tsx = """import Image from 'next/image'
+
+export default function Home() {
+  return (
+    <section className="relative min-h-screen flex items-center justify-center px-8 pt-36 pb-20">
+      <div className="max-w-4xl mx-auto text-center">
+        <h1 className="font-head text-5xl lg:text-6xl font-semibold text-(--color-texto) mb-4">
+          Giselle <span className="text-(--color-destacado)">Miravete</span>
+        </h1>
+        <p className="text-xl text-(--color-texto-sec) mb-6">
+          Concejal de Santo Tomé
+        </p>
+        <p className="text-(--color-texto-sec) max-w-2xl mx-auto mb-8">
+          Trabajando por una ciudad productiva, eficiente, segura donde emprender no sea un desafío.
+        </p>
+        <div className="flex flex-wrap gap-4 justify-center">
+          <a href="/proyectos" className="btn-primary">
+            Ver mi gestión
+          </a>
+          <a href="#contacto" className="btn-outline">
+            Contactame
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+"""
+create_file("app/page.tsx", page_tsx)
+
+# app/components/Nav.tsx
+nav_tsx = """'use client'
+
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+
+export default function Nav() {
+  const [scrolled, setScrolled] = useState(false)
+  const [mobileMenu, setMobileMenu] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 60)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  return (
+    <nav className={`fixed top-0 left-0 right-0 z-50 h-18 flex items-center justify-between px-8 t-modo ${scrolled ? 'scrolled' : ''}`}
+         style={{ backgroundColor: 'var(--color-nav)', backdropFilter: 'blur(16px)' }}>
+      <Link href="/" className="flex items-center gap-2">
+        <Image src="/images/aguila-blanca.png" alt="La Libertad Avanza" width={48} height={48} className="h-12 w-auto" />
+        <span className="text-white font-bold text-lg">Giselle Miravete</span>
+      </Link>
+
+      <div className="hidden md:flex items-center gap-8">
+        <Link href="/" className="text-white/75 hover:text-white transition-colors">Inicio</Link>
+        <Link href="/#sobre-mi" className="text-white/75 hover:text-white transition-colors">Sobre Mí</Link>
+        <Link href="/proyectos" className="text-white/75 hover:text-white transition-colors">Proyectos</Link>
+        <Link href="/mapa" className="text-white/75 hover:text-white transition-colors">Mapa</Link>
+        <Link href="/#contacto" className="text-white/75 hover:text-white transition-colors">Contacto</Link>
+      </div>
+
+      <button className="md:hidden text-white" onClick={() => setMobileMenu(!mobileMenu)}>
+        {mobileMenu ? '✕' : '☰'}
+      </button>
+
+      {mobileMenu && (
+        <div className="absolute top-18 left-0 right-0 bg-(--color-fondo) border-b border-(--color-borde) p-4 flex flex-col gap-4 md:hidden">
+          <Link href="/" className="text-(--color-texto) hover:text-(--color-destacado)">Inicio</Link>
+          <Link href="/#sobre-mi" className="text-(--color-texto) hover:text-(--color-destacado)">Sobre Mí</Link>
+          <Link href="/proyectos" className="text-(--color-texto) hover:text-(--color-destacado)">Proyectos</Link>
+          <Link href="/mapa" className="text-(--color-texto) hover:text-(--color-destacado)">Mapa</Link>
+          <Link href="/#contacto" className="text-(--color-texto) hover:text-(--color-destacado)">Contacto</Link>
+        </div>
+      )}
+    </nav>
+  )
+}
+"""
+create_file("app/components/Nav.tsx", nav_tsx)
+
+# app/proyectos/page.tsx (página de proyectos)
+proyectos_page = """export default function ProyectosPage() {
+  return (
+    <section className="min-h-screen pt-36 pb-20 px-8">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="font-head text-4xl lg:text-5xl font-semibold text-(--color-texto) text-center mb-4">
+          Mi trabajo en el Concejo
+        </h1>
+        <p className="text-(--color-texto-sec) text-center max-w-2xl mx-auto mb-8">
+          Explorá los proyectos, ordenanzas y declaraciones que presenté durante mi gestión.
+        </p>
+
+        {/* Aquí irán los filtros y las tarjetas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Tarjeta de ejemplo */}
+          <div className="bg-(--color-fondo-alt) rounded-xl p-6 border border-(--color-borde) hover:shadow-xl transition-all">
+            <span className="text-xs font-bold uppercase text-(--color-primario)">Ordenanza</span>
+            <h3 className="font-head text-lg font-semibold mt-2">Ejemplo de proyecto</h3>
+            <p className="text-(--color-texto-sec) text-sm mt-1">Descripción del proyecto</p>
+            <span className="inline-block mt-3 text-xs font-bold px-2 py-1 rounded-full bg-green-100 text-green-800">Aprobada</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+"""
+create_file("app/proyectos/page.tsx", proyectos_page)
+
+# .env.example
+env_example = """# Google Sheets API
+GOOGLE_SHEETS_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+GOOGLE_SHEETS_CLIENT_EMAIL="your-service-account@project.iam.gserviceaccount.com"
+GOOGLE_SHEETS_SPREADSHEET_ID="1cb4H4nc5Y9LRCmrtO80tlo4iR7ocmEbMcs-s5SL7TPQ"
+GOOGLE_SHEETS_RANGE="Gestion!A:G"
+"""
+create_file(".env.example", env_example)
+
+# .gitignore
+gitignore = """# Next.js
+.next/
+out/
+dist/
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System
+.DS_Store
+Thumbs.db
+
+# Build
+.vercel/
+"""
+create_file(".gitignore", gitignore)
+
+# ============================================================
+# PASO 9: Instalar dependencias adicionales
+# ============================================================
+
+print("\n📦 Instalando dependencias adicionales...")
+run_command("npm install googleapis dotenv --save")
+run_command("npm install @types/googleapis --save-dev")
+
+# ============================================================
+# PASO 10: Script de fetch data
+# ============================================================
+
+print("\n📄 Creando script de fetch-data...")
+
+fetch_script = """// scripts/fetch-gestion-data.ts
+import { google } from 'googleapis';
+import fs from 'fs/promises';
+import path from 'path';
+import dotenv from 'dotenv';
+
+// Cargar variables de entorno
+dotenv.config();
+
+const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
+const RANGE = process.env.GOOGLE_SHEETS_RANGE || 'Gestion!A:G';
+const CLIENT_EMAIL = process.env.GOOGLE_SHEETS_CLIENT_EMAIL;
+const PRIVATE_KEY = process.env.GOOGLE_SHEETS_PRIVATE_KEY;
+
+async function fetchAndProcessData() {
+  console.log('📊 Iniciando fetch de datos de gestión...');
+  
+  if (!SPREADSHEET_ID || !CLIENT_EMAIL || !PRIVATE_KEY) {
+    console.error('❌ Faltan variables de entorno');
+    return;
+  }
+
+  try {
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email: CLIENT_EMAIL,
+        private_key: PRIVATE_KEY.replace(/\\\\n/g, '\\n'),
+      },
+      scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+    });
+
+    const sheets = google.sheets({ version: 'v4', auth });
+    
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: RANGE,
+    });
+
+    const rows = response.data.values || [];
+    
+    if (rows.length < 2) {
+      console.warn('⚠️ No se encontraron datos en el Excel');
+      return;
+    }
+
+    const data = rows.slice(1)
+      .filter(row => row.length > 0 && row.some(cell => cell?.toString().trim()))
+      .map(row => ({
+        fecha: row[0]?.toString().trim() || '',
+        año: parseInt(row[1]) || 0,
+        tipo: row[2]?.toString().trim().toLowerCase() || 'sin-tipo',
+        titulo: row[3]?.toString().trim() || 'Sin título',
+        descripcion: row[4]?.toString().trim() || '',
+        estado: row[5]?.toString().trim().toLowerCase() || 'sin-estado',
+        enlacePdf: row[6]?.toString().trim() || undefined,
+      }))
+      .filter(item => item.año > 0 && item.titulo !== 'Sin título')
+      .sort((a, b) => b.año - a.año || b.fecha.localeCompare(a.fecha));
+
+    // Guardar en la carpeta public/data para que sea accesible
+    const dataDir = path.join(process.cwd(), 'public', 'data');
+    await fs.mkdir(dataDir, { recursive: true });
+
+    const jsonPath = path.join(dataDir, 'gestion.json');
+    await fs.writeFile(jsonPath, JSON.stringify(data, null, 2));
+    
+    console.log(`✅ ${data.length} proyectos guardados en ${jsonPath}`);
+    console.log(`📊 Total de proyectos: ${data.length}`);
+
+  } catch (error) {
+    console.error('❌ Error:', error);
+  }
+}
+
+fetchAndProcessData();
+"""
+create_file("scripts/fetch-gestion-data.ts", fetch_script)
+
+# ============================================================
+# PASO 11: Resumen final
+# ============================================================
+
+print("\n" + "="*60)
+print("🎉 SETUP COMPLETADO CON ÉXITO")
+print("="*60)
+print("\n📁 Estructura creada:")
+print("   app/           # Páginas y componentes")
+print("   public/data/   # Datos generados (se crea automáticamente)")
+print("   scripts/       # Scripts de utilidad")
+print("\n📦 Dependencias instaladas:")
+print("   ✅ Next.js (última versión)")
+print("   ✅ React y React DOM")
+print("   ✅ TypeScript")
+print("   ✅ Tailwind CSS")
+print("   ✅ Google APIs")
+print("   ✅ dotenv")
+print("\n🚀 Comandos útiles:")
+print("   npm run dev          # Iniciar servidor de desarrollo")
+print("   npm run fetch-data   # Obtener datos del Excel")
+print("   npm run build        # Construir para producción")
+print("   npm run start        # Ejecutar en producción")
+print("\n📝 Próximos pasos:")
+print("   1. Copiar el archivo .env con tus credenciales")
+print("   2. Ejecutar npm run fetch-data")
+print("   3. Ejecutar npm run dev")
+print("   4. Visitar http://localhost:3000")
+print("="*60)
