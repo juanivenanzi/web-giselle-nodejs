@@ -24,9 +24,7 @@ export default function Nav() {
     };
 
     window.addEventListener("scroll", handleScroll);
-    // Ejecutar una vez al inicio para establecer el estado correcto
     handleScroll();
-
     return () => window.removeEventListener("scroll", handleScroll);
   }, [tema]);
 
@@ -41,15 +39,7 @@ export default function Nav() {
 
   return (
     <>
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 h-18 flex items-center justify-between px-8 t-modo ${scrolled ? "scrolled" : ""}`}
-        style={{
-          backgroundColor: "var(--color-nav)",
-          backdropFilter: "blur(16px)",
-          borderBottom:
-            "1px solid color-mix(in srgb, var(--color-texto) 35%, transparent)",
-        }}
-      >
+      <nav className={`nav-container ${scrolled ? "scrolled" : ""}`}>
         <Link
           href="/"
           className="flex items-center gap-2 h-9 w-auto transition-colors duration-50"
@@ -188,41 +178,6 @@ export default function Nav() {
           </Link>
         </div>
       </div>
-
-      {/* Estilos específicos para el Nav */}
-      <style jsx>{`
-        .scrolled {
-          background-color: var(--color-nav-scrolled) !important;
-          border-bottom-color: transparent !important;
-          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
-        }
-        .scrolled .nav-link {
-          color: rgba(255, 255, 255, 0.75) !important;
-        }
-        .scrolled .hamburger-line {
-          background-color: #ffffff !important;
-        }
-        .scrolled button {
-          color: rgba(255, 255, 255, 0.75) !important;
-        }
-        .scrolled button:hover {
-          color: #ffffff !important;
-        }
-        .scrolled .h-8 {
-          background-color: rgba(255, 255, 255, 0.6) !important;
-        }
-        /* En modo claro, el nav nunca se vuelve oscuro al hacer scroll */
-        .nav-link {
-          color: var(--color-texto);
-          font-size: 0.875rem;
-          font-weight: 500;
-          transition: color 0.3s ease;
-          border-bottom: 2px solid transparent;
-        }
-        .nav-link:hover {
-          border-bottom-color: var(--color-destacado);
-        }
-      `}</style>
     </>
   );
 }

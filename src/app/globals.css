@@ -970,8 +970,9 @@ html[data-tema="oscuro"] .gestion-card .btn-expediente {
 }
 
 /* ============================================================
-   BOTÓN VOLUNTARIADO - ESTILOS UNIFICADOS
+   BOTÓN VOLUNTARIADO - ESTILOS CORREGIDOS
    ============================================================ */
+
 .btn-voluntario {
   background-color: var(--color-texto);
   color: #ffffff;
@@ -990,22 +991,23 @@ html[data-tema="oscuro"] .gestion-card .btn-expediente {
   transform: none !important;
 }
 
-/* Dark mode: fondo blanco, texto azul */
+/* Dark Mode: fondo blanco, borde blanco, texto azul */
 html[data-tema="oscuro"] .btn-voluntario {
-  background-color: #ffffff;
-  color: var(--color-destacado);
-  border: 2px solid var(--color-destacado);
+  background-color: #ffffff !important;
+  color: var(--color-destacado) !important;
+  border: 2px solid #ffffff !important;
 }
 
 html[data-tema="oscuro"] .btn-voluntario:hover {
-  background-color: var(--color-destacado);
-  color: #ffffff;
-  border-color: var(--color-destacado);
+  background-color: var(--color-destacado) !important;
+  color: #ffffff !important;
+  border-color: var(--color-destacado) !important;
 }
 
 /* ============================================================
-   BOTÓN ENVIAR - ESTILOS UNIFICADOS
+   BOTÓN ENVIAR - ESTILOS CORREGIDOS
    ============================================================ */
+
 .btn-enviar {
   background-color: var(--color-texto);
   color: #ffffff;
@@ -1024,17 +1026,17 @@ html[data-tema="oscuro"] .btn-voluntario:hover {
   transform: none !important;
 }
 
-/* Dark mode: fondo blanco, texto azul */
+/* Dark Mode: fondo blanco, borde blanco, texto azul */
 html[data-tema="oscuro"] .btn-enviar {
-  background-color: #ffffff;
-  color: var(--color-destacado);
-  border: 2px solid var(--color-destacado);
+  background-color: #ffffff !important;
+  color: var(--color-destacado) !important;
+  border: 2px solid #ffffff !important;
 }
 
 html[data-tema="oscuro"] .btn-enviar:hover {
-  background-color: var(--color-destacado);
-  color: #ffffff;
-  border-color: var(--color-destacado);
+  background-color: var(--color-destacado) !important;
+  color: #ffffff !important;
+  border-color: var(--color-destacado) !important;
 }
 
 /* ══════════════════════════════════════════

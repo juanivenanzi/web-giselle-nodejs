@@ -252,10 +252,6 @@ export default function Contacto() {
                 type="submit"
                 disabled={enviando}
                 className="btn-enviar inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold shadow-md t-modo transition-all duration-300 hover:scale-105 hover:shadow-xl shrink-0"
-                style={{
-                  backgroundColor: "var(--color-texto)",
-                  color: "#ffffff",
-                }}
               >
                 <i className="fas fa-paper-plane"></i>{" "}
                 {enviando ? "Enviando..." : "Enviar mensaje"}
