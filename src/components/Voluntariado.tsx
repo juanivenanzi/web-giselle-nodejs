@@ -42,13 +42,13 @@ export default function Voluntariado() {
       <div className="max-w-300 mx-auto">
         <div className="reveal text-center mb-14">
           <div className="reveal pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-3">
-            Voluntariado
+            VOLUNTARIADO
           </div>
           <h2
             className="font-head text-4xl lg:text-5xl font-semibold"
             style={{ color: "var(--color-texto)" }}
           >
-            {modo === "institucional" ? "Voluntariado" : "Sumate"}
+            {modo === "institucional" ? "Anotate" : "Sumate"}
           </h2>
           <p
             className="reveal reveal-delay-1 leading-relaxed mb-3.5 font-medium"
@@ -131,7 +131,7 @@ export default function Voluntariado() {
               {enviando
                 ? "Enviando..."
                 : modo === "institucional"
-                  ? "Quiero ser voluntario/a"
+                  ? "Enviar datos"
                   : "Enviar datos"}
             </button>
           </div>

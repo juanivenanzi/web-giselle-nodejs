@@ -8,11 +8,17 @@ export default function Nav() {
   const [tema, setTema] = useState("claro");
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     const temaGuardado = localStorage.getItem("gm-tema") || "claro";
     setTema(temaGuardado);
     document.documentElement.setAttribute("data-tema", temaGuardado);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
 
     const handleScroll = () => {
       // Solo aplicar scroll en modo oscuro
@@ -26,7 +32,7 @@ export default function Nav() {
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [tema]);
+  }, [tema, isMounted]);
 
   const toggleTema = () => {
     const nuevo = tema === "claro" ? "oscuro" : "claro";
@@ -36,6 +42,19 @@ export default function Nav() {
   };
 
   const toggleMobile = () => setMobileOpen(!mobileOpen);
+
+  // Si no está montado, mostrar un placeholder para evitar problemas de hidratación
+  if (!isMounted) {
+    return (
+      <nav className="nav-container">
+        <div className="flex items-center gap-2 h-9 w-auto">
+          <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse"></div>
+          <div className="h-8 w-0.75 bg-current opacity-60"></div>
+          <div className="h-8 w-32 bg-gray-200 rounded animate-pulse"></div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <>
@@ -49,12 +68,12 @@ export default function Nav() {
             src={
               tema === "oscuro"
                 ? "/images/aguila-blanca.png"
-                : "/images/aguila-negro.png"
+                : "/images/aguila-negra.png"
             }
-            alt=""
-            width={48}
-            height={48}
-            className="h-12 w-auto"
+            alt="Giselle Miravete"
+            width={40}
+            height={40}
+            className="h-9 w-auto"
             priority
           />
           <div className="h-8 w-0.75 bg-current opacity-60"></div>
@@ -68,6 +87,7 @@ export default function Nav() {
             width={120}
             height={32}
             className="h-8 w-auto"
+            priority
           />
         </Link>
 
@@ -114,19 +134,25 @@ export default function Nav() {
             onClick={toggleMobile}
             className="flex flex-col gap-1.5 p-1"
             aria-label="Abrir menú"
-            aria-expanded="false"
+            aria-expanded={mobileOpen ? "true" : "false"}
             aria-controls="mobileMenu"
           >
             <span
-              className={`hamburger-line block w-6 h-0.5 transition-all duration-300 origin-center ${mobileOpen ? "line1" : ""}`}
+              className={`hamburger-line block w-6 h-0.5 transition-all duration-300 origin-center ${
+                mobileOpen ? "line1" : ""
+              }`}
               style={{ backgroundColor: "var(--color-texto)" }}
             ></span>
             <span
-              className={`hamburger-line block w-6 h-0.5 transition-all duration-300 ${mobileOpen ? "line2" : ""}`}
+              className={`hamburger-line block w-6 h-0.5 transition-all duration-300 ${
+                mobileOpen ? "line2" : ""
+              }`}
               style={{ backgroundColor: "var(--color-texto)" }}
             ></span>
             <span
-              className={`hamburger-line block w-6 h-0.5 transition-all duration-300 origin-center ${mobileOpen ? "line3" : ""}`}
+              className={`hamburger-line block w-6 h-0.5 transition-all duration-300 origin-center ${
+                mobileOpen ? "line3" : ""
+              }`}
               style={{ backgroundColor: "var(--color-texto)" }}
             ></span>
           </button>
@@ -134,6 +160,7 @@ export default function Nav() {
       </nav>
 
       <div
+        id="mobileMenu"
         className={`mobile-menu ${mobileOpen ? "open" : ""}`}
         style={{
           backgroundColor: "var(--color-fondo)",
