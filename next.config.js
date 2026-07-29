@@ -2,15 +2,16 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ["picsum.photos"],
     remotePatterns: [
       {
         protocol: "https",
         hostname: "picsum.photos",
+        pathname: "/**",
       },
     ],
   },
-  transpilePackages: ["@tailwindcss/postcss"],
+  // Configuración para imágenes locales
+  // Las imágenes en /public/images no necesitan configuración especial
 };
 
 module.exports = nextConfig;

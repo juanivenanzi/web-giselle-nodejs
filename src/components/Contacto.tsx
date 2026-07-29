@@ -178,15 +178,11 @@ export default function Contacto() {
                   Teléfono
                 </label>
               </div>
-
-              {/* ============================================================
-                  DROPDOWN ASUNTO - CON EFECTO FLOTANTE (USANDO PEER)
-                  ============================================================ */}
               <div className="form-group relative asunto-dropdown">
                 <button
                   type="button"
                   onClick={toggleDropdown}
-                  className={`peer w-full py-3.5 px-4 rounded-xl border-2 text-sm text-left t-modo transition-all flex items-center justify-between focus:outline-none bg-transparent ${asunto ? "text-(--color-texto)" : "text-(--color-texto-sec)"}`}
+                  className={`w-full py-3.5 px-4 rounded-xl border-2 text-sm text-left t-modo transition-all flex items-center justify-between focus:outline-none bg-transparent ${asunto ? "text-(--color-texto)" : "text-(--color-texto-sec)"}`}
                   style={{
                     backgroundColor: "var(--color-fondo)",
                     borderColor: asunto
@@ -199,11 +195,10 @@ export default function Contacto() {
                     className={`fas fa-chevron-down text-xs transition-transform duration-200 ${asuntoOpen ? "rotate-180" : ""}`}
                   ></i>
                 </button>
-                {/* Etiqueta flotante - usa peer para detectar si hay valor */}
                 <label
-                  className={`absolute left-4 text-sm text-(--color-texto-sec) transition-all duration-200 pointer-events-none bg-(--color-fondo) px-1 peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-[0.65rem] peer-focus:font-semibold peer-focus:text-(--color-texto) peer-focus:bg-(--color-fondo) peer-focus:px-1 ${
+                  className={`absolute left-4 text-sm text-(--color-texto-sec) transition-all duration-200 pointer-events-none bg-(--color-fondo) px-1 ${
                     asunto
-                      ? "top-0 -translate-y-1/2 text-[0.65rem] font-semibold text-(--color-texto) bg-(--color-fondo) px-1"
+                      ? "top-0 -translate-y-1/2 text-[0.65rem] font-semibold text-(--color-texto)"
                       : "top-1/2 -translate-y-1/2"
                   }`}
                 >

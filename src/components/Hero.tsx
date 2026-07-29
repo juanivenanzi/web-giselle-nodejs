@@ -35,7 +35,7 @@ export default function Hero() {
 
   return (
     <section
-      className="relative min-h-screen flex items-center overflow-hidden"
+      className="relative min-h-screen flex items-center overflow-hidden pt-30 pb-28"
       id="inicio"
     >
       <div
@@ -53,7 +53,7 @@ export default function Hero() {
             "color-mix(in srgb, var(--color-primario) 88%, transparent)",
         }}
       ></div>
-      <div className="relative z-10 max-w-300 mx-auto px-6 pt-30 pb-20 text-center sm:text-left">
+      <div className="relative z-10 max-w-300 mx-auto px-6 pt-36 pb-20 text-center sm:text-left">
         <h1
           className="font-head text-white leading-[1.05] mb-2"
           style={{ fontSize: "clamp(2.8rem, 6.5vw, 5rem)" }}
@@ -98,7 +98,6 @@ export default function Hero() {
           </Link>
         </div>
       </div>
-      {/* Efecto "Bajá" */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-white/60">
         <a
           href="https://www.microsoft.com/es-es/accessible-windows/accessibility-in-windows-11-22-05-30"

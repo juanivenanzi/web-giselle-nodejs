@@ -14,10 +14,21 @@ export default function Nav() {
     setTema(temaGuardado);
     document.documentElement.setAttribute("data-tema", temaGuardado);
 
-    const handleScroll = () => setScrolled(window.scrollY > 60);
+    const handleScroll = () => {
+      // Solo aplicar scroll en modo oscuro
+      if (tema === "oscuro") {
+        setScrolled(window.scrollY > 60);
+      } else {
+        setScrolled(false);
+      }
+    };
+
     window.addEventListener("scroll", handleScroll);
+    // Ejecutar una vez al inicio para establecer el estado correcto
+    handleScroll();
+
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [tema]);
 
   const toggleTema = () => {
     const nuevo = tema === "claro" ? "oscuro" : "claro";
@@ -44,67 +55,48 @@ export default function Nav() {
           className="flex items-center gap-2 h-9 w-auto transition-colors duration-50"
           aria-label="Inicio"
         >
-          {/* Logo según tema */}
-          <img
+          <Image
             src={
               tema === "oscuro"
                 ? "/images/aguila-blanca.png"
                 : "/images/aguila-negro.png"
             }
             alt=""
-            aria-hidden="true"
+            width={48}
+            height={48}
             className="h-12 w-auto"
+            priority
           />
           <div className="h-8 w-0.75 bg-current opacity-60"></div>
-          <img
+          <Image
             src={
               tema === "oscuro"
                 ? "/images/texto_blanco.png"
                 : "/images/texto_negro.png"
             }
             alt=""
-            aria-hidden="true"
+            width={120}
+            height={32}
             className="h-8 w-auto"
           />
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
-          <Link
-            href="/"
-            className="text-sm font-medium t-modo transition-colors"
-            style={{ color: "var(--color-texto)" }}
-          >
+          <Link href="/" className="nav-link">
             Inicio
           </Link>
-          <Link
-            href="/#sobre-mi"
-            className="text-sm font-medium t-modo transition-colors"
-            style={{ color: "var(--color-texto)" }}
-          >
+          <Link href="/#sobre-mi" className="nav-link">
             Sobre Mí
           </Link>
-          <Link
-            href="/proyectos"
-            className="text-sm font-medium t-modo transition-colors"
-            style={{ color: "var(--color-texto)" }}
-          >
+          <Link href="/proyectos" className="nav-link">
             Proyectos
           </Link>
-          <Link
-            href="/mapa"
-            className="text-sm font-medium t-modo transition-colors"
-            style={{ color: "var(--color-texto)" }}
-          >
+          <Link href="/mapa" className="nav-link">
             Mapa
           </Link>
-          <Link
-            href="/#contacto"
-            className="text-sm font-medium t-modo transition-colors"
-            style={{ color: "var(--color-texto)" }}
-          >
+          <Link href="/#contacto" className="nav-link">
             Contacto
           </Link>
-          {/* Botón de tema con sol/luna y hover */}
           <button
             onClick={toggleTema}
             className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 hover:shadow-[0_0_0_3px_var(--color-destacado)]"
@@ -150,8 +142,9 @@ export default function Nav() {
           </button>
         </div>
       </nav>
+
       <div
-        className={`fixed top-18 left-0 right-0 z-40 overflow-hidden transition-all duration-300 ease-in-out shadow-lg ${mobileOpen ? "max-h-100" : "max-h-0"}`}
+        className={`mobile-menu ${mobileOpen ? "open" : ""}`}
         style={{
           backgroundColor: "var(--color-fondo)",
           borderBottom: "1px solid var(--color-borde)",
@@ -161,45 +154,75 @@ export default function Nav() {
           <Link
             href="/"
             className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
-            style={{ color: "var(--color-texto)" }}
-            onClick={toggleMobile}
+            onClick={() => setMobileOpen(false)}
           >
             Inicio
           </Link>
           <Link
             href="/#sobre-mi"
             className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
-            style={{ color: "var(--color-texto)" }}
-            onClick={toggleMobile}
+            onClick={() => setMobileOpen(false)}
           >
             Sobre Mí
           </Link>
           <Link
             href="/proyectos"
             className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
-            style={{ color: "var(--color-texto)" }}
-            onClick={toggleMobile}
+            onClick={() => setMobileOpen(false)}
           >
             Proyectos
           </Link>
           <Link
             href="/mapa"
             className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
-            style={{ color: "var(--color-texto)" }}
-            onClick={toggleMobile}
+            onClick={() => setMobileOpen(false)}
           >
             Mapa
           </Link>
           <Link
             href="/#contacto"
             className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
-            style={{ color: "var(--color-texto)" }}
-            onClick={toggleMobile}
+            onClick={() => setMobileOpen(false)}
           >
             Contacto
           </Link>
         </div>
       </div>
+
+      {/* Estilos específicos para el Nav */}
+      <style jsx>{`
+        .scrolled {
+          background-color: var(--color-nav-scrolled) !important;
+          border-bottom-color: transparent !important;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+        }
+        .scrolled .nav-link {
+          color: rgba(255, 255, 255, 0.75) !important;
+        }
+        .scrolled .hamburger-line {
+          background-color: #ffffff !important;
+        }
+        .scrolled button {
+          color: rgba(255, 255, 255, 0.75) !important;
+        }
+        .scrolled button:hover {
+          color: #ffffff !important;
+        }
+        .scrolled .h-8 {
+          background-color: rgba(255, 255, 255, 0.6) !important;
+        }
+        /* En modo claro, el nav nunca se vuelve oscuro al hacer scroll */
+        .nav-link {
+          color: var(--color-texto);
+          font-size: 0.875rem;
+          font-weight: 500;
+          transition: color 0.3s ease;
+          border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover {
+          border-bottom-color: var(--color-destacado);
+        }
+      `}</style>
     </>
   );
 }

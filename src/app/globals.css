@@ -76,7 +76,7 @@
 }
 
 /* ══════════════════════════════════════════
-   4 PALETAS COMPLETAS
+   4 PALETAS COMPLETAS (ORIGINALES DEL PROYECTO ASTRO)
    ══════════════════════════════════════════ */
 
 /* ── INSTITUCIONAL + CLARO (por defecto) ── */
@@ -113,34 +113,34 @@
 
 /* ── CAMPAÑA + CLARO ── */
 [data-modo="campaña"] {
-  --color-primario: #1e3a5f;
-  --color-primario-dark: #0f2744;
-  --color-destacado: #4a7c9e;
-  --color-destacado-fondo: #3a6a8a;
-  --color-destacado-pastilla: #5a8cae;
+  --color-primario: #6c3fa0;
+  --color-primario-dark: #4c1d95;
+  --color-destacado: #d4a017;
+  --color-destacado-fondo: #96750f;
+  --color-destacado-pastilla: #ddb830;
   --color-fondo: #ffffff;
   --color-fondo-alt: #f0e8ff;
   --color-texto: #1a1a1a;
   --color-texto-sec: #374151;
   --color-borde: #d8b4fe;
   --color-nav: rgba(255, 255, 255, 0.85);
-  --color-nav-scrolled: #1e3a5f;
+  --color-nav-scrolled: #6c3fa0;
 }
 
 /* ── CAMPAÑA + OSCURO ── */
 [data-modo="campaña"][data-tema="oscuro"] {
-  --color-primario: #1a3352;
-  --color-primario-dark: #0c1e35;
-  --color-destacado: #5a8cae;
-  --color-destacado-fondo: #3a6a8a;
-  --color-destacado-pastilla: #4a7c9e;
-  --color-fondo: #0f172a;
-  --color-fondo-alt: #1e293b;
+  --color-primario: #4c1d95;
+  --color-primario-dark: #2e1065;
+  --color-destacado: #f0c040;
+  --color-destacado-fondo: #a08015;
+  --color-destacado-pastilla: #d4a017;
+  --color-fondo: #1a1025;
+  --color-fondo-alt: #2d1b4e;
   --color-texto: #f1f5f9;
-  --color-texto-sec: #cbd5e1;
-  --color-borde: #475569;
-  --color-nav: rgba(15, 23, 42, 0.85);
-  --color-nav-scrolled: #1a3352;
+  --color-texto-sec: #c4b5fd;
+  --color-borde: #6d28d9;
+  --color-nav: rgba(26, 16, 37, 0.85);
+  --color-nav-scrolled: #4c1d95;
 }
 
 /* ══════════════════════════════════════════
@@ -205,7 +205,7 @@ body {
 }
 
 /* ══════════════════════════════════════════
-   SKIP LINK
+   SKIP LINK - ACCESIBILIDAD
    ══════════════════════════════════════════ */
 .skip-link {
   position: fixed;
@@ -227,7 +227,7 @@ body {
 }
 
 /* ══════════════════════════════════════════
-   ACCESIBILIDAD
+   ACCESIBILIDAD — Foco visible por teclado
    ══════════════════════════════════════════ */
 :focus-visible {
   outline: 3px solid var(--color-destacado);
@@ -261,20 +261,6 @@ body {
     color 0.6s ease,
     border-color 0.6s ease,
     box-shadow 0.6s ease;
-}
-
-.nav-container.scrolled {
-  background-color: var(--color-nav-scrolled);
-  border-bottom-color: transparent;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
-}
-
-.nav-container.scrolled a {
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.nav-container.scrolled .hamburger-line {
-  background-color: #ffffff;
 }
 
 .nav-container .nav-link {
@@ -819,7 +805,7 @@ html[data-tema="oscuro"] .gestion-card .btn-expediente {
 }
 
 /* ══════════════════════════════════════════
-   FORMULARIOS - ESTILOS PROFESIONALES
+   FORMULARIOS — ESTILOS PROFESIONALES
    ══════════════════════════════════════════ */
 .form-group {
   position: relative;
@@ -983,20 +969,72 @@ html[data-tema="oscuro"] .gestion-card .btn-expediente {
   background-color: var(--color-texto-sec);
 }
 
-/* ══════════════════════════════════════════
-   BOTÓN ENVIAR - DARK MODE (FONDO BLANCO, TEXTO AZUL)
-   ══════════════════════════════════════════ */
+/* ============================================================
+   BOTÓN VOLUNTARIADO - ESTILOS UNIFICADOS
+   ============================================================ */
+.btn-voluntario {
+  background-color: var(--color-texto);
+  color: #ffffff;
+  border: 2px solid var(--color-texto);
+  transition: all 0.3s ease;
+}
 
+.btn-voluntario:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+}
+
+.btn-voluntario:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Dark mode: fondo blanco, texto azul */
+html[data-tema="oscuro"] .btn-voluntario {
+  background-color: #ffffff;
+  color: var(--color-destacado);
+  border: 2px solid var(--color-destacado);
+}
+
+html[data-tema="oscuro"] .btn-voluntario:hover {
+  background-color: var(--color-destacado);
+  color: #ffffff;
+  border-color: var(--color-destacado);
+}
+
+/* ============================================================
+   BOTÓN ENVIAR - ESTILOS UNIFICADOS
+   ============================================================ */
+.btn-enviar {
+  background-color: var(--color-texto);
+  color: #ffffff;
+  border: 2px solid var(--color-texto);
+  transition: all 0.3s ease;
+}
+
+.btn-enviar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+}
+
+.btn-enviar:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Dark mode: fondo blanco, texto azul */
 html[data-tema="oscuro"] .btn-enviar {
-  background-color: #ffffff !important;
-  color: var(--color-destacado) !important;
-  border: 2px solid var(--color-destacado) !important;
+  background-color: #ffffff;
+  color: var(--color-destacado);
+  border: 2px solid var(--color-destacado);
 }
 
 html[data-tema="oscuro"] .btn-enviar:hover {
-  background-color: var(--color-destacado) !important;
-  color: #ffffff !important;
-  border-color: var(--color-destacado) !important;
+  background-color: var(--color-destacado);
+  color: #ffffff;
+  border-color: var(--color-destacado);
 }
 
 /* ══════════════════════════════════════════

@@ -1,16 +1,29 @@
 export default function MapaPage() {
   return (
-    <main className="pt-36 pb-20 px-8" style={{ backgroundColor: 'var(--color-fondo)' }}>
+    <main
+      className="pt-36 pb-20 px-8"
+      style={{ backgroundColor: "var(--color-fondo)" }}
+    >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10">
-          <p className="text-xl max-w-2xl mx-auto" style={{ color: 'var(--color-texto-sec)' }}>
-            Conocé los servicios, las obras y los puntos de interés más importantes de Santo Tomé.
+          <p
+            className="text-xl max-w-2xl mx-auto"
+            style={{ color: "var(--color-texto-sec)" }}
+          >
+            Conocé los servicios, las obras y los puntos de interés más
+            importantes de Santo Tomé.
           </p>
-          <p className="text-sm max-w-xl mx-auto mt-3" style={{ color: 'var(--color-texto-sec)' }}>
+          <p
+            className="text-sm max-w-xl mx-auto mt-3"
+            style={{ color: "var(--color-texto-sec)" }}
+          >
             Actualizado permanentemente por el equipo de Giselle Miravete.
           </p>
         </div>
-        <div className="w-full overflow-hidden rounded-2xl shadow-2xl border" style={{ borderColor: 'var(--color-borde)' }}>
+        <div
+          className="w-full overflow-hidden rounded-2xl shadow-2xl border"
+          style={{ borderColor: "var(--color-borde)" }}
+        >
           <iframe
             src="https://www.google.com/maps/d/u/0/embed?mid=1AiIR7TWamqonDCPndiN-UXhQxkFqbA8&ehbc=2E312F&noprof=1&ll=-31.6627,-60.7653&z=13"
             width="100%"
@@ -20,15 +33,22 @@ export default function MapaPage() {
             loading="lazy"
           />
         </div>
-        <div className="text-center mt-10 pt-6 border-t" style={{ borderColor: 'var(--color-borde)' }}>
-          <p className="text-base" style={{ color: 'var(--color-texto-sec)' }}>
+        <div
+          className="text-center mt-10 pt-6 border-t"
+          style={{ borderColor: "var(--color-borde)" }}
+        >
+          <p className="text-base" style={{ color: "var(--color-texto-sec)" }}>
             ¿Querés sugerir un punto de interés o reportar algo?
-            <a href="/#contacto" className="inline-flex items-center gap-1 font-semibold hover:underline ml-1" style={{ color: 'var(--color-destacado)' }}>
+            <a
+              href="/#contacto"
+              className="inline-flex items-center gap-1 font-semibold hover:underline ml-1"
+              style={{ color: "var(--color-destacado)" }}
+            >
               Contactanos <i className="fas fa-arrow-right text-xs"></i>
             </a>
           </p>
         </div>
       </div>
     </main>
-  )
+  );
 }

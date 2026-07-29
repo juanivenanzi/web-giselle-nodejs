@@ -78,11 +78,12 @@ export default function Equipo() {
                 className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-[3px] foto-equipo t-modo transition-all duration-300 group-hover:shadow-[0_6px_0_0_var(--color-destacado)]"
                 style={{ borderColor: "var(--color-borde)" }}
               >
-                <img
-                  src="/images/equipo-placeholder.webp"
-                  alt={m.nombre}
-                  className="w-full h-full object-cover"
-                />
+                <div className="w-full h-full flex items-center justify-center bg-(--color-fondo-alt) text-(--color-texto-sec) text-4xl font-head">
+                  {m.nombre
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </div>
               </div>
               <h3 className="font-head text-(--color-texto) text-lg font-semibold mb-0.5">
                 {m.nombre}
