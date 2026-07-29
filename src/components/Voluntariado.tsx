@@ -3,7 +3,7 @@
 import { useState, useEffect, useTransition, useRef } from "react";
 import { enviarVoluntario, type VoluntarioState } from "@/actions/voluntario";
 
-// ✅ Constantes de validación mejoradas y centralizadas
+// ✅ Constantes de validación (compartidas con Contacto)
 const VALIDACIONES = {
   // 📧 Email
   email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,

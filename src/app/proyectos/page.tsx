@@ -79,95 +79,98 @@ function TarjetaGestion({ item }: { item: GestionItem }) {
   );
 }
 
-function Filtros({ filtro, setFiltro, años, tipos, estados }: any) {
+// ✅ Variante 1: Filtros Minimalistas y Flotantes
+function FiltrosMinimalistas({ filtro, setFiltro, años, tipos, estados }: any) {
   return (
-    <div className="filtros-vertical">
-      <div className="filtro-fila">
-        <div className="label-guia">
-          <span className="numero-paso">1</span>
-          <i className="fas fa-calendar-alt"></i> Año
-          <span
-            className="tooltip-ayuda"
-            title="Elegí un año para empezar a filtrar"
-          >
-            ⓘ ¿Qué año te interesa?
+    <div className="filtros-flotantes sticky top-20 z-10 backdrop-blur-md bg-(--color-fondo)/70 rounded-2xl p-4 mb-8 border border-(--color-borde) shadow-sm transition-all duration-300">
+      <div className="flex flex-wrap items-center gap-4 justify-center">
+        {/* Filtro de Año */}
+        <div className="flex items-center gap-2 flex-wrap justify-center">
+          <i className="fas fa-calendar-alt text-(--color-texto-sec) text-xs"></i>
+          <span className="text-xs font-semibold text-(--color-texto-sec)">
+            Año
           </span>
-        </div>
-        <div className="opciones">
-          <span
-            className={`pastilla-color tipo-todos ${filtro.anio === "todos" ? "activa" : ""}`}
-            onClick={() => setFiltro({ ...filtro, anio: "todos" })}
-          >
-            Todos
-          </span>
-          {años.map((a: number) => (
+          <div className="flex gap-1 flex-wrap">
             <span
-              key={a}
-              className={`pastilla-color anio-pastilla ${filtro.anio === String(a) ? "activa" : ""}`}
-              onClick={() => setFiltro({ ...filtro, anio: String(a) })}
+              className={`pastilla-color text-xs ${filtro.anio === "todos" ? "activa" : ""}`}
+              onClick={() => setFiltro({ ...filtro, anio: "todos" })}
             >
-              {a}
+              Todos
             </span>
-          ))}
+            {años.map((a: number) => (
+              <span
+                key={a}
+                className={`pastilla-color text-xs ${filtro.anio === String(a) ? "activa" : ""}`}
+                onClick={() => setFiltro({ ...filtro, anio: String(a) })}
+              >
+                {a}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="hidden sm:block w-px h-8 bg-(--color-borde)"></div>
+
+        {/* Filtro de Tipo */}
+        <div className="flex items-center gap-2 flex-wrap justify-center">
+          <i className="fas fa-folder-open text-(--color-texto-sec) text-xs"></i>
+          <span className="text-xs font-semibold text-(--color-texto-sec)">
+            Tipo
+          </span>
+          <div className="flex gap-1 flex-wrap">
+            <span
+              className={`pastilla-color text-xs ${filtro.tipo === "todos" ? "activa" : ""}`}
+              onClick={() => setFiltro({ ...filtro, tipo: "todos" })}
+            >
+              Todos
+            </span>
+            {tipos.map((t: string) => (
+              <span
+                key={t}
+                className={`pastilla-color text-xs ${filtro.tipo === t ? "activa" : ""}`}
+                onClick={() => setFiltro({ ...filtro, tipo: t })}
+              >
+                {tipoLabel[t] || t}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="hidden sm:block w-px h-8 bg-(--color-borde)"></div>
+
+        {/* Filtro de Estado */}
+        <div className="flex items-center gap-2 flex-wrap justify-center">
+          <i className="fas fa-tag text-(--color-texto-sec) text-xs"></i>
+          <span className="text-xs font-semibold text-(--color-texto-sec)">
+            Estado
+          </span>
+          <div className="flex gap-1 flex-wrap">
+            <span
+              className={`pastilla-color text-xs ${filtro.estado === "todos" ? "activa" : ""}`}
+              onClick={() => setFiltro({ ...filtro, estado: "todos" })}
+            >
+              Todos
+            </span>
+            {estados.map((e: string) => (
+              <span
+                key={e}
+                className={`pastilla-color text-xs ${filtro.estado === e ? "activa" : ""}`}
+                onClick={() => setFiltro({ ...filtro, estado: e })}
+              >
+                {estadoLabel[e] || e}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
-      <div className="filtro-fila">
-        <div className="label-guia">
-          <span className="numero-paso">2</span>
-          <i className="fas fa-folder-open"></i> Tipo
-          <span
-            className="tooltip-ayuda"
-            title="Filtrá por el tipo de gestión que te interesa"
-          >
-            ⓘ ¿Qué tipo de proyecto?
-          </span>
-        </div>
-        <div className="opciones">
-          <span
-            className={`pastilla-color tipo-todos ${filtro.tipo === "todos" ? "activa" : ""}`}
-            onClick={() => setFiltro({ ...filtro, tipo: "todos" })}
-          >
-            Todos
-          </span>
-          {tipos.map((t: string) => (
-            <span
-              key={t}
-              className={`pastilla-color ${filtro.tipo === t ? "activa" : ""}`}
-              onClick={() => setFiltro({ ...filtro, tipo: t })}
-            >
-              {tipoLabel[t] || t}
-            </span>
-          ))}
-        </div>
-      </div>
-      <div className="filtro-fila">
-        <div className="label-guia">
-          <span className="numero-paso">3</span>
-          <i className="fas fa-tag"></i> Estado
-          <span
-            className="tooltip-ayuda"
-            title="Seleccioná el estado actual del proyecto"
-          >
-            ⓘ ¿En qué estado está?
-          </span>
-        </div>
-        <div className="opciones">
-          <span
-            className={`pastilla-color tipo-todos ${filtro.estado === "todos" ? "activa" : ""}`}
-            onClick={() => setFiltro({ ...filtro, estado: "todos" })}
-          >
-            Todos
-          </span>
-          {estados.map((e: string) => (
-            <span
-              key={e}
-              className={`pastilla-color ${filtro.estado === e ? "activa" : ""}`}
-              onClick={() => setFiltro({ ...filtro, estado: e })}
-            >
-              {estadoLabel[e] || e}
-            </span>
-          ))}
-        </div>
+
+      {/* Contador de resultados integrado */}
+      <div className="text-center text-xs text-(--color-texto-sec) mt-3 pt-2 border-t border-(--color-borde)/50">
+        <i className="fas fa-file-alt mr-1"></i>
+        <span className="font-bold text-(--color-texto)">
+          {/* Contador se muestra afuera */}
+        </span>{" "}
+        resultados encontrados
       </div>
     </div>
   );
@@ -186,10 +189,15 @@ export default function ProyectosPage() {
     async function cargarDatos() {
       try {
         const res = await fetch("/api/gestion");
+        if (!res.ok) {
+          throw new Error(`Error HTTP: ${res.status}`);
+        }
         const data = await res.json();
         setProyectos(data);
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Error cargando datos:", error);
+        // Datos de ejemplo para desarrollo
+        setProyectos([]);
       } finally {
         setLoading(false);
       }
@@ -236,8 +244,9 @@ export default function ProyectosPage() {
       style={{ backgroundColor: "var(--color-fondo)" }}
     >
       <div className="max-w-300 mx-auto">
+        {/* Contenido Institucional */}
         <div className="contenido-institucional">
-          <div className="text-center mb-14">
+          <div className="text-center mb-10">
             <div className="pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-3">
               Gestión
             </div>
@@ -247,30 +256,54 @@ export default function ProyectosPage() {
             >
               Mi trabajo en el Concejo
             </h1>
-            <p className="mensaje-bienvenida">
-              <span>
-                <strong>Probá combinar</strong> los filtros para encontrar lo
-                que buscás.
-              </span>
+            <p
+              className="mt-3 text-base"
+              style={{ color: "var(--color-texto-sec)" }}
+            >
+              <i className="fas fa-filter mr-2"></i>
+              Probá combinar los filtros para encontrar lo que buscás.
             </p>
           </div>
-          <Filtros
+
+          {/* Filtros Minimalistas */}
+          <FiltrosMinimalistas
             filtro={filtro}
             setFiltro={setFiltro}
             años={años}
             tipos={tipos}
             estados={estados}
           />
-          <div className="contador-resultados">
+
+          {/* Contador de resultados */}
+          <div className="contador-resultados mb-6">
             <i className="fas fa-file-alt"></i>{" "}
             <strong>{filtrados.length}</strong> proyectos encontrados
           </div>
-          <div className="grid-tarjetas">
-            {filtrados.map((item, i) => (
-              <TarjetaGestion key={i} item={item} />
-            ))}
-          </div>
+
+          {/* Grid de tarjetas */}
+          {filtrados.length > 0 ? (
+            <div className="grid-tarjetas">
+              {filtrados.map((item, i) => (
+                <TarjetaGestion key={i} item={item} />
+              ))}
+            </div>
+          ) : (
+            <div
+              className="text-center py-12"
+              style={{ color: "var(--color-texto-sec)" }}
+            >
+              <i className="fas fa-search text-4xl mb-4 opacity-50"></i>
+              <p className="text-lg font-medium">
+                No se encontraron proyectos con esos filtros
+              </p>
+              <p className="text-sm mt-2">
+                Probá cambiando los criterios de búsqueda
+              </p>
+            </div>
+          )}
         </div>
+
+        {/* Contenido Campaña */}
         <div className="contenido-campaña">
           <div className="text-center mb-14">
             <div className="pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-3">
@@ -282,139 +315,75 @@ export default function ProyectosPage() {
             >
               Nuestro trabajo para Santo Tomé
             </h1>
-            <p className="mensaje-bienvenida">
-              <span>
-                <strong>Conocé nuestras propuestas</strong> para Santo Tomé.
-              </span>
+            <p
+              className="mt-3 text-base"
+              style={{ color: "var(--color-texto-sec)" }}
+            >
+              Conocé nuestras propuestas para construir la ciudad que queremos.
             </p>
           </div>
+
           <div className="grid-tarjetas">
-            <article
-              className="gestion-card"
-              style={{
-                backgroundColor: "var(--color-fondo-alt)",
-                borderColor: "var(--color-borde)",
-              }}
-            >
-              <div className="cabecera">
-                <span
-                  className="tipo"
-                  style={{
-                    backgroundColor: "var(--color-destacado)",
-                    color: "#000000",
-                  }}
-                >
-                  Transparencia
-                </span>
-                <span className="estado estado-aprobada">
-                  <i className="fas fa-check text-white text-[0.75rem]"></i>{" "}
-                  Activa
-                </span>
-              </div>
-              <div className="fecha">
-                <i className="fas fa-calendar-day"></i> 2025
-              </div>
-              <div className="titulo">Municipio transparente</div>
-              <div className="descripcion">
-                Acceso total a los gastos públicos y contrataciones a través de
-                una plataforma digital.
-              </div>
-            </article>
-            <article
-              className="gestion-card"
-              style={{
-                backgroundColor: "var(--color-fondo-alt)",
-                borderColor: "var(--color-borde)",
-              }}
-            >
-              <div className="cabecera">
-                <span
-                  className="tipo"
-                  style={{
-                    backgroundColor: "var(--color-destacado)",
-                    color: "#000000",
-                  }}
-                >
-                  Libertad
-                </span>
-                <span className="estado estado-aprobada">
-                  <i className="fas fa-check text-white text-[0.75rem]"></i>{" "}
-                  Activa
-                </span>
-              </div>
-              <div className="fecha">
-                <i className="fas fa-calendar-day"></i> 2025
-              </div>
-              <div className="titulo">Menos impuestos, más desarrollo</div>
-              <div className="descripcion">
-                Reducción de tasas municipales para pequeños comerciantes y
-                emprendedores.
-              </div>
-            </article>
-            <article
-              className="gestion-card"
-              style={{
-                backgroundColor: "var(--color-fondo-alt)",
-                borderColor: "var(--color-borde)",
-              }}
-            >
-              <div className="cabecera">
-                <span
-                  className="tipo"
-                  style={{
-                    backgroundColor: "var(--color-destacado)",
-                    color: "#000000",
-                  }}
-                >
-                  Territorio
-                </span>
-                <span className="estado estado-aprobada">
-                  <i className="fas fa-check text-white text-[0.75rem]"></i>{" "}
-                  Activa
-                </span>
-              </div>
-              <div className="fecha">
-                <i className="fas fa-calendar-day"></i> 2025
-              </div>
-              <div className="titulo">Santo Tomé participativo</div>
-              <div className="descripcion">
-                Presupuesto participativo donde los vecinos deciden en qué se
-                invierten los recursos.
-              </div>
-            </article>
-            <article
-              className="gestion-card"
-              style={{
-                backgroundColor: "var(--color-fondo-alt)",
-                borderColor: "var(--color-borde)",
-              }}
-            >
-              <div className="cabecera">
-                <span
-                  className="tipo"
-                  style={{
-                    backgroundColor: "var(--color-destacado)",
-                    color: "#000000",
-                  }}
-                >
-                  Orden
-                </span>
-                <span className="estado estado-aprobada">
-                  <i className="fas fa-check text-white text-[0.75rem]"></i>{" "}
-                  Activa
-                </span>
-              </div>
-              <div className="fecha">
-                <i className="fas fa-calendar-day"></i> 2025
-              </div>
-              <div className="titulo">Plan de ordenamiento urbano</div>
-              <div className="descripcion">
-                Desarrollo planificado con ordenanzas claras y previsibles para
-                el crecimiento de la ciudad.
-              </div>
-            </article>
+            {[
+              {
+                titulo: "Municipio transparente",
+                descripcion:
+                  "Acceso total a los gastos públicos y contrataciones a través de una plataforma digital.",
+                tipo: "Transparencia",
+              },
+              {
+                titulo: "Menos impuestos, más desarrollo",
+                descripcion:
+                  "Reducción de tasas municipales para pequeños comerciantes y emprendedores.",
+                tipo: "Libertad",
+              },
+              {
+                titulo: "Santo Tomé participativo",
+                descripcion:
+                  "Presupuesto participativo donde los vecinos deciden en qué se invierten los recursos.",
+                tipo: "Territorio",
+              },
+              {
+                titulo: "Plan de ordenamiento urbano",
+                descripcion:
+                  "Desarrollo planificado con ordenanzas claras y previsibles para el crecimiento de la ciudad.",
+                tipo: "Orden",
+              },
+            ].map((propuesta, i) => (
+              <article
+                key={i}
+                className="gestion-card"
+                style={{
+                  backgroundColor: "var(--color-fondo-alt)",
+                  borderColor: "var(--color-borde)",
+                }}
+              >
+                <div className="cabecera">
+                  <span
+                    className="tipo"
+                    style={{
+                      backgroundColor: "var(--color-destacado)",
+                      color: "#000000",
+                    }}
+                  >
+                    {propuesta.tipo}
+                  </span>
+                  <span className="estado estado-aprobada">
+                    <i className="fas fa-check text-white text-[0.75rem]"></i>{" "}
+                    Activa
+                  </span>
+                </div>
+                <div className="fecha">
+                  <i className="fas fa-calendar-day"></i> 2025
+                </div>
+                <div className="titulo">{propuesta.titulo}</div>
+                <div className="descripcion">{propuesta.descripcion}</div>
+              </article>
+            ))}
           </div>
         </div>
+
+        {/* Botón de regreso */}
         <div className="flex justify-center mt-12">
           <a
             href="/"

@@ -5,22 +5,55 @@ import Image from "next/image";
 
 export default function Footer() {
   const [tema, setTema] = useState("claro");
+  const [modo, setModo] = useState("institucional");
 
   useEffect(() => {
+    // Obtener tema guardado
     const temaGuardado = localStorage.getItem("gm-tema") || "claro";
     setTema(temaGuardado);
 
-    const observer = new MutationObserver(() => {
+    // Obtener modo guardado
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
+    setModo(modoGuardado);
+
+    // Observar cambios en el tema
+    const observerTema = new MutationObserver(() => {
       const nuevoTema =
         document.documentElement.getAttribute("data-tema") || "claro";
       setTema(nuevoTema);
     });
-    observer.observe(document.documentElement, {
+    observerTema.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["data-tema"],
     });
-    return () => observer.disconnect();
+
+    // Observar cambios en el modo
+    const observerModo = new MutationObserver(() => {
+      const nuevoModo =
+        document.documentElement.getAttribute("data-modo") || "institucional";
+      setModo(nuevoModo);
+    });
+    observerModo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-modo"],
+    });
+
+    return () => {
+      observerTema.disconnect();
+      observerModo.disconnect();
+    };
   }, []);
+
+  // Determinar la imagen según modo y tema
+  const getLogoPath = () => {
+    if (modo === "campania") {
+      // Modo campaña: siempre león (independiente del tema)
+      return "/images/leon-amarillo.png";
+    } else {
+      // Modo institucional: sol (independiente del tema)
+      return "/images/sol-amarillo.png";
+    }
+  };
 
   return (
     <footer className="footer">
@@ -32,12 +65,8 @@ export default function Footer() {
         </p>
         <div className="h-12 md:h-14 flex items-center overflow-hidden">
           <Image
-            src={
-              tema === "oscuro"
-                ? "/images/aguila-blanca.png"
-                : "/images/aguila-negro.png"
-            }
-            alt="La Libertad Avanza"
+            src={getLogoPath()}
+            alt={modo === "campania" ? "León - Campaña" : "Sol - Institucional"}
             width={56}
             height={56}
             className="h-14 md:h-15 object-contain opacity-60 md:opacity-70 -my-2 md:-my-4"
