@@ -6,10 +6,11 @@ import Image from "next/image";
 import { useApp } from "@/context/AppContext";
 
 export default function Nav() {
-  const { modo, tema, setTema } = useApp();
+  const { tema, setTema } = useApp();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [modoLocal, setModoLocal] = useState("institucional");
 
   useEffect(() => {
     setIsMounted(true);
@@ -17,7 +18,27 @@ export default function Nav() {
 
   useEffect(() => {
     if (!isMounted) return;
+    const modoActual =
+      document.documentElement.getAttribute("data-modo") || "institucional";
+    setModoLocal(modoActual);
+  }, [isMounted]);
 
+  useEffect(() => {
+    if (!isMounted) return;
+    const observer = new MutationObserver(() => {
+      const nuevoModo =
+        document.documentElement.getAttribute("data-modo") || "institucional";
+      setModoLocal(nuevoModo);
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-modo"],
+    });
+    return () => observer.disconnect();
+  }, [isMounted]);
+
+  useEffect(() => {
+    if (!isMounted) return;
     const handleScroll = () => {
       if (tema === "oscuro") {
         setScrolled(window.scrollY > 60);
@@ -25,7 +46,6 @@ export default function Nav() {
         setScrolled(false);
       }
     };
-
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
@@ -52,11 +72,11 @@ export default function Nav() {
 
   return (
     <>
+      {/* ✅ NAV CON COLOR ELEGIDO */}
       <nav
         className={`nav-container ${scrolled ? "scrolled" : ""}`}
         style={{
-          backgroundColor:
-            "color-mix(in srgb, var(--color-nav) 90%, var(--color-texto) 20%)",
+          backgroundColor: "var(--color-fondo)",
           backdropFilter: "blur(16px)",
           borderBottom: "3px solid var(--color-destacado)",
         }}
@@ -101,8 +121,7 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
-          {/* ✅ Muestra "Proyectos" o "Propuestas" según el modo */}
-          {modo === "campania" ? (
+          {modoLocal === "campania" ? (
             <>
               <Link href="/proyectos" className="nav-link">
                 Proyectos
@@ -199,7 +218,7 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
-          {modo === "campania" ? (
+          {modoLocal === "campania" ? (
             <>
               <Link
                 href="/proyectos"
