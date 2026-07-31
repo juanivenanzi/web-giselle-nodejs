@@ -3,25 +3,22 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useApp } from "../context/AppContext";  // ✅ Importación relativa
 
 export default function Nav() {
-  const [tema, setTema] = useState("claro");
+  const { modo, tema, setTema } = useApp();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-    const temaGuardado = localStorage.getItem("gm-tema") || "claro";
-    setTema(temaGuardado);
-    document.documentElement.setAttribute("data-tema", temaGuardado);
   }, []);
 
   useEffect(() => {
     if (!isMounted) return;
 
     const handleScroll = () => {
-      // Solo aplicar scroll en modo oscuro
       if (tema === "oscuro") {
         setScrolled(window.scrollY > 60);
       } else {
@@ -37,13 +34,10 @@ export default function Nav() {
   const toggleTema = () => {
     const nuevo = tema === "claro" ? "oscuro" : "claro";
     setTema(nuevo);
-    localStorage.setItem("gm-tema", nuevo);
-    document.documentElement.setAttribute("data-tema", nuevo);
   };
 
   const toggleMobile = () => setMobileOpen(!mobileOpen);
 
-  // Si no está montado, mostrar un placeholder para evitar problemas de hidratación
   if (!isMounted) {
     return (
       <nav className="nav-container">
@@ -58,7 +52,15 @@ export default function Nav() {
 
   return (
     <>
-      <nav className={`nav-container ${scrolled ? "scrolled" : ""}`}>
+      <nav
+        className={`nav-container ${scrolled ? "scrolled" : ""}`}
+        style={{
+          backgroundColor:
+            "color-mix(in srgb, var(--color-nav) 90%, var(--color-texto) 20%)",
+          backdropFilter: "blur(16px)",
+          borderBottom: "3px solid var(--color-destacado)",
+        }}
+      >
         <Link
           href="/"
           className="flex items-center gap-2 h-9 w-auto transition-colors duration-50"
@@ -98,9 +100,22 @@ export default function Nav() {
           <Link href="/#sobre-mi" className="nav-link">
             Sobre Mí
           </Link>
-          <Link href="/proyectos" className="nav-link">
-            Proyectos
-          </Link>
+
+          {modo === "campania" ? (
+            <>
+              <Link href="/proyectos" className="nav-link">
+                Proyectos
+              </Link>
+              <Link href="/propuestas" className="nav-link">
+                Propuestas
+              </Link>
+            </>
+          ) : (
+            <Link href="/proyectos" className="nav-link">
+              Proyectos
+            </Link>
+          )}
+
           <Link href="/mapa" className="nav-link">
             Mapa
           </Link>
@@ -182,13 +197,34 @@ export default function Nav() {
           >
             Sobre Mí
           </Link>
-          <Link
-            href="/proyectos"
-            className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
-            onClick={() => setMobileOpen(false)}
-          >
-            Proyectos
-          </Link>
+
+          {modo === "campania" ? (
+            <>
+              <Link
+                href="/proyectos"
+                className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
+                onClick={() => setMobileOpen(false)}
+              >
+                Proyectos
+              </Link>
+              <Link
+                href="/propuestas"
+                className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
+                onClick={() => setMobileOpen(false)}
+              >
+                Propuestas
+              </Link>
+            </>
+          ) : (
+            <Link
+              href="/proyectos"
+              className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
+              onClick={() => setMobileOpen(false)}
+            >
+              Proyectos
+            </Link>
+          )}
+
           <Link
             href="/mapa"
             className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"

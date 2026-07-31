@@ -211,7 +211,9 @@ export default function Contacto() {
           </h2>
           <p
             className="reveal reveal-delay-1 leading-relaxed mb-3.5 font-medium"
-            style={{ color: "var(--color-texto-sec)" }}
+            style={{
+              color: "color-mix(in srgb, var(--color-texto) 75%, transparent)",
+            }}
           >
             Tu opinión es fundamental. No dudes en comunicarte.
           </p>
@@ -220,33 +222,93 @@ export default function Contacto() {
           <div className="reveal text-center lg:text-left">
             <h3
               className="text-sm font-semibold mb-4"
-              style={{ color: "var(--color-texto)" }}
+              style={{
+                color:
+                  "color-mix(in srgb, var(--color-texto) 80%, transparent)",
+              }}
             >
               Mis redes sociales
             </h3>
             <div className="flex gap-3 justify-center lg:justify-start">
-              {[
-                "facebook-f",
-                "instagram",
-                "x-twitter",
-                "threads",
-                "youtube",
-              ].map((red, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  className="red-social w-11 h-11 rounded-xl grid place-items-center transition-all duration-300 hover:scale-110 hover:shadow-lg"
-                  style={{
-                    backgroundColor: "var(--color-fondo)",
-                    border: "2px solid var(--color-borde)",
-                    color: "var(--color-texto)",
-                  }}
-                >
-                  <i className={`fab fa-${red}`}></i>
-                </a>
-              ))}
+              {/* ✅ FACEBOOK */}
+              <a
+                href="https://www.facebook.com/giselle.miravete"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="red-social w-11 h-11 rounded-xl grid place-items-center transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                style={{
+                  backgroundColor: "var(--color-fondo)",
+                  border: "2px solid var(--color-borde)",
+                  color: "var(--color-texto)",
+                }}
+                aria-label="Facebook de Giselle Miravete"
+              >
+                <i className="fab fa-facebook-f"></i>
+              </a>
+              {/* ✅ INSTAGRAM */}
+              <a
+                href="https://www.instagram.com/giselmiravete/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="red-social w-11 h-11 rounded-xl grid place-items-center transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                style={{
+                  backgroundColor: "var(--color-fondo)",
+                  border: "2px solid var(--color-borde)",
+                  color: "var(--color-texto)",
+                }}
+                aria-label="Instagram de Giselle Miravete"
+              >
+                <i className="fab fa-instagram"></i>
+              </a>
+              {/* ✅ X (TWITTER) */}
+              <a
+                href="https://x.com/giselmira"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="red-social w-11 h-11 rounded-xl grid place-items-center transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                style={{
+                  backgroundColor: "var(--color-fondo)",
+                  border: "2px solid var(--color-borde)",
+                  color: "var(--color-texto)",
+                }}
+                aria-label="X de Giselle Miravete"
+              >
+                <i className="fab fa-x-twitter"></i>
+              </a>
+              {/* ✅ THREADS */}
+              <a
+                href="https://www.threads.com/@giselmiravete"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="red-social w-11 h-11 rounded-xl grid place-items-center transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                style={{
+                  backgroundColor: "var(--color-fondo)",
+                  border: "2px solid var(--color-borde)",
+                  color: "var(--color-texto)",
+                }}
+                aria-label="Threads de Giselle Miravete"
+              >
+                <i className="fab fa-threads"></i>
+              </a>
+              {/* ✅ YOUTUBE */}
+              <a
+                href="https://www.youtube.com/@GiselleMiravete"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="red-social w-11 h-11 rounded-xl grid place-items-center transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                style={{
+                  backgroundColor: "var(--color-fondo)",
+                  border: "2px solid var(--color-borde)",
+                  color: "var(--color-texto)",
+                }}
+                aria-label="YouTube de Giselle Miravete"
+              >
+                <i className="fab fa-youtube"></i>
+              </a>
             </div>
           </div>
+
+          {/* ✅ FORMULARIO SIN TARJETA - Mismo estilo que Voluntariado */}
           <form
             ref={formRef}
             onSubmit={handleSubmit}
@@ -378,12 +440,18 @@ export default function Contacto() {
                         : "var(--color-borde)",
                   }}
                 >
-                  <span>{asunto || "Seleccionar asunto"}</span>
-                  <i
-                    className={`fas fa-chevron-down text-xs transition-transform duration-300 ${
-                      asuntoOpen ? "rotate-180" : ""
-                    }`}
-                  ></i>
+                  <span>{asunto || "Seleccionar"}</span>
+                  <div className="flex items-center gap-2">
+                    <i
+                      className="fas fa-circle-question text-xs text-(--color-texto-sec) opacity-60 hover:opacity-100 transition-opacity"
+                      title="Selecciona el tema de tu mensaje"
+                    ></i>
+                    <i
+                      className={`fas fa-chevron-down text-xs transition-transform duration-300 ${
+                        asuntoOpen ? "rotate-180" : ""
+                      }`}
+                    ></i>
+                  </div>
                 </button>
                 <label
                   className={`absolute left-4 text-sm text-(--color-texto-sec) transition-all duration-300 pointer-events-none bg-(--color-fondo) px-1 ${
@@ -414,6 +482,13 @@ export default function Contacto() {
                     ))}
                   </ul>
                 )}
+                {/* ✅ TEXTO GUÍA */}
+                <p
+                  className="text-xs mt-1.5"
+                  style={{ color: "var(--color-texto-sec)" }}
+                >
+                  Haz click arriba en seleccionar y elige el asunto.
+                </p>
                 {getFieldError("asunto") && (
                   <p className="text-xs text-red-600 mt-1">
                     {getFieldError("asunto")}
@@ -499,19 +574,18 @@ export default function Contacto() {
                       Enviando...
                     </>
                   ) : (
-                    <>
-                      <i className="fas fa-paper-plane"></i> Enviar mensaje
-                    </>
+                    <>Enviar mensaje</>
                   )}
                 </span>
                 <span className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
               </button>
               <div
                 className="flex flex-col items-center text-center sm:items-start sm:text-left gap-1"
-                style={{ color: "var(--color-texto-sec)" }}
+                style={{ color: "var(--color-texto)" }}
               >
-                <p className="text-sm">
-                  * Los campos marcados son obligatorios.
+                <p className="text-sm font-medium">
+                  <i className="fas fa-asterisk text-[0.5rem] align-top mr-1"></i>
+                  Los campos marcados son obligatorios.
                 </p>
               </div>
             </div>

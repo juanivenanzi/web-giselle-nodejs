@@ -57,10 +57,18 @@ export default function Pilares() {
           <div className="reveal pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-3">
             Valores
           </div>
-          <h2 className="font-head text-white text-4xl lg:text-5xl font-semibold">
+          <h2
+            className="font-head text-4xl lg:text-5xl font-semibold"
+            style={{ color: "#ffffff" }}
+          >
             En qué creo
           </h2>
-          <p className="text-white/85 max-w-130 mx-auto mt-3">
+          <p
+            className="max-w-130 mx-auto mt-3"
+            style={{
+              color: "rgba(255, 255, 255, 0.8)",
+            }}
+          >
             Los que me guían cada decisión en el Concejo Municipal.
           </p>
         </div>
@@ -68,27 +76,37 @@ export default function Pilares() {
           {pilares.map((p, i) => (
             <div
               key={i}
-              className={`pilar-card reveal text-center p-10 rounded-2xl border t-modo transition-all duration-300 hover:-translate-y-1 ${i === 1 ? "reveal-delay-1" : i === 2 ? "reveal-delay-2" : i === 3 ? "reveal-delay-3" : ""}`}
+              className={`pilar-card reveal text-center p-10 rounded-2xl border-b-4 t-modo transition-all duration-300 hover:scale-105 hover:border-b-8 ${i === 1 ? "reveal-delay-1" : i === 2 ? "reveal-delay-2" : i === 3 ? "reveal-delay-3" : ""}`}
               style={{
                 backgroundColor:
                   "color-mix(in srgb, var(--color-primario-dark) 90%, white)",
                 borderColor:
                   "color-mix(in srgb, var(--color-destacado) 55%, transparent)",
+                borderBottomColor:
+                  "color-mix(in srgb, var(--color-destacado) 80%, transparent)",
               }}
             >
               <div
-                className="w-14 h-14 rounded-xl grid place-items-center mx-auto mb-5 text-xl text-white t-modo"
+                className="mx-auto mb-5 text-3xl t-modo transition-all duration-300 group-hover:animate-float"
                 style={{
-                  backgroundColor:
-                    "color-mix(in srgb, var(--color-destacado-fondo) 70%, transparent)",
+                  color: "var(--color-destacado)",
                 }}
               >
                 <i className={`fas ${p.icono}`}></i>
               </div>
-              <h3 className="font-head text-white text-lg font-semibold mb-2.5">
+              <h3
+                className="font-head text-lg font-semibold mb-2.5"
+                style={{ color: "#ffffff" }}
+              >
                 {p.titulo}
               </h3>
-              <p className="text-white/80 text-sm leading-relaxed">
+              {/* ✅ DESCRIPCIÓN - Con más fuerza (85% de opacidad) */}
+              <p
+                className="text-sm leading-relaxed"
+                style={{
+                  color: "rgba(255, 255, 255, 0.85)",
+                }}
+              >
                 {p.descripcion}
               </p>
             </div>

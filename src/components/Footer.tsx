@@ -8,15 +8,12 @@ export default function Footer() {
   const [modo, setModo] = useState("institucional");
 
   useEffect(() => {
-    // Obtener tema guardado
     const temaGuardado = localStorage.getItem("gm-tema") || "claro";
     setTema(temaGuardado);
 
-    // Obtener modo guardado
     const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
     setModo(modoGuardado);
 
-    // Observar cambios en el tema
     const observerTema = new MutationObserver(() => {
       const nuevoTema =
         document.documentElement.getAttribute("data-tema") || "claro";
@@ -27,7 +24,6 @@ export default function Footer() {
       attributeFilter: ["data-tema"],
     });
 
-    // Observar cambios en el modo
     const observerModo = new MutationObserver(() => {
       const nuevoModo =
         document.documentElement.getAttribute("data-modo") || "institucional";
@@ -44,13 +40,10 @@ export default function Footer() {
     };
   }, []);
 
-  // Determinar la imagen según modo y tema
   const getLogoPath = () => {
     if (modo === "campania") {
-      // Modo campaña: siempre león (independiente del tema)
       return "/images/leon-amarillo.png";
     } else {
-      // Modo institucional: sol (independiente del tema)
       return "/images/sol-amarillo.png";
     }
   };
@@ -58,7 +51,10 @@ export default function Footer() {
   return (
     <footer className="footer">
       <div className="max-w-300 mx-auto flex flex-col md:flex-row items-center justify-between gap-2 text-sm">
-        <p className="text-white/60 text-[11px] leading-snug text-center md:text-left">
+        <p
+          className="text-[11px] leading-snug text-center md:text-left"
+          style={{ color: "var(--color-blanco-suave, #f8f9fa)" }}
+        >
           © 2026 Giselle Miravete. Todos los derechos reservados.
           <br className="hidden md:block" />
           Santo Tomé, Santa Fe, Argentina.
@@ -69,7 +65,7 @@ export default function Footer() {
             alt={modo === "campania" ? "León - Campaña" : "Sol - Institucional"}
             width={56}
             height={56}
-            className="h-14 md:h-15 object-contain opacity-60 md:opacity-70 -my-2 md:-my-4"
+            className="h-14 md:h-15 object-contain opacity-80 md:opacity-80 -my-2 md:-my-4"
           />
         </div>
       </div>

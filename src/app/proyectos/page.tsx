@@ -88,28 +88,40 @@ export default function ProyectosPage() {
   const [loading, setLoading] = useState(true);
   const [modo, setModo] = useState("institucional");
   const [vistaGrid, setVistaGrid] = useState(true);
+  const [tema, setTema] = useState("claro");
 
-  // ✅ Filtros del panel
-  const [filtroAño, setFiltroAño] = useState("Todos");
-  const [filtroTipo, setFiltroTipo] = useState("Todos");
-  const [filtroEstado, setFiltroEstado] = useState("Todos");
-  const [busqueda, setBusqueda] = useState("");
-
-  // Detectar modo
+  // ✅ Detectar cambios de modo y tema
   useEffect(() => {
     const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
     setModo(modoGuardado);
 
-    const observer = new MutationObserver(() => {
+    const temaGuardado = localStorage.getItem("gm-tema") || "claro";
+    setTema(temaGuardado);
+
+    const observerModo = new MutationObserver(() => {
       const nuevoModo =
         document.documentElement.getAttribute("data-modo") || "institucional";
       setModo(nuevoModo);
     });
-    observer.observe(document.documentElement, {
+    observerModo.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["data-modo"],
     });
-    return () => observer.disconnect();
+
+    const observerTema = new MutationObserver(() => {
+      const nuevoTema =
+        document.documentElement.getAttribute("data-tema") || "claro";
+      setTema(nuevoTema);
+    });
+    observerTema.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-tema"],
+    });
+
+    return () => {
+      observerModo.disconnect();
+      observerTema.disconnect();
+    };
   }, []);
 
   // Cargar datos
@@ -131,6 +143,12 @@ export default function ProyectosPage() {
     }
     cargarDatos();
   }, []);
+
+  // ✅ Filtros del panel
+  const [filtroAño, setFiltroAño] = useState("Todos");
+  const [filtroTipo, setFiltroTipo] = useState("Todos");
+  const [filtroEstado, setFiltroEstado] = useState("Todos");
+  const [busqueda, setBusqueda] = useState("");
 
   // Obtener opciones únicas para filtros
   const años = [
@@ -166,22 +184,43 @@ export default function ProyectosPage() {
     return matchAño && matchTipo && matchEstado && matchBusqueda;
   });
 
-  // Obtener color del estado para badges
   const getEstadoBadge = (estado: string) => {
     switch (estado) {
       case "aprobada":
-        return "bg-green-100 text-green-700";
+        return "bg-green-600 text-white font-bold"; // Verde claro sobre verde oscuro
       case "en-tratamiento":
-        return "bg-yellow-100 text-yellow-700";
+        return "bg-yellow-600 text-white font-bold"; // Amarillo claro sobre amarillo oscuro
       case "no-aprobada":
-        return "bg-red-100 text-red-700";
+        return "bg-red-600 text-white font-bold"; // Rojo claro sobre rojo oscuro
       case "en-comision":
-        return "bg-blue-100 text-blue-700";
+        return "bg-blue-600 text-white font-bold"; // Azul claro sobre azul oscuro
       case "vetada":
-        return "bg-purple-100 text-purple-700";
+        return "bg-purple-600 text-white font-bold"; // Púrpura claro sobre púrpura oscuro
       default:
         return "bg-gray-100 text-gray-600";
     }
+  };
+
+  // ✅ Función para obtener los estilos de los botones según el tema
+  const getButtonStyles = (isActive: boolean) => {
+    const isDark = tema === "oscuro";
+    return {
+      borderColor: isActive
+        ? isDark
+          ? "var(--color-destacado)"
+          : "var(--color-primario)"
+        : "var(--color-borde)",
+      color: isActive
+        ? isDark
+          ? "var(--color-destacado)"
+          : "var(--color-texto)"
+        : "var(--color-texto-sec)",
+      backgroundColor: isActive
+        ? isDark
+          ? "color-mix(in srgb, var(--color-destacado) 15%, var(--color-fondo-alt))"
+          : "var(--color-fondo-alt)"
+        : "transparent",
+    };
   };
 
   if (loading) {
@@ -252,10 +291,9 @@ export default function ProyectosPage() {
           <aside
             className="lg:w-72 shrink-0 p-4 rounded-xl"
             style={{
-              backgroundColor:
-                "color-mix(in srgb, var(--color-fondo-alt) 70%, var(--color-texto) 10%)",
+              backgroundColor: "var(--color-fondo-alt)",
               border: "1px solid var(--color-borde)",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
             }}
           >
             <div className="flex flex-col lg:block">
@@ -268,7 +306,7 @@ export default function ProyectosPage() {
 
               {/* En móvil: filtros en línea */}
               <div className="flex flex-wrap lg:flex-col gap-3 lg:gap-4">
-                {/* ✅ Búsqueda - con ícono (Opción 2) */}
+                {/* ✅ Búsqueda - con ícono */}
                 <div className="flex-1 min-w-30 lg:w-full">
                   <div className="relative">
                     <input
@@ -413,7 +451,7 @@ export default function ProyectosPage() {
                   </select>
                 </div>
 
-                {/* Botón limpiar - con mejor contraste */}
+                {/* Botón limpiar */}
                 <button
                   onClick={() => {
                     setFiltroAño("Todos");
@@ -421,12 +459,11 @@ export default function ProyectosPage() {
                     setFiltroEstado("Todos");
                     setBusqueda("");
                   }}
-                  className="w-full py-2.5 rounded-lg text-sm font-medium mt-1 lg:mt-2 transition-all hover:brightness-90 active:scale-95"
+                  className="w-full py-2.5 rounded-lg text-sm font-medium mt-1 lg:mt-2 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_6px_0_0_var(--color-destacado)] hover:border-(--color-destacado) active:scale-95"
                   style={{
-                    backgroundColor: "var(--color-primario)",
-                    color: "white",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.15)",
-                    border: "none",
+                    backgroundColor: "var(--color-fondo)",
+                    border: "2px solid var(--color-borde)",
+                    color: "var(--color-texto)",
                   }}
                 >
                   Limpiar filtros
@@ -450,33 +487,19 @@ export default function ProyectosPage() {
                 proyectos
               </p>
               <div className="flex gap-2">
+                {/* ✅ Botón Grid - con estilos adaptados al tema */}
                 <button
                   onClick={() => setVistaGrid(true)}
                   className={`p-2 rounded-lg border transition-all ${vistaGrid ? "shadow-sm" : ""}`}
-                  style={{
-                    borderColor: "var(--color-borde)",
-                    color: vistaGrid
-                      ? "var(--color-primario)"
-                      : "var(--color-texto-sec)",
-                    backgroundColor: vistaGrid
-                      ? "var(--color-fondo-alt)"
-                      : "transparent",
-                  }}
+                  style={getButtonStyles(vistaGrid)}
                 >
                   ⊞ Grid
                 </button>
+                {/* ✅ Botón Lista - con estilos adaptados al tema */}
                 <button
                   onClick={() => setVistaGrid(false)}
                   className={`p-2 rounded-lg border transition-all ${!vistaGrid ? "shadow-sm" : ""}`}
-                  style={{
-                    borderColor: "var(--color-borde)",
-                    color: !vistaGrid
-                      ? "var(--color-primario)"
-                      : "var(--color-texto-sec)",
-                    backgroundColor: !vistaGrid
-                      ? "var(--color-fondo-alt)"
-                      : "transparent",
-                  }}
+                  style={getButtonStyles(!vistaGrid)}
                 >
                   ☰ Lista
                 </button>
@@ -501,8 +524,9 @@ export default function ProyectosPage() {
                       }}
                     >
                       <div className="flex items-start justify-between gap-2">
+                        {/* ✅ Badge con texto NEGRO */}
                         <span
-                          className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ${getEstadoBadge(proyecto.estado)}`}
+                          className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap font-bold ${getEstadoBadge(proyecto.estado)}`}
                         >
                           {estadoLabel[proyecto.estado] || proyecto.estado}
                         </span>
@@ -541,7 +565,7 @@ export default function ProyectosPage() {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-xs font-medium hover:underline whitespace-nowrap"
-                            style={{ color: "var(--color-primario)" }}
+                            style={{ color: "var(--color-texto-sec)" }}
                           >
                             <i className="fas fa-file-pdf mr-1"></i> Ver
                           </a>
@@ -654,8 +678,9 @@ export default function ProyectosPage() {
                             {proyecto.fecha}
                           </td>
                           <td className="p-3">
+                            {/* ✅ Badge con texto NEGRO */}
                             <span
-                              className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ${getEstadoBadge(proyecto.estado)}`}
+                              className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap font-bold ${getEstadoBadge(proyecto.estado)}`}
                             >
                               {estadoLabel[proyecto.estado] || proyecto.estado}
                             </span>
@@ -667,7 +692,7 @@ export default function ProyectosPage() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-xs font-medium hover:underline whitespace-nowrap"
-                                style={{ color: "var(--color-primario)" }}
+                                style={{ color: "var(--color-texto-sec)" }}
                               >
                                 <i className="fas fa-file-pdf mr-1"></i> Ver
                               </a>

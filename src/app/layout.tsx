@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { AppProvider } from "@/context/AppContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" data-modo="institucional" data-tema="claro">
+    <html lang="es">
       <head>
         <link
           rel="stylesheet"
@@ -47,9 +48,11 @@ export default function RootLayout({
         <a href="#inicio" className="skip-link">
           Saltar al contenido
         </a>
-        <Nav />
-        <main>{children}</main>
-        <Footer />
+        <AppProvider>
+          <Nav />
+          <main>{children}</main>
+          <Footer />
+        </AppProvider>
       </body>
     </html>
   );

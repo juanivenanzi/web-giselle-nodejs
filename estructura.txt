@@ -1,0 +1,567 @@
+ESTRUCTURA DE CARPETAS
+Directorio: E:\giselle\web-giselle-nodejs
+Fecha: 2026-07-31 04:19:14
+================================================================================
+
+📁 web-giselle-nodejs/
+    📄 .env
+    📄 .env.example
+    📄 .gitignore
+    📄 codigo-proyecto.txt
+    📄 estructura.py
+    📄 estructura.txt
+    📄 extensions.txt
+    📄 next-env.d.ts
+    📄 next.config.js
+    📄 package-lock.json
+    📄 package.json
+    📄 postcss.config.js
+    📄 setup_nextjs.py
+    📄 tailwind.config.js
+    📄 tsconfig.json
+
+    📁 .next/
+        📄 app-build-manifest.json
+        📄 build-manifest.json
+        📄 fallback-build-manifest.json
+        📄 package.json
+        📄 prerender-manifest.json
+        📄 react-loadable-manifest.json
+        📄 routes-manifest.json
+        📄 trace
+
+        📁 cache/
+            📄 .rscinfo
+            📄 chrome-devtools-workspace-uuid
+            📄 next-devtools-config.json
+
+            📁 images/
+                📁 6jeQjDZMdDAWAg4Hmx13LgS3SGEPTcZOBydW0gEKU74/
+                    📄 60.1785297310524.EE2EKWz4BLeS4CNJV-ODypryDpPmdtbJcsiszD_KR6s.Vy8iZDg5Mi0xOWYyMDY3YjY2MiI.webp
+
+                📁 C-bXEWkR_ByDQ_9CqfhKJjQz-OUworZVGuRfkIxC168/
+                    📄 60.1785479782191.zo8uE2ctoa4H9pO8TckZjYZdY3EwhtbcQCm-hYJDzbc.Vy8iZDg5Mi0xOWYyMDY3YjY2MiI.webp
+
+                📁 gR4qMmE3kEwWO15Blm1KjgjBvu4MWJPFUGzckhnH1ZI/
+                    📄 30.1785300617238.I0Loh3gD_wyQgOI3DSYGZTqhd5R07aU3_ioHPTqU3ko.Vy8iMTI3NWMtMTlmMWYyYTIzMzIi.webp
+
+                📁 I8pfl41xPk-t-2rfR0NDtNpmSYTeQoKaCELbhzlvNO4/
+                    📄 60.1785479782190.hkCddeE47BPS1qhx9_MXQ_hLUHMtF7ZrmDlmTf5cEGM.Vy8iOWQ4Yy0xOWRmNGM5ZmU5MiI.webp
+
+                📁 nYlQkks1loTqimP-ZBcmmkcLg09zlTAPH4jNX-40nPE/
+                    📄 60.1785482288480.pMHh00QuEwfE9fElQOubnWq1uuuLuxYCYIdvJPpLJ4A.Vy8iZjNiMy0xOWRmNGM5YmU3ZCI.webp
+
+                📁 Pa0RmGJ9I8gjyeGV3mWnoNu7O7IFSzBpZ7NLBSL0wtc/
+                    📄 60.1785482288034.iN7TvPPKm29wz6QUNOvflJVYEfN5QXeeovHkw3e3AeI.Vy8iNDRlZTctMTlkZWNhYmEyMmYi.webp
+
+                📁 zjoyBz7wLtS8RU7nepfAXIGRINUAk_z0nQlieG_wxbk/
+                    📄 60.1785482288481.1YTLj9d-7AFhE9oBalGAQiVDS4AkNF-CZ5xnPYnXTPw.Vy8iMTI3NWMtMTlmMWYyYTIzMzIi.webp
+
+                📁 _ve2kpck6e0FTSH56j6q4HhHD8i7qRlkWrGTzwW36Ss/
+                    📄 60.1785291811170.1YTLj9d-7AFhE9oBalGAQiVDS4AkNF-CZ5xnPYnXTPw.Vy8iMTI3NWMtMTlmMWYyYTIzMzIi.webp
+
+            📁 swc/
+                📁 plugins/
+                    📁 windows_x86_64_18.0.0/
+            📁 webpack/
+                📁 client-development/
+                    📄 0.pack.gz
+                    📄 1.pack.gz
+                    📄 10.pack.gz
+                    📄 11.pack.gz
+                    📄 12.pack.gz
+                    📄 13.pack.gz
+                    📄 14.pack.gz
+                    📄 15.pack.gz
+                    📄 16.pack.gz
+                    📄 17.pack.gz
+                    📄 2.pack.gz
+                    📄 3.pack.gz
+                    📄 4.pack.gz
+                    📄 5.pack.gz
+                    📄 6.pack.gz
+                    📄 7.pack.gz
+                    📄 8.pack.gz
+                    📄 9.pack.gz
+                    📄 index.pack.gz
+                    📄 index.pack.gz.old
+
+                📁 client-development-fallback/
+                    📄 0.pack.gz
+                    📄 1.pack.gz
+                    📄 2.pack.gz
+                    📄 index.pack.gz
+                    📄 index.pack.gz.old
+
+                📁 server-development/
+                    📄 0.pack.gz
+                    📄 1.pack.gz
+                    📄 10.pack.gz
+                    📄 11.pack.gz
+                    📄 12.pack.gz
+                    📄 13.pack.gz
+                    📄 14.pack.gz
+                    📄 15.pack.gz
+                    📄 16.pack.gz
+                    📄 17.pack.gz
+                    📄 18.pack.gz
+                    📄 19.pack.gz
+                    📄 2.pack.gz
+                    📄 20.pack.gz
+                    📄 21.pack.gz
+                    📄 22.pack.gz
+                    📄 23.pack.gz
+                    📄 24.pack.gz
+                    📄 25.pack.gz
+                    📄 26.pack.gz
+                    📄 27.pack.gz
+                    📄 28.pack.gz
+                    📄 29.pack.gz
+                    📄 3.pack.gz
+                    📄 4.pack.gz
+                    📄 5.pack.gz
+                    📄 6.pack.gz
+                    📄 7.pack.gz
+                    📄 8.pack.gz
+                    📄 9.pack.gz
+                    📄 index.pack.gz
+                    📄 index.pack.gz.old
+
+        📁 server/
+            📄 app-paths-manifest.json
+            📄 interception-route-rewrite-manifest.js
+            📄 middleware-build-manifest.js
+            📄 middleware-manifest.json
+            📄 middleware-react-loadable-manifest.js
+            📄 next-font-manifest.js
+            📄 next-font-manifest.json
+            📄 pages-manifest.json
+            📄 server-reference-manifest.js
+            📄 server-reference-manifest.json
+            📄 webpack-runtime.js
+            📄 _error.js
+
+            📁 app/
+                📄 page.js
+                📄 page_client-reference-manifest.js
+
+                📁 api/
+                    📁 gestion/
+                        📄 route.js
+                        📄 route_client-reference-manifest.js
+
+                📁 mapa/
+                    📄 page.js
+                    📄 page_client-reference-manifest.js
+
+                📁 proyectos/
+                    📄 page.js
+                    📄 page_client-reference-manifest.js
+
+            📁 pages/
+                📄 _app.js
+                📄 _document.js
+                📄 _error.js
+
+            📁 vendor-chunks/
+                📄 @swc.js
+                📄 agent-base.js
+                📄 base64-js.js
+                📄 bignumber.js.js
+                📄 buffer-equal-constant-time.js
+                📄 call-bind-apply-helpers.js
+                📄 call-bound.js
+                📄 debug.js
+                📄 dunder-proto.js
+                📄 ecdsa-sig-formatter.js
+                📄 es-define-property.js
+                📄 es-errors.js
+                📄 es-object-atoms.js
+                📄 extend.js
+                📄 function-bind.js
+                📄 gaxios.js
+                📄 gcp-metadata.js
+                📄 get-intrinsic.js
+                📄 get-proto.js
+                📄 google-auth-library.js
+                📄 google-logging-utils.js
+                📄 googleapis-common.js
+                📄 googleapis.js
+                📄 gopd.js
+                📄 gtoken.js
+                📄 has-flag.js
+                📄 has-symbols.js
+                📄 hasown.js
+                📄 https-proxy-agent.js
+                📄 is-stream.js
+                📄 json-bigint.js
+                📄 jwa.js
+                📄 jws.js
+                📄 math-intrinsics.js
+                📄 ms.js
+                📄 next.js
+                📄 node-fetch.js
+                📄 object-inspect.js
+                📄 qs.js
+                📄 safe-buffer.js
+                📄 side-channel-list.js
+                📄 side-channel-map.js
+                📄 side-channel-weakmap.js
+                📄 side-channel.js
+                📄 supports-color.js
+                📄 tr46.js
+                📄 url-template.js
+                📄 uuid.js
+                📄 webidl-conversions.js
+                📄 whatwg-url.js
+                📄 zod.js
+
+        📁 static/
+            📁 chunks/
+                📄 app-pages-internals.js
+                📄 main-app.js
+                📄 main.js
+                📄 polyfills.js
+                📄 react-refresh.js
+                📄 webpack.js
+                📄 _app-pages-browser_node_modules_next_dist_client_dev_noop-turbopack-hmr_js.js
+                📄 _error.js
+                📄 _pages-dir-browser_node_modules_next_dist_pages__app_js.js
+                📄 _pages-dir-browser_node_modules_next_dist_pages__error_js.js
+
+                📁 app/
+                    📄 layout.js
+                    📄 page.js
+
+                    📁 api/
+                        📁 gestion/
+                            📄 route.js
+
+                    📁 mapa/
+                        📄 page.js
+
+                    📁 proyectos/
+                        📄 page.js
+
+                📁 fallback/
+                    📄 amp.js
+                    📄 main-app.js
+                    📄 main.js
+                    📄 react-refresh.js
+                    📄 webpack.js
+                    📄 _app-pages-browser_node_modules_next_dist_client_dev_noop-turbopack-hmr_js.js
+                    📄 _pages-dir-browser_node_modules_next_dist_pages__app_js.js
+                    📄 _pages-dir-browser_node_modules_next_dist_pages__error_js.js
+
+                    📁 pages/
+                        📄 _app.js
+                        📄 _error.js
+
+                📁 pages/
+                    📄 _app.js
+                    📄 _error.js
+
+            📁 css/
+                📁 app/
+                    📄 layout.css
+
+            📁 development/
+                📄 _buildManifest.js
+                📄 _ssgManifest.js
+
+            📁 media/
+                📄 19cfc7226ec3afaa-s.woff2
+                📄 21350d82a1f187e9-s.woff2
+                📄 8e9860b6e62d6359-s.woff2
+                📄 ba9851c3c22cd980-s.woff2
+                📄 c5fe6dc8356a8c31-s.woff2
+                📄 df0a9ae256c0569c-s.woff2
+                📄 e4af272ccee01ff0-s.p.woff2
+
+            📁 webpack/
+                📄 0120678973f0f998.webpack.hot-update.json
+                📄 034fa14ebf6a65cf.webpack.hot-update.json
+                📄 12f4b3a51b262408.webpack.hot-update.json
+                📄 1988b949cea842a5.webpack.hot-update.json
+                📄 252f4809b2373788.webpack.hot-update.json
+                📄 2f8ada6eb9266328.webpack.hot-update.json
+                📄 30f6942b8020f703.webpack.hot-update.json
+                📄 37a1246881050cc1.webpack.hot-update.json
+                📄 3ad6ee4600424353.webpack.hot-update.json
+                📄 4703108321872fba.webpack.hot-update.json
+                📄 47d02abeb1be432e.webpack.hot-update.json
+                📄 4a548b6551922d92.webpack.hot-update.json
+                📄 4b93149e3b27d133.webpack.hot-update.json
+                📄 4c2c7b308f5aa583.webpack.hot-update.json
+                📄 4d5a878ff4e14ddf.webpack.hot-update.json
+                📄 4e3eba239abd80c0.webpack.hot-update.json
+                📄 4f354dbd0496cf6b.webpack.hot-update.json
+                📄 52188b0f5c6f99fe.webpack.hot-update.json
+                📄 5573cbba3c2bad0d.webpack.hot-update.json
+                📄 56c42d2c5fb7afa4.webpack.hot-update.json
+                📄 5e40cacf9c6d91a5.webpack.hot-update.json
+                📄 62afdf98d708e3db.webpack.hot-update.json
+                📄 633457081244afec._.hot-update.json
+                📄 63e226e1bc5a139a.webpack.hot-update.json
+                📄 6ebb5bccfb1d077b.webpack.hot-update.json
+                📄 6f5dfa09a466c3cd.webpack.hot-update.json
+                📄 6f82b9dba1948239.webpack.hot-update.json
+                📄 7aeffb08192653ce.webpack.hot-update.json
+                📄 7f1fc2a8b377c5d5.webpack.hot-update.json
+                📄 822cbdad45756f54.webpack.hot-update.json
+                📄 84dc396bf2c41293.webpack.hot-update.json
+                📄 861cf9ff5cad600b.webpack.hot-update.json
+                📄 984b3c4ea902bd27.webpack.hot-update.json
+                📄 a535c63b5f244ab1.webpack.hot-update.json
+                📄 a8eef845af2746af.webpack.hot-update.json
+                📄 ab70dc1440efafd5.webpack.hot-update.json
+                📄 ac8af51e8c668165.webpack.hot-update.json
+                📄 b41522b6475efbab.webpack.hot-update.json
+                📄 b90724bcfd14f429.webpack.hot-update.json
+                📄 bad7ef06c7df3853.webpack.hot-update.json
+                📄 be56b58d63a745e4.webpack.hot-update.json
+                📄 c03d845762cf5cf9.webpack.hot-update.json
+                📄 c5618378582a9360.webpack.hot-update.json
+                📄 d0fdf8dbc683a00a.webpack.hot-update.json
+                📄 d2e4a605314352c3.webpack.hot-update.json
+                📄 d70832677c443241.webpack.hot-update.json
+                📄 dda88c5a1635dc12.webpack.hot-update.json
+                📄 e3243a6c5fecc824.webpack.hot-update.json
+                📄 e3b21ed0e47d0cb4.webpack.hot-update.json
+                📄 e554767be4c5b113.webpack.hot-update.json
+                📄 eb8b3200162a6774.webpack.hot-update.json
+                📄 edd383b74531444f.webpack.hot-update.json
+                📄 ef9f71a485af702f.webpack.hot-update.json
+                📄 f15082e7c546152d.webpack.hot-update.json
+                📄 f57a3859e01fb0e8.webpack.hot-update.json
+                📄 fb1366c071249a04.webpack.hot-update.json
+                📄 fd5fd94399183c9c.webpack.hot-update.json
+                📄 main.ef9f71a485af702f.hot-update.js
+                📄 webpack.0120678973f0f998.hot-update.js
+                📄 webpack.034fa14ebf6a65cf.hot-update.js
+                📄 webpack.12f4b3a51b262408.hot-update.js
+                📄 webpack.1988b949cea842a5.hot-update.js
+                📄 webpack.252f4809b2373788.hot-update.js
+                📄 webpack.2f8ada6eb9266328.hot-update.js
+                📄 webpack.30f6942b8020f703.hot-update.js
+                📄 webpack.37a1246881050cc1.hot-update.js
+                📄 webpack.3ad6ee4600424353.hot-update.js
+                📄 webpack.4703108321872fba.hot-update.js
+                📄 webpack.47d02abeb1be432e.hot-update.js
+                📄 webpack.4a548b6551922d92.hot-update.js
+                📄 webpack.4b93149e3b27d133.hot-update.js
+                📄 webpack.4c2c7b308f5aa583.hot-update.js
+                📄 webpack.4d5a878ff4e14ddf.hot-update.js
+                📄 webpack.4e3eba239abd80c0.hot-update.js
+                📄 webpack.4f354dbd0496cf6b.hot-update.js
+                📄 webpack.52188b0f5c6f99fe.hot-update.js
+                📄 webpack.5573cbba3c2bad0d.hot-update.js
+                📄 webpack.56c42d2c5fb7afa4.hot-update.js
+                📄 webpack.5e40cacf9c6d91a5.hot-update.js
+                📄 webpack.62afdf98d708e3db.hot-update.js
+                📄 webpack.63e226e1bc5a139a.hot-update.js
+                📄 webpack.6ebb5bccfb1d077b.hot-update.js
+                📄 webpack.6f5dfa09a466c3cd.hot-update.js
+                📄 webpack.6f82b9dba1948239.hot-update.js
+                📄 webpack.7aeffb08192653ce.hot-update.js
+                📄 webpack.7f1fc2a8b377c5d5.hot-update.js
+                📄 webpack.822cbdad45756f54.hot-update.js
+                📄 webpack.84dc396bf2c41293.hot-update.js
+                📄 webpack.861cf9ff5cad600b.hot-update.js
+                📄 webpack.984b3c4ea902bd27.hot-update.js
+                📄 webpack.a535c63b5f244ab1.hot-update.js
+                📄 webpack.a8eef845af2746af.hot-update.js
+                📄 webpack.ab70dc1440efafd5.hot-update.js
+                📄 webpack.ac8af51e8c668165.hot-update.js
+                📄 webpack.b41522b6475efbab.hot-update.js
+                📄 webpack.b90724bcfd14f429.hot-update.js
+                📄 webpack.bad7ef06c7df3853.hot-update.js
+                📄 webpack.be56b58d63a745e4.hot-update.js
+                📄 webpack.c03d845762cf5cf9.hot-update.js
+                📄 webpack.c5618378582a9360.hot-update.js
+                📄 webpack.d0fdf8dbc683a00a.hot-update.js
+                📄 webpack.d2e4a605314352c3.hot-update.js
+                📄 webpack.d70832677c443241.hot-update.js
+                📄 webpack.dda88c5a1635dc12.hot-update.js
+                📄 webpack.e3243a6c5fecc824.hot-update.js
+                📄 webpack.e3b21ed0e47d0cb4.hot-update.js
+                📄 webpack.e554767be4c5b113.hot-update.js
+                📄 webpack.eb8b3200162a6774.hot-update.js
+                📄 webpack.edd383b74531444f.hot-update.js
+                📄 webpack.ef9f71a485af702f.hot-update.js
+                📄 webpack.f15082e7c546152d.hot-update.js
+                📄 webpack.f57a3859e01fb0e8.hot-update.js
+                📄 webpack.fb1366c071249a04.hot-update.js
+                📄 webpack.fd5fd94399183c9c.hot-update.js
+
+                📁 app/
+                    📄 layout.0120678973f0f998.hot-update.js
+                    📄 layout.034fa14ebf6a65cf.hot-update.js
+                    📄 layout.12f4b3a51b262408.hot-update.js
+                    📄 layout.1988b949cea842a5.hot-update.js
+                    📄 layout.252f4809b2373788.hot-update.js
+                    📄 layout.30f6942b8020f703.hot-update.js
+                    📄 layout.37a1246881050cc1.hot-update.js
+                    📄 layout.3ad6ee4600424353.hot-update.js
+                    📄 layout.4703108321872fba.hot-update.js
+                    📄 layout.47d02abeb1be432e.hot-update.js
+                    📄 layout.4a548b6551922d92.hot-update.js
+                    📄 layout.4b93149e3b27d133.hot-update.js
+                    📄 layout.4c2c7b308f5aa583.hot-update.js
+                    📄 layout.4d5a878ff4e14ddf.hot-update.js
+                    📄 layout.4e3eba239abd80c0.hot-update.js
+                    📄 layout.4f354dbd0496cf6b.hot-update.js
+                    📄 layout.52188b0f5c6f99fe.hot-update.js
+                    📄 layout.5573cbba3c2bad0d.hot-update.js
+                    📄 layout.56c42d2c5fb7afa4.hot-update.js
+                    📄 layout.5e40cacf9c6d91a5.hot-update.js
+                    📄 layout.62afdf98d708e3db.hot-update.js
+                    📄 layout.63e226e1bc5a139a.hot-update.js
+                    📄 layout.6ebb5bccfb1d077b.hot-update.js
+                    📄 layout.6f5dfa09a466c3cd.hot-update.js
+                    📄 layout.6f82b9dba1948239.hot-update.js
+                    📄 layout.7aeffb08192653ce.hot-update.js
+                    📄 layout.7f1fc2a8b377c5d5.hot-update.js
+                    📄 layout.822cbdad45756f54.hot-update.js
+                    📄 layout.84dc396bf2c41293.hot-update.js
+                    📄 layout.861cf9ff5cad600b.hot-update.js
+                    📄 layout.a535c63b5f244ab1.hot-update.js
+                    📄 layout.a8eef845af2746af.hot-update.js
+                    📄 layout.ab70dc1440efafd5.hot-update.js
+                    📄 layout.ac8af51e8c668165.hot-update.js
+                    📄 layout.b41522b6475efbab.hot-update.js
+                    📄 layout.b90724bcfd14f429.hot-update.js
+                    📄 layout.bad7ef06c7df3853.hot-update.js
+                    📄 layout.be56b58d63a745e4.hot-update.js
+                    📄 layout.c03d845762cf5cf9.hot-update.js
+                    📄 layout.c5618378582a9360.hot-update.js
+                    📄 layout.d70832677c443241.hot-update.js
+                    📄 layout.dda88c5a1635dc12.hot-update.js
+                    📄 layout.e3243a6c5fecc824.hot-update.js
+                    📄 layout.e3b21ed0e47d0cb4.hot-update.js
+                    📄 layout.e554767be4c5b113.hot-update.js
+                    📄 layout.eb8b3200162a6774.hot-update.js
+                    📄 layout.edd383b74531444f.hot-update.js
+                    📄 layout.f15082e7c546152d.hot-update.js
+                    📄 layout.f57a3859e01fb0e8.hot-update.js
+                    📄 layout.fb1366c071249a04.hot-update.js
+                    📄 layout.fd5fd94399183c9c.hot-update.js
+
+                    📁 proyectos/
+                        📄 page.1988b949cea842a5.hot-update.js
+                        📄 page.252f4809b2373788.hot-update.js
+                        📄 page.47d02abeb1be432e.hot-update.js
+                        📄 page.4a548b6551922d92.hot-update.js
+                        📄 page.4c2c7b308f5aa583.hot-update.js
+                        📄 page.4d5a878ff4e14ddf.hot-update.js
+                        📄 page.62afdf98d708e3db.hot-update.js
+                        📄 page.63e226e1bc5a139a.hot-update.js
+                        📄 page.6ebb5bccfb1d077b.hot-update.js
+                        📄 page.6f5dfa09a466c3cd.hot-update.js
+                        📄 page.7aeffb08192653ce.hot-update.js
+                        📄 page.7f1fc2a8b377c5d5.hot-update.js
+                        📄 page.84dc396bf2c41293.hot-update.js
+                        📄 page.ab70dc1440efafd5.hot-update.js
+                        📄 page.ac8af51e8c668165.hot-update.js
+                        📄 page.eb8b3200162a6774.hot-update.js
+                        📄 page.fb1366c071249a04.hot-update.js
+
+        📁 types/
+            📄 cache-life.d.ts
+            📄 package.json
+            📄 routes.d.ts
+            📄 validator.ts
+
+            📁 app/
+                📄 layout.ts
+                📄 page.ts
+
+                📁 api/
+                    📁 gestion/
+                        📄 route.ts
+
+                📁 mapa/
+                    📄 page.ts
+
+                📁 proyectos/
+                    📄 page.ts
+
+    📁 nppBackup/
+        📄 setup-nextjs.py.2026-07-28_171344.bak
+        📄 setup_nextjs.py.2026-07-28_172143.bak
+
+    📁 public/
+        📄 favicon.ico
+        📄 favicon.svg
+
+        📁 images/
+            📄 aguila-blanca.png
+            📄 aguila-negra.png
+            📄 ave_blanca.png
+            📄 ave_negra.png
+            📄 ChatGPT Image 28 abr 2026, 03_44_46 a.m..webp
+            📄 equipo-placeholder.webp
+            📄 hero-bg-campana.webp
+            📄 hero-bg-institucional.webp
+            📄 leon-amarillo.png
+            📄 leon-lla.png
+            📄 leon-negro.png
+            📄 logo-santo-tome.png
+            📄 og-image.jpg
+            📄 sobre-mi.webp
+            📄 sol-amarillo.png
+            📄 sol-negro.png
+            📄 texto_blanco.png
+            📄 texto_negro.png
+
+    📁 scripts/
+        📄 fetch-gestion-data.ts
+        📄 test-formularios.ts
+        📄 update-gestion-data.ts
+
+    📁 src/
+        📄 globals.d.ts
+
+        📁 actions/
+            📄 contacto.ts
+            📄 voluntario.ts
+
+        📁 app/
+            📄 globals.css
+            📄 layout.tsx
+            📄 page.tsx
+
+            📁 api/
+                📁 gestion/
+                    📄 route.ts
+
+            📁 mapa/
+                📄 page.tsx
+
+            📁 propuestas/
+                📄 page.tsx
+
+            📁 proyectos/
+                📄 page.tsx
+
+        📁 components/
+            📄 Contacto.tsx
+            📄 Equipo.tsx
+            📄 Footer.tsx
+            📄 Hero.tsx
+            📄 Nav.tsx
+            📄 Pilares.tsx
+            📄 SobreMi.tsx
+            📄 Voluntariado.tsx
+
+        📁 context/
+            📄 AppContext.tsx
+
+        📁 data/
+            📄 gestion-meta.json
+            📄 gestion.json
+            📄 propuestas.ts
+
+        📁 lib/
+            📄 types.ts
+

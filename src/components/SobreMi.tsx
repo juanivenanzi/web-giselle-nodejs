@@ -42,9 +42,11 @@ export default function SobreMi() {
         </div>
         <div className="text-center lg:text-left">
           <div className="reveal mb-6">
+            {/* ✅ PILL "SOBRE MÍ" - Sin cambios */}
             <div className="reveal pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-widest uppercase mb-3">
               Sobre Mí
             </div>
+            {/* ✅ TÍTULO - Se adapta a light/dark mode */}
             <h2
               className="font-head text-4xl lg:text-5xl font-semibold leading-tight"
               style={{ color: "var(--color-texto)" }}
@@ -54,6 +56,8 @@ export default function SobreMi() {
               nuestra ciudad
             </h2>
           </div>
+
+          {/* ✅ PRIMER PÁRRAFO */}
           <p
             className="reveal reveal-delay-1 leading-relaxed mb-3.5 font-medium"
             style={{
@@ -67,6 +71,8 @@ export default function SobreMi() {
             Profesional convencida de que la política transformadora se
             construye desde el territorio, escuchando a cada vecino.
           </p>
+
+          {/* ✅ SEGUNDO PÁRRAFO - Mismo color que el primero */}
           <p
             className="reveal reveal-delay-2 leading-relaxed mb-3.5 font-medium"
             style={{

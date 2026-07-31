@@ -56,13 +56,16 @@ export default function Equipo() {
           <div className="reveal pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-widest uppercase mb-3">
             Equipo
           </div>
-          <h2 className="font-head text-(--color-texto) text-4xl lg:text-5xl font-semibold">
+          <h2
+            className="font-head text-4xl lg:text-5xl font-semibold"
+            style={{ color: "var(--color-texto)" }}
+          >
             Quiénes trabajan conmigo
           </h2>
           <p
             className="reveal reveal-delay-1 leading-relaxed mb-3.5 font-medium mt-3"
             style={{
-              color: "color-mix(in srgb, var(--color-texto) 85%, transparent)",
+              color: "color-mix(in srgb, var(--color-texto) 75%, transparent)",
             }}
           >
             Profesionales comprometidos con Santo Tomé.
@@ -75,8 +78,10 @@ export default function Equipo() {
               className={`reveal text-center group ${i === 1 ? "reveal-delay-1" : i === 2 ? "reveal-delay-2" : i === 3 ? "reveal-delay-3" : ""}`}
             >
               <div
-                className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-[3px] foto-equipo t-modo transition-all duration-300 group-hover:shadow-[0_6px_0_0_var(--color-destacado)]"
-                style={{ borderColor: "var(--color-borde)" }}
+                className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-[3px] foto-equipo t-modo transition-all duration-300 group-hover:border-(--color-destacado)"
+                style={{
+                  borderColor: "var(--color-borde)",
+                }}
               >
                 <div className="w-full h-full flex items-center justify-center bg-(--color-fondo-alt) text-(--color-texto-sec) text-4xl font-head">
                   {m.nombre
@@ -85,20 +90,27 @@ export default function Equipo() {
                     .join("")}
                 </div>
               </div>
-              <h3 className="font-head text-(--color-texto) text-lg font-semibold mb-0.5">
+              <h3
+                className="font-head text-lg font-semibold mb-0.5"
+                style={{
+                  color:
+                    "color-mix(in srgb, var(--color-texto) 85%, transparent)",
+                }}
+              >
                 {m.nombre}
               </h3>
+              {/* ✅ ROL - Ahora usa color primario (más oscuro y legible) */}
               <p
                 className="text-sm font-medium mb-2"
-                style={{ color: "var(--color-destacado)" }}
+                style={{ color: "var(--color-rol)" }}
               >
                 {m.rol}
               </p>
               <p
-                className="text-sm leading-relaxed"
+                className="text-sm leading-relaxed font-medium"
                 style={{
                   color:
-                    "color-mix(in srgb, var(--color-texto-sec) 90%, transparent)",
+                    "color-mix(in srgb, var(--color-texto) 75%, transparent)",
                 }}
               >
                 {m.descripcion}

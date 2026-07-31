@@ -77,17 +77,13 @@ const initialState: VoluntarioState = {
 };
 
 export default function Voluntariado() {
-  // ✅ Todos los estados declarados correctamente
   const [enviando, setEnviando] = useState(false);
   const [mensaje, setMensaje] = useState("");
   const [modo, setModo] = useState("institucional");
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
-
-  // ✅ Referencia al formulario
   const formRef = useRef<HTMLFormElement>(null);
 
-  // Detectar cambios de modo (institucional/campaña)
   useEffect(() => {
     const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
     setModo(modoGuardado);
@@ -104,14 +100,11 @@ export default function Voluntariado() {
     return () => observer.disconnect();
   }, []);
 
-  // Manejar envío del formulario
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrores({});
 
     const formData = new FormData(e.currentTarget);
-
-    // ✅ Validación en cliente
     const validationErrors = validateForm(formData);
     if (Object.keys(validationErrors).length > 0) {
       setErrores(validationErrors);
@@ -122,22 +115,17 @@ export default function Voluntariado() {
 
     startTransition(async () => {
       try {
-        // ✅ Usar la función correcta con estado inicial
         const result = await enviarVoluntario(initialState, formData);
 
         if (result.success) {
           setMensaje(
-            `✅ ${result.message || "¡Gracias por sumarte! Tus datos fueron enviados correctamente."}`,
+            `✅ ${result.message || "¡Gracias por sumarte! Tus datos fueron enviados correctamente."}`
           );
-
-          // ✅ Usar la referencia al formulario para resetear
           if (formRef.current) {
             formRef.current.reset();
           }
-
           setTimeout(() => setMensaje(""), 5000);
         } else {
-          // ✅ Mostrar errores del servidor si existen
           if (result.errors) {
             const serverErrors: Record<string, string> = {};
             Object.keys(result.errors).forEach((key) => {
@@ -150,12 +138,12 @@ export default function Voluntariado() {
             setErrores(serverErrors);
           }
           setMensaje(
-            `❌ ${result.message || "No se pudo enviar. Intentá nuevamente."}`,
+            `❌ ${result.message || "No se pudo enviar. Intentá nuevamente."}`
           );
         }
       } catch (error) {
         setMensaje(
-          "❌ Ocurrió un error inesperado. Por favor, intentá más tarde.",
+          "❌ Ocurrió un error inesperado. Por favor, intentá más tarde."
         );
         console.error("Error en handleSubmit:", error);
       } finally {
@@ -172,7 +160,6 @@ export default function Voluntariado() {
     >
       <div className="max-w-300 mx-auto">
         <div className="grid lg:grid-cols-5 gap-12 items-center">
-          {/* Columna izquierda: información */}
           <div className="lg:col-span-2 reveal text-center lg:text-left">
             <div className="reveal pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-4">
               VOLUNTARIADO
@@ -187,8 +174,7 @@ export default function Voluntariado() {
             <p
               className="reveal reveal-delay-1 leading-relaxed text-lg"
               style={{
-                color:
-                  "color-mix(in srgb, var(--color-texto) 85%, transparent)",
+                color: "color-mix(in srgb, var(--color-texto) 75%, transparent)",
               }}
             >
               {modo === "institucional"
@@ -197,14 +183,14 @@ export default function Voluntariado() {
             </p>
           </div>
 
-          {/* Columna derecha: formulario */}
+          {/* ✅ FORMULARIO SIN TARJETA - Mismo estilo que Contacto */}
           <div className="lg:col-span-3">
             <form
-              ref={formRef} // ✅ Asignar la referencia al formulario
+              ref={formRef}
               onSubmit={handleSubmit}
-              className="reveal reveal-delay-1 flex flex-col gap-4 relative bg-(--color-fondo-alt) p-6 md:p-8 rounded-2xl shadow-lg border border-(--color-borde) t-modo"
+              className="reveal reveal-delay-1 flex flex-col gap-4 relative"
             >
-              {/* Honeypot mejorado con timestamp */}
+              {/* Honeypot oculto */}
               <div className="absolute left-[-9999px]" aria-hidden="true">
                 <input
                   type="text"
@@ -225,7 +211,7 @@ export default function Voluntariado() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="form-group flex flex-col gap-1.5 relative">
+                <div className="form-group relative">
                   <input
                     type="text"
                     id="volNombre"
@@ -233,8 +219,12 @@ export default function Voluntariado() {
                     required
                     maxLength={100}
                     placeholder=" "
-                    className="peer py-3.5 px-4 rounded-xl bg-(--color-fondo) border-2 border-(--color-borde) text-sm text-(--color-texto) t-modo transition-all duration-300 focus:outline-none focus:border-(--color-destacado) focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-destacado)_15%,transparent)]"
-                    aria-describedby="nombre-error"
+                    className="peer w-full py-3.5 px-4 rounded-xl border-2 text-sm t-modo focus:outline-none transition-all duration-300 bg-transparent"
+                    style={{
+                      backgroundColor: "var(--color-fondo)",
+                      borderColor: errores.nombre ? "#dc2626" : "var(--color-borde)",
+                      color: "var(--color-texto)",
+                    }}
                   />
                   <label
                     htmlFor="volNombre"
@@ -243,20 +233,24 @@ export default function Voluntariado() {
                     Nombre completo *
                   </label>
                   {errores.nombre && (
-                    <p id="nombre-error" className="text-xs text-red-500 mt-1">
+                    <p className="text-xs text-red-500 mt-1">
                       {errores.nombre}
                     </p>
                   )}
                 </div>
-                <div className="form-group flex flex-col gap-1.5 relative">
+                <div className="form-group relative">
                   <input
                     type="email"
                     id="volEmail"
                     name="email"
                     required
                     placeholder=" "
-                    className="peer py-3.5 px-4 rounded-xl bg-(--color-fondo) border-2 border-(--color-borde) text-sm text-(--color-texto) t-modo transition-all duration-300 focus:outline-none focus:border-(--color-destacado) focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-destacado)_15%,transparent)]"
-                    aria-describedby="email-error"
+                    className="peer w-full py-3.5 px-4 rounded-xl border-2 text-sm t-modo focus:outline-none transition-all duration-300 bg-transparent"
+                    style={{
+                      backgroundColor: "var(--color-fondo)",
+                      borderColor: errores.email ? "#dc2626" : "var(--color-borde)",
+                      color: "var(--color-texto)",
+                    }}
                   />
                   <label
                     htmlFor="volEmail"
@@ -265,22 +259,26 @@ export default function Voluntariado() {
                     Email *
                   </label>
                   {errores.email && (
-                    <p id="email-error" className="text-xs text-red-500 mt-1">
+                    <p className="text-xs text-red-500 mt-1">
                       {errores.email}
                     </p>
                   )}
                 </div>
               </div>
 
-              <div className="form-group flex flex-col gap-1.5 relative">
+              <div className="form-group relative">
                 <input
                   type="tel"
                   id="volTelefono"
                   name="telefono"
                   maxLength={20}
                   placeholder=" "
-                  className="peer py-3.5 px-4 rounded-xl bg-(--color-fondo) border-2 border-(--color-borde) text-sm text-(--color-texto) t-modo transition-all duration-300 focus:outline-none focus:border-(--color-destacado) focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-destacado)_15%,transparent)]"
-                  aria-describedby="telefono-error"
+                  className="peer w-full py-3.5 px-4 rounded-xl border-2 text-sm t-modo focus:outline-none transition-all duration-300 bg-transparent"
+                  style={{
+                    backgroundColor: "var(--color-fondo)",
+                    borderColor: errores.telefono ? "#dc2626" : "var(--color-borde)",
+                    color: "var(--color-texto)",
+                  }}
                 />
                 <label
                   htmlFor="volTelefono"
@@ -289,31 +287,34 @@ export default function Voluntariado() {
                   Teléfono (Ejemplo: 3425478996)
                 </label>
                 {errores.telefono && (
-                  <p id="telefono-error" className="text-xs text-red-500 mt-1">
+                  <p className="text-xs text-red-500 mt-1">
                     {errores.telefono}
                   </p>
                 )}
               </div>
 
-              <div className="form-group flex flex-col gap-1.5 relative">
+              <div className="form-group relative">
                 <textarea
                   id="volMensaje"
                   name="mensaje"
                   placeholder=" "
                   rows={4}
                   maxLength={500}
-                  className="peer py-3.5 px-4 rounded-xl bg-(--color-fondo) border-2 border-(--color-borde) text-sm text-(--color-texto) t-modo transition-all duration-300 focus:outline-none focus:border-(--color-destacado) focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-destacado)_15%,transparent)] resize-y min-h-25"
-                  aria-describedby="mensaje-error"
+                  className="peer w-full py-3.5 px-4 rounded-xl border-2 text-sm t-modo focus:outline-none transition-all duration-300 resize-y min-h-25 bg-transparent"
+                  style={{
+                    backgroundColor: "var(--color-fondo)",
+                    borderColor: errores.mensaje ? "#dc2626" : "var(--color-borde)",
+                    color: "var(--color-texto)",
+                  }}
                 />
                 <label
                   htmlFor="volMensaje"
                   className="absolute left-4 top-4 text-sm text-(--color-texto-sec) transition-all duration-300 pointer-events-none peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-[0.65rem] peer-focus:font-semibold peer-focus:text-(--color-destacado) peer-focus:bg-(--color-fondo) peer-focus:px-1 peer-not-placeholder-shown:top-0 peer-not-placeholder-shown:-translate-y-1/2 peer-not-placeholder-shown:text-[0.65rem] peer-not-placeholder-shown:font-semibold peer-not-placeholder-shown:text-(--color-destacado) peer-not-placeholder-shown:bg-(--color-fondo) peer-not-placeholder-shown:px-1"
                 >
-                  ¿En qué actividad te gustaría participar? (máx. 500
-                  caracteres)
+                  ¿En qué actividad te gustaría participar? (máx. 500 caracteres)
                 </label>
                 {errores.mensaje && (
-                  <p id="mensaje-error" className="text-xs text-red-500 mt-1">
+                  <p className="text-xs text-red-500 mt-1">
                     {errores.mensaje}
                   </p>
                 )}
