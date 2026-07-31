@@ -12,12 +12,12 @@ type AppContextType = {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [modo, setModoState] = useState("campania");
+  const [modo, setModoState] = useState("institucional");
   const [tema, setTemaState] = useState("claro");
 
   // Cargar estado inicial desde localStorage
   useEffect(() => {
-    const modoGuardado = localStorage.getItem("gm-modo") || "campania";
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
     const temaGuardado = localStorage.getItem("gm-tema") || "claro";
     setModoState(modoGuardado);
     setTemaState(temaGuardado);

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useApp } from "../context/AppContext";  // ✅ Importación relativa
+import { useApp } from "@/context/AppContext";
 
 export default function Nav() {
   const { modo, tema, setTema } = useApp();
@@ -101,6 +101,7 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
+          {/* ✅ Muestra "Proyectos" o "Propuestas" según el modo */}
           {modo === "campania" ? (
             <>
               <Link href="/proyectos" className="nav-link">

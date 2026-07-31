@@ -76,10 +76,10 @@
 }
 
 /* ══════════════════════════════════════════
-   4 PALETAS COMPLETAS (ORIGINALES DEL PROYECTO ASTRO)
+   PALETAS UNIFICADAS (Mismo color para institucional y campaña)
    ══════════════════════════════════════════ */
 
-/* ── INSTITUCIONAL + CLARO (por defecto) ── */
+/* ── CLARO (por defecto) ── */
 :root {
   --color-primario: #1e3a5f;
   --color-primario-dark: #0f2744;
@@ -97,8 +97,8 @@
   --color-rol: #1a3a6a;
 }
 
-/* ── INSTITUCIONAL + OSCURO ── */
-[data-modo="institucional"][data-tema="oscuro"] {
+/* ── OSCURO ── */
+[data-tema="oscuro"] {
   --color-primario: #1a3352;
   --color-primario-dark: #0c1e35;
   --color-destacado: #8fc4e8;
@@ -114,38 +114,39 @@
   --color-rol: #a8d4f0;
 }
 
-/* ── CAMPAÑA + CLARO ── */
+/* ── CAMPAÑA + CLARO (Mismos colores que institucional) ── */
 [data-modo="campaña"] {
-  --color-primario: #6c3fa0;
-  --color-primario-dark: #4c1d95;
-  --color-destacado: #d4a017;
-  --color-destacado-fondo: #96750f;
-  --color-destacado-pastilla: #ddb830;
+  --color-primario: #1e3a5f;
+  --color-primario-dark: #0f2744;
+  --color-destacado: #74acdf;
+  --color-destacado-fondo: var(--color-destacado);
+  --color-destacado-pastilla: var(--color-destacado);
   --color-fondo: #ffffff;
-  --color-fondo-alt: #f0e8ff;
-  --color-texto: #1a1a1a;
-  --color-texto-sec: #374151;
-  --color-borde: #9a8ab0;
+  --color-fondo-alt: #f8f9fa;
+  --color-texto: #1a1a2e;
+  --color-texto-sec: #4a4a6a;
+  --color-blanco-suave: rgba(255, 255, 255, 0.85);
+  --color-borde: #94a3b8;
   --color-nav: rgba(255, 255, 255, 0.85);
-  --color-nav-scrolled: #6c3fa0;
-  --color-rol: #3a2a7a;
+  --color-nav-scrolled: #1e3a5f;
+  --color-rol: #1a3a6a;
 }
 
-/* ── CAMPAÑA + OSCURO ── */
+/* ── CAMPAÑA + OSCURO (Mismos colores que institucional) ── */
 [data-modo="campaña"][data-tema="oscuro"] {
-  --color-primario: #4c1d95;
-  --color-primario-dark: #2e1065;
-  --color-destacado: #f0c040;
-  --color-destacado-fondo: #a08015;
-  --color-destacado-pastilla: #d4a017;
-  --color-fondo: #1a1025;
-  --color-fondo-alt: #2d1b4e;
+  --color-primario: #1a3352;
+  --color-primario-dark: #0c1e35;
+  --color-destacado: #8fc4e8;
+  --color-destacado-fondo: var(--color-destacado);
+  --color-destacado-pastilla: var(--color-destacado);
+  --color-fondo: #0f172a;
+  --color-fondo-alt: #1e293b;
   --color-texto: #f1f5f9;
-  --color-texto-sec: #c4b5fd;
-  --color-borde: #7a6a9a;
-  --color-nav: rgba(26, 16, 37, 0.85);
-  --color-nav-scrolled: #4c1d95;
-  --color-rol: #d4c0f0;
+  --color-texto-sec: #cbd5e1;
+  --color-borde: #64748b;
+  --color-nav: rgba(15, 23, 42, 0.85);
+  --color-nav-scrolled: #1a3352;
+  --color-rol: #a8d4f0;
 }
 
 /* ══════════════════════════════════════════
@@ -371,7 +372,7 @@ body {
 
 /* ══════════════════════════════════════════
    PILL MÁGICA
-   ══════════════════════════════════════════ */
+   ══════════════════════════════════════ */
 .pill-magica {
   background-color: var(--color-texto);
   color: #ffffff;
@@ -661,30 +662,29 @@ html[data-tema="oscuro"] .contador-resultados strong {
   flex-shrink: 0;
 }
 
-/* ✅ Colores de estado - Texto en BLANCO para probar */
 .estado-aprobada {
   background-color: #16a34a !important;
-  color: #ffffff !important; /* ✅ Blanco */
+  color: #ffffff !important;
 }
 
 .estado-no-aprobada {
   background-color: #dc2626 !important;
-  color: #ffffff !important; /* ✅ Blanco */
+  color: #ffffff !important;
 }
 
 .estado-en-tratamiento {
   background-color: #ca8a04 !important;
-  color: #ffffff !important; /* ✅ Blanco */
+  color: #ffffff !important;
 }
 
 .estado-en-comision {
   background-color: #2563eb !important;
-  color: #ffffff !important; /* ✅ Blanco */
+  color: #ffffff !important;
 }
 
 .estado-vetada {
   background-color: #7c3aed !important;
-  color: #ffffff !important; /* ✅ Blanco */
+  color: #ffffff !important;
 }
 
 .gestion-card .fecha {
@@ -997,14 +997,13 @@ html[data-tema="oscuro"] .gestion-card .btn-expediente {
   cursor: not-allowed;
 }
 
-/* ✅ Dark Mode: fondo blanco, borde blanco, texto azul oscuro */
+/* Dark Mode: fondo blanco, borde blanco, texto azul oscuro */
 html[data-tema="oscuro"] .btn-voluntario {
   background-color: #ffffff !important;
   color: #1a1a2e !important;
   border: 2px solid #ffffff !important;
 }
 
-/* ✅ Dark Mode Hover: solo escala, sin cambio de color */
 html[data-tema="oscuro"] .btn-voluntario:hover:not(:disabled) {
   background-color: #ffffff !important;
   color: #1a1a2e !important;
@@ -1034,14 +1033,13 @@ html[data-tema="oscuro"] .btn-voluntario:hover:not(:disabled) {
   cursor: not-allowed;
 }
 
-/* ✅ Dark Mode: fondo blanco, borde blanco, texto azul oscuro */
+/* Dark Mode: fondo blanco, borde blanco, texto azul oscuro */
 html[data-tema="oscuro"] .btn-enviar {
   background-color: #ffffff !important;
   color: #1a1a2e !important;
   border: 2px solid #ffffff !important;
 }
 
-/* ✅ Dark Mode Hover: solo escala, sin cambio de color */
 html[data-tema="oscuro"] .btn-enviar:hover:not(:disabled) {
   background-color: #ffffff !important;
   color: #1a1a2e !important;

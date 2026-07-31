@@ -1,29 +1,25 @@
 ESTRUCTURA DE CARPETAS
 Directorio: E:\giselle\web-giselle-nodejs
-Fecha: 2026-07-31 04:19:14
+Fecha: 2026-07-31 15:06:48
 ================================================================================
 
 📁 web-giselle-nodejs/
     📄 .env
     📄 .env.example
     📄 .gitignore
-    📄 codigo-proyecto.txt
     📄 estructura.py
     📄 estructura.txt
-    📄 extensions.txt
     📄 next-env.d.ts
     📄 next.config.js
     📄 package-lock.json
     📄 package.json
     📄 postcss.config.js
-    📄 setup_nextjs.py
     📄 tailwind.config.js
     📄 tsconfig.json
 
     📁 .next/
         📄 app-build-manifest.json
         📄 build-manifest.json
-        📄 fallback-build-manifest.json
         📄 package.json
         📄 prerender-manifest.json
         📄 react-loadable-manifest.json
@@ -145,16 +141,7 @@ Fecha: 2026-07-31 04:19:14
                 📄 page.js
                 📄 page_client-reference-manifest.js
 
-                📁 api/
-                    📁 gestion/
-                        📄 route.js
-                        📄 route_client-reference-manifest.js
-
-                📁 mapa/
-                    📄 page.js
-                    📄 page_client-reference-manifest.js
-
-                📁 proyectos/
+                📁 _not-found/
                     📄 page.js
                     📄 page_client-reference-manifest.js
 
@@ -164,6 +151,7 @@ Fecha: 2026-07-31 04:19:14
                 📄 _error.js
 
             📁 vendor-chunks/
+                📄 @fortawesome.js
                 📄 @swc.js
                 📄 agent-base.js
                 📄 base64-js.js
@@ -233,29 +221,8 @@ Fecha: 2026-07-31 04:19:14
                     📄 layout.js
                     📄 page.js
 
-                    📁 api/
-                        📁 gestion/
-                            📄 route.js
-
-                    📁 mapa/
+                    📁 _not-found/
                         📄 page.js
-
-                    📁 proyectos/
-                        📄 page.js
-
-                📁 fallback/
-                    📄 amp.js
-                    📄 main-app.js
-                    📄 main.js
-                    📄 react-refresh.js
-                    📄 webpack.js
-                    📄 _app-pages-browser_node_modules_next_dist_client_dev_noop-turbopack-hmr_js.js
-                    📄 _pages-dir-browser_node_modules_next_dist_pages__app_js.js
-                    📄 _pages-dir-browser_node_modules_next_dist_pages__error_js.js
-
-                    📁 pages/
-                        📄 _app.js
-                        📄 _error.js
 
                 📁 pages/
                     📄 _app.js
@@ -275,196 +242,64 @@ Fecha: 2026-07-31 04:19:14
                 📄 8e9860b6e62d6359-s.woff2
                 📄 ba9851c3c22cd980-s.woff2
                 📄 c5fe6dc8356a8c31-s.woff2
+                📄 ccc01da6a2b3d788-s.woff2
                 📄 df0a9ae256c0569c-s.woff2
                 📄 e4af272ccee01ff0-s.p.woff2
+                📄 fa3e259cafa8f47e-s.p.woff2
 
             📁 webpack/
-                📄 0120678973f0f998.webpack.hot-update.json
-                📄 034fa14ebf6a65cf.webpack.hot-update.json
-                📄 12f4b3a51b262408.webpack.hot-update.json
-                📄 1988b949cea842a5.webpack.hot-update.json
-                📄 252f4809b2373788.webpack.hot-update.json
-                📄 2f8ada6eb9266328.webpack.hot-update.json
-                📄 30f6942b8020f703.webpack.hot-update.json
-                📄 37a1246881050cc1.webpack.hot-update.json
-                📄 3ad6ee4600424353.webpack.hot-update.json
-                📄 4703108321872fba.webpack.hot-update.json
-                📄 47d02abeb1be432e.webpack.hot-update.json
-                📄 4a548b6551922d92.webpack.hot-update.json
-                📄 4b93149e3b27d133.webpack.hot-update.json
-                📄 4c2c7b308f5aa583.webpack.hot-update.json
-                📄 4d5a878ff4e14ddf.webpack.hot-update.json
-                📄 4e3eba239abd80c0.webpack.hot-update.json
-                📄 4f354dbd0496cf6b.webpack.hot-update.json
-                📄 52188b0f5c6f99fe.webpack.hot-update.json
-                📄 5573cbba3c2bad0d.webpack.hot-update.json
-                📄 56c42d2c5fb7afa4.webpack.hot-update.json
-                📄 5e40cacf9c6d91a5.webpack.hot-update.json
-                📄 62afdf98d708e3db.webpack.hot-update.json
+                📄 000f4fc59308b42f.webpack.hot-update.json
+                📄 1f50291f17a40439.webpack.hot-update.json
+                📄 219a19f86dff418d.webpack.hot-update.json
+                📄 26d4f3ff22f643ce.webpack.hot-update.json
+                📄 37aa728e91411d6e.webpack.hot-update.json
+                📄 39eb866efa030505.webpack.hot-update.json
+                📄 474d2dc3459eb5f9.webpack.hot-update.json
+                📄 54a7df0c381716f3.webpack.hot-update.json
+                📄 5e788ab52918ebdc.webpack.hot-update.json
                 📄 633457081244afec._.hot-update.json
-                📄 63e226e1bc5a139a.webpack.hot-update.json
-                📄 6ebb5bccfb1d077b.webpack.hot-update.json
-                📄 6f5dfa09a466c3cd.webpack.hot-update.json
-                📄 6f82b9dba1948239.webpack.hot-update.json
-                📄 7aeffb08192653ce.webpack.hot-update.json
-                📄 7f1fc2a8b377c5d5.webpack.hot-update.json
-                📄 822cbdad45756f54.webpack.hot-update.json
-                📄 84dc396bf2c41293.webpack.hot-update.json
-                📄 861cf9ff5cad600b.webpack.hot-update.json
-                📄 984b3c4ea902bd27.webpack.hot-update.json
-                📄 a535c63b5f244ab1.webpack.hot-update.json
-                📄 a8eef845af2746af.webpack.hot-update.json
-                📄 ab70dc1440efafd5.webpack.hot-update.json
-                📄 ac8af51e8c668165.webpack.hot-update.json
-                📄 b41522b6475efbab.webpack.hot-update.json
-                📄 b90724bcfd14f429.webpack.hot-update.json
-                📄 bad7ef06c7df3853.webpack.hot-update.json
-                📄 be56b58d63a745e4.webpack.hot-update.json
-                📄 c03d845762cf5cf9.webpack.hot-update.json
-                📄 c5618378582a9360.webpack.hot-update.json
-                📄 d0fdf8dbc683a00a.webpack.hot-update.json
-                📄 d2e4a605314352c3.webpack.hot-update.json
-                📄 d70832677c443241.webpack.hot-update.json
-                📄 dda88c5a1635dc12.webpack.hot-update.json
-                📄 e3243a6c5fecc824.webpack.hot-update.json
-                📄 e3b21ed0e47d0cb4.webpack.hot-update.json
-                📄 e554767be4c5b113.webpack.hot-update.json
-                📄 eb8b3200162a6774.webpack.hot-update.json
-                📄 edd383b74531444f.webpack.hot-update.json
-                📄 ef9f71a485af702f.webpack.hot-update.json
-                📄 f15082e7c546152d.webpack.hot-update.json
-                📄 f57a3859e01fb0e8.webpack.hot-update.json
-                📄 fb1366c071249a04.webpack.hot-update.json
-                📄 fd5fd94399183c9c.webpack.hot-update.json
-                📄 main.ef9f71a485af702f.hot-update.js
-                📄 webpack.0120678973f0f998.hot-update.js
-                📄 webpack.034fa14ebf6a65cf.hot-update.js
-                📄 webpack.12f4b3a51b262408.hot-update.js
-                📄 webpack.1988b949cea842a5.hot-update.js
-                📄 webpack.252f4809b2373788.hot-update.js
-                📄 webpack.2f8ada6eb9266328.hot-update.js
-                📄 webpack.30f6942b8020f703.hot-update.js
-                📄 webpack.37a1246881050cc1.hot-update.js
-                📄 webpack.3ad6ee4600424353.hot-update.js
-                📄 webpack.4703108321872fba.hot-update.js
-                📄 webpack.47d02abeb1be432e.hot-update.js
-                📄 webpack.4a548b6551922d92.hot-update.js
-                📄 webpack.4b93149e3b27d133.hot-update.js
-                📄 webpack.4c2c7b308f5aa583.hot-update.js
-                📄 webpack.4d5a878ff4e14ddf.hot-update.js
-                📄 webpack.4e3eba239abd80c0.hot-update.js
-                📄 webpack.4f354dbd0496cf6b.hot-update.js
-                📄 webpack.52188b0f5c6f99fe.hot-update.js
-                📄 webpack.5573cbba3c2bad0d.hot-update.js
-                📄 webpack.56c42d2c5fb7afa4.hot-update.js
-                📄 webpack.5e40cacf9c6d91a5.hot-update.js
-                📄 webpack.62afdf98d708e3db.hot-update.js
-                📄 webpack.63e226e1bc5a139a.hot-update.js
-                📄 webpack.6ebb5bccfb1d077b.hot-update.js
-                📄 webpack.6f5dfa09a466c3cd.hot-update.js
-                📄 webpack.6f82b9dba1948239.hot-update.js
-                📄 webpack.7aeffb08192653ce.hot-update.js
-                📄 webpack.7f1fc2a8b377c5d5.hot-update.js
-                📄 webpack.822cbdad45756f54.hot-update.js
-                📄 webpack.84dc396bf2c41293.hot-update.js
-                📄 webpack.861cf9ff5cad600b.hot-update.js
-                📄 webpack.984b3c4ea902bd27.hot-update.js
-                📄 webpack.a535c63b5f244ab1.hot-update.js
-                📄 webpack.a8eef845af2746af.hot-update.js
-                📄 webpack.ab70dc1440efafd5.hot-update.js
-                📄 webpack.ac8af51e8c668165.hot-update.js
-                📄 webpack.b41522b6475efbab.hot-update.js
-                📄 webpack.b90724bcfd14f429.hot-update.js
-                📄 webpack.bad7ef06c7df3853.hot-update.js
-                📄 webpack.be56b58d63a745e4.hot-update.js
-                📄 webpack.c03d845762cf5cf9.hot-update.js
-                📄 webpack.c5618378582a9360.hot-update.js
-                📄 webpack.d0fdf8dbc683a00a.hot-update.js
-                📄 webpack.d2e4a605314352c3.hot-update.js
-                📄 webpack.d70832677c443241.hot-update.js
-                📄 webpack.dda88c5a1635dc12.hot-update.js
-                📄 webpack.e3243a6c5fecc824.hot-update.js
-                📄 webpack.e3b21ed0e47d0cb4.hot-update.js
-                📄 webpack.e554767be4c5b113.hot-update.js
-                📄 webpack.eb8b3200162a6774.hot-update.js
-                📄 webpack.edd383b74531444f.hot-update.js
-                📄 webpack.ef9f71a485af702f.hot-update.js
-                📄 webpack.f15082e7c546152d.hot-update.js
-                📄 webpack.f57a3859e01fb0e8.hot-update.js
-                📄 webpack.fb1366c071249a04.hot-update.js
-                📄 webpack.fd5fd94399183c9c.hot-update.js
+                📄 9de56e5981920408.webpack.hot-update.json
+                📄 ad302200c1722adb.webpack.hot-update.json
+                📄 b9cc2fa066a68cc8.webpack.hot-update.json
+                📄 baff95e8cae9b993.webpack.hot-update.json
+                📄 c9689a86944f33ac.webpack.hot-update.json
+                📄 ce64315fc6fcead2.webpack.hot-update.json
+                📄 efeafbb2cd0384ea.webpack.hot-update.json
+                📄 f22e037d0b9ba300.webpack.hot-update.json
+                📄 webpack.000f4fc59308b42f.hot-update.js
+                📄 webpack.1f50291f17a40439.hot-update.js
+                📄 webpack.219a19f86dff418d.hot-update.js
+                📄 webpack.26d4f3ff22f643ce.hot-update.js
+                📄 webpack.37aa728e91411d6e.hot-update.js
+                📄 webpack.39eb866efa030505.hot-update.js
+                📄 webpack.474d2dc3459eb5f9.hot-update.js
+                📄 webpack.54a7df0c381716f3.hot-update.js
+                📄 webpack.5e788ab52918ebdc.hot-update.js
+                📄 webpack.9de56e5981920408.hot-update.js
+                📄 webpack.ad302200c1722adb.hot-update.js
+                📄 webpack.b9cc2fa066a68cc8.hot-update.js
+                📄 webpack.baff95e8cae9b993.hot-update.js
+                📄 webpack.c9689a86944f33ac.hot-update.js
+                📄 webpack.ce64315fc6fcead2.hot-update.js
+                📄 webpack.efeafbb2cd0384ea.hot-update.js
+                📄 webpack.f22e037d0b9ba300.hot-update.js
 
                 📁 app/
-                    📄 layout.0120678973f0f998.hot-update.js
-                    📄 layout.034fa14ebf6a65cf.hot-update.js
-                    📄 layout.12f4b3a51b262408.hot-update.js
-                    📄 layout.1988b949cea842a5.hot-update.js
-                    📄 layout.252f4809b2373788.hot-update.js
-                    📄 layout.30f6942b8020f703.hot-update.js
-                    📄 layout.37a1246881050cc1.hot-update.js
-                    📄 layout.3ad6ee4600424353.hot-update.js
-                    📄 layout.4703108321872fba.hot-update.js
-                    📄 layout.47d02abeb1be432e.hot-update.js
-                    📄 layout.4a548b6551922d92.hot-update.js
-                    📄 layout.4b93149e3b27d133.hot-update.js
-                    📄 layout.4c2c7b308f5aa583.hot-update.js
-                    📄 layout.4d5a878ff4e14ddf.hot-update.js
-                    📄 layout.4e3eba239abd80c0.hot-update.js
-                    📄 layout.4f354dbd0496cf6b.hot-update.js
-                    📄 layout.52188b0f5c6f99fe.hot-update.js
-                    📄 layout.5573cbba3c2bad0d.hot-update.js
-                    📄 layout.56c42d2c5fb7afa4.hot-update.js
-                    📄 layout.5e40cacf9c6d91a5.hot-update.js
-                    📄 layout.62afdf98d708e3db.hot-update.js
-                    📄 layout.63e226e1bc5a139a.hot-update.js
-                    📄 layout.6ebb5bccfb1d077b.hot-update.js
-                    📄 layout.6f5dfa09a466c3cd.hot-update.js
-                    📄 layout.6f82b9dba1948239.hot-update.js
-                    📄 layout.7aeffb08192653ce.hot-update.js
-                    📄 layout.7f1fc2a8b377c5d5.hot-update.js
-                    📄 layout.822cbdad45756f54.hot-update.js
-                    📄 layout.84dc396bf2c41293.hot-update.js
-                    📄 layout.861cf9ff5cad600b.hot-update.js
-                    📄 layout.a535c63b5f244ab1.hot-update.js
-                    📄 layout.a8eef845af2746af.hot-update.js
-                    📄 layout.ab70dc1440efafd5.hot-update.js
-                    📄 layout.ac8af51e8c668165.hot-update.js
-                    📄 layout.b41522b6475efbab.hot-update.js
-                    📄 layout.b90724bcfd14f429.hot-update.js
-                    📄 layout.bad7ef06c7df3853.hot-update.js
-                    📄 layout.be56b58d63a745e4.hot-update.js
-                    📄 layout.c03d845762cf5cf9.hot-update.js
-                    📄 layout.c5618378582a9360.hot-update.js
-                    📄 layout.d70832677c443241.hot-update.js
-                    📄 layout.dda88c5a1635dc12.hot-update.js
-                    📄 layout.e3243a6c5fecc824.hot-update.js
-                    📄 layout.e3b21ed0e47d0cb4.hot-update.js
-                    📄 layout.e554767be4c5b113.hot-update.js
-                    📄 layout.eb8b3200162a6774.hot-update.js
-                    📄 layout.edd383b74531444f.hot-update.js
-                    📄 layout.f15082e7c546152d.hot-update.js
-                    📄 layout.f57a3859e01fb0e8.hot-update.js
-                    📄 layout.fb1366c071249a04.hot-update.js
-                    📄 layout.fd5fd94399183c9c.hot-update.js
-
-                    📁 proyectos/
-                        📄 page.1988b949cea842a5.hot-update.js
-                        📄 page.252f4809b2373788.hot-update.js
-                        📄 page.47d02abeb1be432e.hot-update.js
-                        📄 page.4a548b6551922d92.hot-update.js
-                        📄 page.4c2c7b308f5aa583.hot-update.js
-                        📄 page.4d5a878ff4e14ddf.hot-update.js
-                        📄 page.62afdf98d708e3db.hot-update.js
-                        📄 page.63e226e1bc5a139a.hot-update.js
-                        📄 page.6ebb5bccfb1d077b.hot-update.js
-                        📄 page.6f5dfa09a466c3cd.hot-update.js
-                        📄 page.7aeffb08192653ce.hot-update.js
-                        📄 page.7f1fc2a8b377c5d5.hot-update.js
-                        📄 page.84dc396bf2c41293.hot-update.js
-                        📄 page.ab70dc1440efafd5.hot-update.js
-                        📄 page.ac8af51e8c668165.hot-update.js
-                        📄 page.eb8b3200162a6774.hot-update.js
-                        📄 page.fb1366c071249a04.hot-update.js
+                    📄 layout.000f4fc59308b42f.hot-update.js
+                    📄 layout.1f50291f17a40439.hot-update.js
+                    📄 layout.219a19f86dff418d.hot-update.js
+                    📄 layout.26d4f3ff22f643ce.hot-update.js
+                    📄 layout.37aa728e91411d6e.hot-update.js
+                    📄 layout.39eb866efa030505.hot-update.js
+                    📄 layout.474d2dc3459eb5f9.hot-update.js
+                    📄 layout.54a7df0c381716f3.hot-update.js
+                    📄 layout.5e788ab52918ebdc.hot-update.js
+                    📄 layout.9de56e5981920408.hot-update.js
+                    📄 layout.ad302200c1722adb.hot-update.js
+                    📄 layout.b9cc2fa066a68cc8.hot-update.js
+                    📄 layout.c9689a86944f33ac.hot-update.js
+                    📄 layout.efeafbb2cd0384ea.hot-update.js
+                    📄 layout.f22e037d0b9ba300.hot-update.js
 
         📁 types/
             📄 cache-life.d.ts
@@ -475,16 +310,6 @@ Fecha: 2026-07-31 04:19:14
             📁 app/
                 📄 layout.ts
                 📄 page.ts
-
-                📁 api/
-                    📁 gestion/
-                        📄 route.ts
-
-                📁 mapa/
-                    📄 page.ts
-
-                📁 proyectos/
-                    📄 page.ts
 
     📁 nppBackup/
         📄 setup-nextjs.py.2026-07-28_171344.bak
@@ -564,4 +389,13 @@ Fecha: 2026-07-31 04:19:14
 
         📁 lib/
             📄 types.ts
+
+    📁 txt y py/
+        📄 código-completo-proyecto.txt
+        📄 estructura.txt
+        📄 extensions.txt
+        📄 setup_nextjs.py
+
+        📁 nppBackup/
+            📄 código-completo-proyecto.txt.2026-07-31_145629.bak
 
