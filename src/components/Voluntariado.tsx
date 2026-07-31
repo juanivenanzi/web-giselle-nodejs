@@ -1,18 +1,16 @@
+// src/components/Voluntariado.tsx
 "use client";
 
 import { useState, useEffect, useTransition, useRef } from "react";
 import { enviarVoluntario, type VoluntarioState } from "@/actions/voluntario";
+import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 // ✅ Constantes de validación (compartidas con Contacto)
 const VALIDACIONES = {
-  // 📧 Email
   email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-  // 📞 Teléfono argentino (con formato flexible)
   telefono:
     /^(?:(?:\(?(?:0?11|0?[1-9][0-9]{2})\)?[\s-]?)?(?:15)?[\s-]?[0-9]{7,8}|[0-9]{7,10})$/,
-  // 👤 Nombre (solo letras y espacios)
   nombre: /^[a-zA-ZáéíóúñÑüÜ\s]+$/,
-  // 🛡️ Patrones de spam
   spam: [
     /http[s]?:\/\//i,
     /www\./i,
@@ -23,7 +21,6 @@ const VALIDACIONES = {
   ],
 };
 
-// Función de validación en cliente mejorada
 const validateForm = (formData: FormData) => {
   const nombre = formData.get("nombre")?.toString().trim() || "";
   const email = formData.get("email")?.toString().trim() || "";
@@ -32,7 +29,6 @@ const validateForm = (formData: FormData) => {
 
   const errors: Record<string, string> = {};
 
-  // 👤 Validación de nombre
   if (!nombre || nombre.length < 2) {
     errors.nombre = "El nombre es requerido (mínimo 2 caracteres)";
   } else if (!VALIDACIONES.nombre.test(nombre)) {
@@ -41,14 +37,12 @@ const validateForm = (formData: FormData) => {
     errors.nombre = "El nombre no puede superar los 100 caracteres";
   }
 
-  // 📧 Validación de email
   if (!email) {
     errors.email = "El email es requerido";
   } else if (!VALIDACIONES.email.test(email)) {
     errors.email = "Email inválido. Usá formato: nombre@dominio.com";
   }
 
-  // 📞 Validación de teléfono (opcional pero con formato)
   if (telefono) {
     const telefonoLimpio = telefono.replace(/\s/g, "");
     if (!VALIDACIONES.telefono.test(telefonoLimpio)) {
@@ -57,7 +51,6 @@ const validateForm = (formData: FormData) => {
     }
   }
 
-  // 💬 Validación de mensaje
   if (mensaje) {
     if (mensaje.length > 500) {
       errors.mensaje = "El mensaje no puede superar los 500 caracteres";
@@ -79,18 +72,18 @@ const initialState: VoluntarioState = {
 export default function Voluntariado() {
   const [enviando, setEnviando] = useState(false);
   const [mensaje, setMensaje] = useState("");
-  const [modo, setModo] = useState("institucional");
+  const [modo, setModo] = useState(MODO_ACTUAL);
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
-    setModo(modoGuardado);
+    const modoActual = MODO_ACTUAL;
+    setModo(modoActual);
 
     const observer = new MutationObserver(() => {
       const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || "institucional";
+        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
       setModo(nuevoModo);
     });
     observer.observe(document.documentElement, {
@@ -99,6 +92,8 @@ export default function Voluntariado() {
     });
     return () => observer.disconnect();
   }, []);
+
+  const esCampania = modo === TIPO_MODO.CAMPANIA;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -168,7 +163,7 @@ export default function Voluntariado() {
               className="font-head text-4xl lg:text-5xl font-semibold mb-4"
               style={{ color: "var(--color-texto)" }}
             >
-              {modo === "institucional" ? "Anotate" : "Sumate"}
+              {esCampania ? "Sumate" : "Anotate"}
             </h2>
             <div className="w-20 h-1 bg-(--color-destacado) rounded-full mb-4 lg:mx-0 mx-auto" />
             <p
@@ -177,20 +172,18 @@ export default function Voluntariado() {
                 color: "color-mix(in srgb, var(--color-texto) 75%, transparent)",
               }}
             >
-              {modo === "institucional"
-                ? "Si querés participar activamente, dejá tus datos."
-                : "Santo Tomé se construye entre todos. Anotate."}
+              {esCampania
+                ? "Santo Tomé se construye entre todos. Anotate."
+                : "Si querés participar activamente, dejá tus datos."}
             </p>
           </div>
 
-          {/* ✅ FORMULARIO SIN TARJETA - Mismo estilo que Contacto */}
           <div className="lg:col-span-3">
             <form
               ref={formRef}
               onSubmit={handleSubmit}
               className="reveal reveal-delay-1 flex flex-col gap-4 relative"
             >
-              {/* Honeypot oculto */}
               <div className="absolute left-[-9999px]" aria-hidden="true">
                 <input
                   type="text"

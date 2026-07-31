@@ -1,6 +1,8 @@
+// src/context/AppContext.tsx
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
+import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 type AppContextType = {
   modo: string;
@@ -12,24 +14,35 @@ type AppContextType = {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [modo, setModoState] = useState("institucional");
+  const [modo, setModoState] = useState(MODO_ACTUAL);
   const [tema, setTemaState] = useState("claro");
 
-  // Cargar estado inicial desde localStorage
   useEffect(() => {
-    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
-    const temaGuardado = localStorage.getItem("gm-tema") || "claro";
-    setModoState(modoGuardado);
-    setTemaState(temaGuardado);
-    document.documentElement.setAttribute("data-modo", modoGuardado);
-    document.documentElement.setAttribute("data-tema", temaGuardado);
+    // ✅ Forzar modo y tema desde la configuración
+    const modoActual = MODO_ACTUAL;
+    const temaActual = "claro";
+    
+    // Establecer en DOM
+    document.documentElement.setAttribute("data-modo", modoActual);
+    document.documentElement.setAttribute("data-tema", temaActual);
+    
+    // Guardar en localStorage (por si acaso)
+    localStorage.setItem("gm-modo", modoActual);
+    localStorage.setItem("gm-tema", temaActual);
+    
+    // Actualizar estado
+    setModoState(modoActual);
+    setTemaState(temaActual);
   }, []);
 
-  // Sincronizar cambios con el DOM y localStorage
   const setModo = (nuevoModo: string) => {
     setModoState(nuevoModo);
     localStorage.setItem("gm-modo", nuevoModo);
     document.documentElement.setAttribute("data-modo", nuevoModo);
+    // ✅ Recargar para asegurar que todos los componentes se actualicen
+    if (typeof window !== "undefined") {
+      window.location.reload();
+    }
   };
 
   const setTema = (nuevoTema: string) => {

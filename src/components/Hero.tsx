@@ -1,27 +1,29 @@
+// src/components/Hero.tsx
 "use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 export default function Hero() {
-  const [modo, setModo] = useState("institucional");
+  const [modo, setModo] = useState(MODO_ACTUAL);
   const [heroBg, setHeroBg] = useState("/images/hero-bg-institucional.webp");
 
   useEffect(() => {
-    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
-    setModo(modoGuardado);
+    const modoActual = MODO_ACTUAL;
+    setModo(modoActual);
     setHeroBg(
-      modoGuardado === "institucional"
+      modoActual === TIPO_MODO.INSTITUCIONAL
         ? "/images/hero-bg-institucional.webp"
         : "/images/hero-bg-campana.webp",
     );
 
     const observer = new MutationObserver(() => {
       const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || "institucional";
+        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
       setModo(nuevoModo);
       setHeroBg(
-        nuevoModo === "institucional"
+        nuevoModo === TIPO_MODO.INSTITUCIONAL
           ? "/images/hero-bg-institucional.webp"
           : "/images/hero-bg-campana.webp",
       );
@@ -32,6 +34,8 @@ export default function Hero() {
     });
     return () => observer.disconnect();
   }, []);
+
+  const esCampania = modo === TIPO_MODO.CAMPANIA;
 
   return (
     <section
@@ -54,7 +58,6 @@ export default function Hero() {
         }}
       ></div>
       <div className="relative z-10 max-w-300 mx-auto px-6 pt-36 pb-20 text-center sm:text-left">
-        {/* ✅ TÍTULO PRINCIPAL - El más claro */}
         <h1
           className="font-head leading-[1.05] mb-2"
           style={{
@@ -69,7 +72,6 @@ export default function Hero() {
           </span>
         </h1>
 
-        {/* ✅ SUBTÍTULO - Tono intermedio */}
         <p
           className="font-head italic mb-5"
           style={{
@@ -78,12 +80,9 @@ export default function Hero() {
           }}
           id="heroRol"
         >
-          {modo === "institucional"
-            ? "Concejal de Santo Tomé"
-            : "Candidata a Intendente"}
+          {esCampania ? "Candidata a Intendente" : "Concejal de Santo Tomé"}
         </p>
 
-        {/* ✅ DESCRIPCIÓN - Tono más suave */}
         <p
           className="max-w-140 leading-relaxed mb-9"
           style={{
@@ -92,14 +91,12 @@ export default function Hero() {
           }}
           id="heroDesc"
         >
-          {modo === "institucional"
-            ? "Trabajando con compromiso por una comunidad más justa, segura y con oportunidades para todos los vecinos."
-            : "Santo Tomé merece más. Juntos podemos construir la ciudad que soñamos. ¡Sumate!"}
+          {esCampania
+            ? "Santo Tomé merece más. Juntos podemos construir la ciudad que soñamos. ¡Sumate!"
+            : "Trabajando con compromiso por una comunidad más justa, segura y con oportunidades para todos los vecinos."}
         </p>
 
-        {/* ✅ BOTONES - Con colores invertidos en light/dark mode */}
         <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
-          {/* ✅ BOTÓN "VER MI GESTIÓN" - Mismo color en light y dark mode */}
           <Link
             href="/proyectos"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold shadow-lg t-modo hover:scale-105 hover:shadow-2xl transition-all"
@@ -108,9 +105,8 @@ export default function Hero() {
               color: "#ffffff",
             }}
           >
-            {modo === "institucional" ? "Ver mi gestión" : "Mis propuestas"}
+            {esCampania ? "Mis propuestas" : "Ver mi gestión"}
           </Link>
-          {/* ✅ BOTÓN "CONTACTAME" - Invierte colores según el tema */}
           <Link
             href="#contacto"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold border-2 t-modo hover:scale-105 hover:shadow-lg transition-all"
@@ -125,7 +121,6 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* ✅ TEXTOS SECUNDARIOS - Los más tenues */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5">
         <a
           href="https://www.microsoft.com/es-es/accessible-windows/accessibility-in-windows-11-22-05-30"

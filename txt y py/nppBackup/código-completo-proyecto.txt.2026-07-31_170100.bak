@@ -1046,10 +1046,10 @@ export async function GET() {
 }
 
 /* ══════════════════════════════════════════
-   PALETAS UNIFICADAS (Mismo color para institucional y campaña)
+   4 PALETAS COMPLETAS (ORIGINALES DEL PROYECTO ASTRO)
    ══════════════════════════════════════════ */
 
-/* ── CLARO (por defecto) ── */
+/* ── INSTITUCIONAL + CLARO (por defecto) ── */
 :root {
   --color-primario: #1e3a5f;
   --color-primario-dark: #0f2744;
@@ -1067,8 +1067,8 @@ export async function GET() {
   --color-rol: #1a3a6a;
 }
 
-/* ── OSCURO ── */
-[data-tema="oscuro"] {
+/* ── INSTITUCIONAL + OSCURO ── */
+[data-modo="institucional"][data-tema="oscuro"] {
   --color-primario: #1a3352;
   --color-primario-dark: #0c1e35;
   --color-destacado: #8fc4e8;
@@ -1084,39 +1084,38 @@ export async function GET() {
   --color-rol: #a8d4f0;
 }
 
-/* ── CAMPAÑA + CLARO (Mismos colores que institucional) ── */
+/* ── CAMPAÑA + CLARO ── */
 [data-modo="campaña"] {
-  --color-primario: #1e3a5f;
-  --color-primario-dark: #0f2744;
-  --color-destacado: #74acdf;
-  --color-destacado-fondo: var(--color-destacado);
-  --color-destacado-pastilla: var(--color-destacado);
+  --color-primario: #6c3fa0;
+  --color-primario-dark: #4c1d95;
+  --color-destacado: #d4a017;
+  --color-destacado-fondo: #96750f;
+  --color-destacado-pastilla: #ddb830;
   --color-fondo: #ffffff;
-  --color-fondo-alt: #f8f9fa;
-  --color-texto: #1a1a2e;
-  --color-texto-sec: #4a4a6a;
-  --color-blanco-suave: rgba(255, 255, 255, 0.85);
-  --color-borde: #94a3b8;
+  --color-fondo-alt: #f0e8ff;
+  --color-texto: #1a1a1a;
+  --color-texto-sec: #374151;
+  --color-borde: #9a8ab0;
   --color-nav: rgba(255, 255, 255, 0.85);
-  --color-nav-scrolled: #1e3a5f;
-  --color-rol: #1a3a6a;
+  --color-nav-scrolled: #6c3fa0;
+  --color-rol: #3a2a7a;
 }
 
-/* ── CAMPAÑA + OSCURO (Mismos colores que institucional) ── */
+/* ── CAMPAÑA + OSCURO ── */
 [data-modo="campaña"][data-tema="oscuro"] {
-  --color-primario: #1a3352;
-  --color-primario-dark: #0c1e35;
-  --color-destacado: #8fc4e8;
-  --color-destacado-fondo: var(--color-destacado);
-  --color-destacado-pastilla: var(--color-destacado);
-  --color-fondo: #0f172a;
-  --color-fondo-alt: #1e293b;
+  --color-primario: #4c1d95;
+  --color-primario-dark: #2e1065;
+  --color-destacado: #f0c040;
+  --color-destacado-fondo: #a08015;
+  --color-destacado-pastilla: #d4a017;
+  --color-fondo: #1a1025;
+  --color-fondo-alt: #2d1b4e;
   --color-texto: #f1f5f9;
-  --color-texto-sec: #cbd5e1;
-  --color-borde: #64748b;
-  --color-nav: rgba(15, 23, 42, 0.85);
-  --color-nav-scrolled: #1a3352;
-  --color-rol: #a8d4f0;
+  --color-texto-sec: #c4b5fd;
+  --color-borde: #7a6a9a;
+  --color-nav: rgba(26, 16, 37, 0.85);
+  --color-nav-scrolled: #4c1d95;
+  --color-rol: #d4c0f0;
 }
 
 /* ══════════════════════════════════════════
@@ -1215,7 +1214,7 @@ body {
 }
 
 /* ══════════════════════════════════════════
-   NAVEGACIÓN
+   NAVEGACIÓN - Clases necesarias
    ══════════════════════════════════════════ */
 .nav-container {
   position: fixed;
@@ -1342,7 +1341,7 @@ body {
 
 /* ══════════════════════════════════════════
    PILL MÁGICA
-   ══════════════════════════════════════ */
+   ══════════════════════════════════════════ */
 .pill-magica {
   background-color: var(--color-texto);
   color: #ffffff;
@@ -1632,29 +1631,30 @@ html[data-tema="oscuro"] .contador-resultados strong {
   flex-shrink: 0;
 }
 
+/* ✅ Colores de estado - Texto en BLANCO para probar */
 .estado-aprobada {
   background-color: #16a34a !important;
-  color: #ffffff !important;
+  color: #ffffff !important; /* ✅ Blanco */
 }
 
 .estado-no-aprobada {
   background-color: #dc2626 !important;
-  color: #ffffff !important;
+  color: #ffffff !important; /* ✅ Blanco */
 }
 
 .estado-en-tratamiento {
   background-color: #ca8a04 !important;
-  color: #ffffff !important;
+  color: #ffffff !important; /* ✅ Blanco */
 }
 
 .estado-en-comision {
   background-color: #2563eb !important;
-  color: #ffffff !important;
+  color: #ffffff !important; /* ✅ Blanco */
 }
 
 .estado-vetada {
   background-color: #7c3aed !important;
-  color: #ffffff !important;
+  color: #ffffff !important; /* ✅ Blanco */
 }
 
 .gestion-card .fecha {
@@ -1967,13 +1967,14 @@ html[data-tema="oscuro"] .gestion-card .btn-expediente {
   cursor: not-allowed;
 }
 
-/* Dark Mode: fondo blanco, borde blanco, texto azul oscuro */
+/* ✅ Dark Mode: fondo blanco, borde blanco, texto azul oscuro */
 html[data-tema="oscuro"] .btn-voluntario {
   background-color: #ffffff !important;
   color: #1a1a2e !important;
   border: 2px solid #ffffff !important;
 }
 
+/* ✅ Dark Mode Hover: solo escala, sin cambio de color */
 html[data-tema="oscuro"] .btn-voluntario:hover:not(:disabled) {
   background-color: #ffffff !important;
   color: #1a1a2e !important;
@@ -2003,13 +2004,14 @@ html[data-tema="oscuro"] .btn-voluntario:hover:not(:disabled) {
   cursor: not-allowed;
 }
 
-/* Dark Mode: fondo blanco, borde blanco, texto azul oscuro */
+/* ✅ Dark Mode: fondo blanco, borde blanco, texto azul oscuro */
 html[data-tema="oscuro"] .btn-enviar {
   background-color: #ffffff !important;
   color: #1a1a2e !important;
   border: 2px solid #ffffff !important;
 }
 
+/* ✅ Dark Mode Hover: solo escala, sin cambio de color */
 html[data-tema="oscuro"] .btn-enviar:hover:not(:disabled) {
   background-color: #ffffff !important;
   color: #1a1a2e !important;
@@ -2082,26 +2084,26 @@ html[data-tema="oscuro"] .btn-enviar:hover:not(:disabled) {
   }
 }
 
+
 --- File: src\app\layout.tsx ---
+// src/app/layout.tsx
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
+import { AppProvider } from "@/context/AppContext";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { AppProvider } from "@/context/AppContext";
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const dmSerif = DM_Serif_Display({ 
+  subsets: ["latin"], 
+  weight: "400", 
+  variable: "--font-dm-serif" 
 });
 
 export const metadata: Metadata = {
-  title: "La Libertad Avanza — Santo Tomé",
-  description:
-    "Sitio oficial de Giselle Miravete, Concejal de Santo Tomé, Santa Fe.",
-  icons: {
-    icon: "/favicon.ico",
-  },
+  title: "Giselle Miravete - Concejal Santo Tomé",
+  description: "Sitio oficial de Giselle Miravete, Concejal de Santo Tomé",
 };
 
 export default function RootLayout({
@@ -2111,28 +2113,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-        />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300..700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body
-        className={`${inter.className} font-body bg-(--color-fondo) text-(--color-texto)`}
-      >
-        <a href="#inicio" className="skip-link">
-          Saltar al contenido
-        </a>
+      <body className={`${inter.variable} ${dmSerif.variable} antialiased`}>
         <AppProvider>
           <Nav />
           <main>{children}</main>
@@ -2245,6 +2226,7 @@ export default function Home() {
     </>
   );
 }
+
 
 --- File: src\app\propuestas\page.tsx ---
 "use client";
@@ -3918,6 +3900,7 @@ export default function Footer() {
   );
 }
 
+
 --- File: src\components\Hero.tsx ---
 "use client";
 
@@ -4081,19 +4064,19 @@ export default function Hero() {
 
 
 --- File: src\components\Nav.tsx ---
+// src/components/Nav.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useApp } from "@/context/AppContext";
+import { useApp } from "../context/AppContext";
 
 export default function Nav() {
-  const { tema, setTema } = useApp();
+  const { modo, tema, setTema } = useApp();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const [modoLocal, setModoLocal] = useState("institucional");
 
   useEffect(() => {
     setIsMounted(true);
@@ -4101,27 +4084,7 @@ export default function Nav() {
 
   useEffect(() => {
     if (!isMounted) return;
-    const modoActual =
-      document.documentElement.getAttribute("data-modo") || "institucional";
-    setModoLocal(modoActual);
-  }, [isMounted]);
 
-  useEffect(() => {
-    if (!isMounted) return;
-    const observer = new MutationObserver(() => {
-      const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || "institucional";
-      setModoLocal(nuevoModo);
-    });
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-modo"],
-    });
-    return () => observer.disconnect();
-  }, [isMounted]);
-
-  useEffect(() => {
-    if (!isMounted) return;
     const handleScroll = () => {
       if (tema === "oscuro") {
         setScrolled(window.scrollY > 60);
@@ -4129,6 +4092,7 @@ export default function Nav() {
         setScrolled(false);
       }
     };
+
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
@@ -4155,11 +4119,11 @@ export default function Nav() {
 
   return (
     <>
-      {/* ✅ NAV CON COLOR ELEGIDO */}
       <nav
         className={`nav-container ${scrolled ? "scrolled" : ""}`}
         style={{
-          backgroundColor: "var(--color-fondo)",
+          backgroundColor:
+            "color-mix(in srgb, var(--color-nav) 90%, var(--color-texto) 20%)",
           backdropFilter: "blur(16px)",
           borderBottom: "3px solid var(--color-destacado)",
         }}
@@ -4204,7 +4168,8 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
-          {modoLocal === "campania" ? (
+          {/* ✅ Lógica corregida: Propuestas solo en campaña */}
+          {modo === "campania" ? (
             <>
               <Link href="/proyectos" className="nav-link">
                 Proyectos
@@ -4301,7 +4266,8 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
-          {modoLocal === "campania" ? (
+          {/* ✅ Misma lógica en mobile */}
+          {modo === "campania" ? (
             <>
               <Link
                 href="/proyectos"
@@ -4347,7 +4313,6 @@ export default function Nav() {
     </>
   );
 }
-
 
 --- File: src\components\Pilares.tsx ---
 "use client";
@@ -4918,53 +4883,55 @@ export default function Voluntariado() {
 }
 
 --- File: src\context\AppContext.tsx ---
+// src/context/AppContext.tsx
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-type AppContextType = {
-  modo: string;
-  setModo: (modo: string) => void;
-  tema: string;
-  setTema: (tema: string) => void;
-};
+type Modo = "institucional" | "campania";
+type Tema = "claro" | "oscuro";
+
+interface AppContextType {
+  modo: Modo;
+  tema: Tema;
+  setModo: (modo: Modo) => void;
+  setTema: (tema: Tema) => void;
+  toggleTema: () => void;
+}
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [modo, setModoState] = useState("campania");
-  const [tema, setTemaState] = useState("claro");
+export function AppProvider({ children }: { children: ReactNode }) {
+  const [modo, setModo] = useState<Modo>("institucional");
+  const [tema, setTema] = useState<Tema>("claro");
 
-  // Cargar estado inicial desde localStorage
   useEffect(() => {
-    const modoGuardado = localStorage.getItem("gm-modo") || "campania";
-    const temaGuardado = localStorage.getItem("gm-tema") || "claro";
-    setModoState(modoGuardado);
-    setTemaState(temaGuardado);
-    document.documentElement.setAttribute("data-modo", modoGuardado);
-    document.documentElement.setAttribute("data-tema", temaGuardado);
+    const storedModo = localStorage.getItem("modo") as Modo | null;
+    const storedTema = localStorage.getItem("tema") as Tema | null;
+
+    if (storedModo) setModo(storedModo);
+    if (storedTema) setTema(storedTema);
   }, []);
 
-  // Sincronizar cambios con el DOM y localStorage
-  const setModo = (nuevoModo: string) => {
-    setModoState(nuevoModo);
-    localStorage.setItem("gm-modo", nuevoModo);
-    document.documentElement.setAttribute("data-modo", nuevoModo);
-  };
+  useEffect(() => {
+    document.documentElement.setAttribute("data-modo", modo);
+    document.documentElement.setAttribute("data-tema", tema);
+    localStorage.setItem("modo", modo);
+    localStorage.setItem("tema", tema);
+  }, [modo, tema]);
 
-  const setTema = (nuevoTema: string) => {
-    setTemaState(nuevoTema);
-    localStorage.setItem("gm-tema", nuevoTema);
-    document.documentElement.setAttribute("data-tema", nuevoTema);
+  const toggleTema = () => {
+    setTema((prev) => (prev === "claro" ? "oscuro" : "claro"));
   };
 
   return (
-    <AppContext.Provider value={{ modo, setModo, tema, setTema }}>
+    <AppContext.Provider value={{ modo, tema, setModo, setTema, toggleTema }}>
       {children}
     </AppContext.Provider>
   );
 }
 
+// ✅ Exportar como useApp (para coincidir con el original)
 export function useApp() {
   const context = useContext(AppContext);
   if (context === undefined) {
@@ -4973,6 +4940,10 @@ export function useApp() {
   return context;
 }
 
+// ✅ También mantener useAppContext para compatibilidad
+export function useAppContext() {
+  return useApp();
+}
 
 --- File: src\data\gestion-meta.json ---
 {
@@ -6508,10 +6479,10 @@ export async function GET() {
 }
 
 /* ══════════════════════════════════════════
-   PALETAS UNIFICADAS (Mismo color para institucional y campaña)
+   4 PALETAS COMPLETAS (ORIGINALES DEL PROYECTO ASTRO)
    ══════════════════════════════════════════ */
 
-/* ── CLARO (por defecto) ── */
+/* ── INSTITUCIONAL + CLARO (por defecto) ── */
 :root {
   --color-primario: #1e3a5f;
   --color-primario-dark: #0f2744;
@@ -6529,8 +6500,8 @@ export async function GET() {
   --color-rol: #1a3a6a;
 }
 
-/* ── OSCURO ── */
-[data-tema="oscuro"] {
+/* ── INSTITUCIONAL + OSCURO ── */
+[data-modo="institucional"][data-tema="oscuro"] {
   --color-primario: #1a3352;
   --color-primario-dark: #0c1e35;
   --color-destacado: #8fc4e8;
@@ -6546,39 +6517,38 @@ export async function GET() {
   --color-rol: #a8d4f0;
 }
 
-/* ── CAMPAÑA + CLARO (Mismos colores que institucional) ── */
+/* ── CAMPAÑA + CLARO ── */
 [data-modo="campaña"] {
-  --color-primario: #1e3a5f;
-  --color-primario-dark: #0f2744;
-  --color-destacado: #74acdf;
-  --color-destacado-fondo: var(--color-destacado);
-  --color-destacado-pastilla: var(--color-destacado);
+  --color-primario: #6c3fa0;
+  --color-primario-dark: #4c1d95;
+  --color-destacado: #d4a017;
+  --color-destacado-fondo: #96750f;
+  --color-destacado-pastilla: #ddb830;
   --color-fondo: #ffffff;
-  --color-fondo-alt: #f8f9fa;
-  --color-texto: #1a1a2e;
-  --color-texto-sec: #4a4a6a;
-  --color-blanco-suave: rgba(255, 255, 255, 0.85);
-  --color-borde: #94a3b8;
+  --color-fondo-alt: #f0e8ff;
+  --color-texto: #1a1a1a;
+  --color-texto-sec: #374151;
+  --color-borde: #9a8ab0;
   --color-nav: rgba(255, 255, 255, 0.85);
-  --color-nav-scrolled: #1e3a5f;
-  --color-rol: #1a3a6a;
+  --color-nav-scrolled: #6c3fa0;
+  --color-rol: #3a2a7a;
 }
 
-/* ── CAMPAÑA + OSCURO (Mismos colores que institucional) ── */
+/* ── CAMPAÑA + OSCURO ── */
 [data-modo="campaña"][data-tema="oscuro"] {
-  --color-primario: #1a3352;
-  --color-primario-dark: #0c1e35;
-  --color-destacado: #8fc4e8;
-  --color-destacado-fondo: var(--color-destacado);
-  --color-destacado-pastilla: var(--color-destacado);
-  --color-fondo: #0f172a;
-  --color-fondo-alt: #1e293b;
+  --color-primario: #4c1d95;
+  --color-primario-dark: #2e1065;
+  --color-destacado: #f0c040;
+  --color-destacado-fondo: #a08015;
+  --color-destacado-pastilla: #d4a017;
+  --color-fondo: #1a1025;
+  --color-fondo-alt: #2d1b4e;
   --color-texto: #f1f5f9;
-  --color-texto-sec: #cbd5e1;
-  --color-borde: #64748b;
-  --color-nav: rgba(15, 23, 42, 0.85);
-  --color-nav-scrolled: #1a3352;
-  --color-rol: #a8d4f0;
+  --color-texto-sec: #c4b5fd;
+  --color-borde: #7a6a9a;
+  --color-nav: rgba(26, 16, 37, 0.85);
+  --color-nav-scrolled: #4c1d95;
+  --color-rol: #d4c0f0;
 }
 
 /* ══════════════════════════════════════════
@@ -6677,7 +6647,7 @@ body {
 }
 
 /* ══════════════════════════════════════════
-   NAVEGACIÓN
+   NAVEGACIÓN - Clases necesarias
    ══════════════════════════════════════════ */
 .nav-container {
   position: fixed;
@@ -6804,7 +6774,7 @@ body {
 
 /* ══════════════════════════════════════════
    PILL MÁGICA
-   ══════════════════════════════════════ */
+   ══════════════════════════════════════════ */
 .pill-magica {
   background-color: var(--color-texto);
   color: #ffffff;
@@ -7094,29 +7064,30 @@ html[data-tema="oscuro"] .contador-resultados strong {
   flex-shrink: 0;
 }
 
+/* ✅ Colores de estado - Texto en BLANCO para probar */
 .estado-aprobada {
   background-color: #16a34a !important;
-  color: #ffffff !important;
+  color: #ffffff !important; /* ✅ Blanco */
 }
 
 .estado-no-aprobada {
   background-color: #dc2626 !important;
-  color: #ffffff !important;
+  color: #ffffff !important; /* ✅ Blanco */
 }
 
 .estado-en-tratamiento {
   background-color: #ca8a04 !important;
-  color: #ffffff !important;
+  color: #ffffff !important; /* ✅ Blanco */
 }
 
 .estado-en-comision {
   background-color: #2563eb !important;
-  color: #ffffff !important;
+  color: #ffffff !important; /* ✅ Blanco */
 }
 
 .estado-vetada {
   background-color: #7c3aed !important;
-  color: #ffffff !important;
+  color: #ffffff !important; /* ✅ Blanco */
 }
 
 .gestion-card .fecha {
@@ -7429,13 +7400,14 @@ html[data-tema="oscuro"] .gestion-card .btn-expediente {
   cursor: not-allowed;
 }
 
-/* Dark Mode: fondo blanco, borde blanco, texto azul oscuro */
+/* ✅ Dark Mode: fondo blanco, borde blanco, texto azul oscuro */
 html[data-tema="oscuro"] .btn-voluntario {
   background-color: #ffffff !important;
   color: #1a1a2e !important;
   border: 2px solid #ffffff !important;
 }
 
+/* ✅ Dark Mode Hover: solo escala, sin cambio de color */
 html[data-tema="oscuro"] .btn-voluntario:hover:not(:disabled) {
   background-color: #ffffff !important;
   color: #1a1a2e !important;
@@ -7465,13 +7437,14 @@ html[data-tema="oscuro"] .btn-voluntario:hover:not(:disabled) {
   cursor: not-allowed;
 }
 
-/* Dark Mode: fondo blanco, borde blanco, texto azul oscuro */
+/* ✅ Dark Mode: fondo blanco, borde blanco, texto azul oscuro */
 html[data-tema="oscuro"] .btn-enviar {
   background-color: #ffffff !important;
   color: #1a1a2e !important;
   border: 2px solid #ffffff !important;
 }
 
+/* ✅ Dark Mode Hover: solo escala, sin cambio de color */
 html[data-tema="oscuro"] .btn-enviar:hover:not(:disabled) {
   background-color: #ffffff !important;
   color: #1a1a2e !important;
@@ -7544,26 +7517,26 @@ html[data-tema="oscuro"] .btn-enviar:hover:not(:disabled) {
   }
 }
 
+
 --- File: src\app\layout.tsx ---
+// src/app/layout.tsx
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
+import { AppProvider } from "@/context/AppContext";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { AppProvider } from "@/context/AppContext";
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const dmSerif = DM_Serif_Display({ 
+  subsets: ["latin"], 
+  weight: "400", 
+  variable: "--font-dm-serif" 
 });
 
 export const metadata: Metadata = {
-  title: "La Libertad Avanza — Santo Tomé",
-  description:
-    "Sitio oficial de Giselle Miravete, Concejal de Santo Tomé, Santa Fe.",
-  icons: {
-    icon: "/favicon.ico",
-  },
+  title: "Giselle Miravete - Concejal Santo Tomé",
+  description: "Sitio oficial de Giselle Miravete, Concejal de Santo Tomé",
 };
 
 export default function RootLayout({
@@ -7573,28 +7546,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-        />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300..700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body
-        className={`${inter.className} font-body bg-(--color-fondo) text-(--color-texto)`}
-      >
-        <a href="#inicio" className="skip-link">
-          Saltar al contenido
-        </a>
+      <body className={`${inter.variable} ${dmSerif.variable} antialiased`}>
         <AppProvider>
           <Nav />
           <main>{children}</main>
@@ -7707,6 +7659,7 @@ export default function Home() {
     </>
   );
 }
+
 
 --- File: src\app\propuestas\page.tsx ---
 "use client";
@@ -8564,6 +8517,39 @@ export default function ProyectosPage() {
       </div>
     </section>
   );
+}
+
+
+--- File: src\app\api\gestion\route.ts ---
+import { NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
+
+export async function GET() {
+  try {
+    // Ruta al archivo JSON generado
+    const jsonPath = path.join(process.cwd(), "src", "data", "gestion.json");
+
+    // Verificar si el archivo existe
+    if (!fs.existsSync(jsonPath)) {
+      return NextResponse.json(
+        { error: "Archivo de datos no encontrado" },
+        { status: 404 },
+      );
+    }
+
+    // Leer y parsear el archivo JSON
+    const jsonData = fs.readFileSync(jsonPath, "utf-8");
+    const data = JSON.parse(jsonData);
+
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Error en API /gestion:", error);
+    return NextResponse.json(
+      { error: "Error al cargar los datos" },
+      { status: 500 },
+    );
+  }
 }
 
 
@@ -10548,10 +10534,10 @@ export default function ProyectosPage() {
 }
 
 /* ══════════════════════════════════════════
-   PALETAS UNIFICADAS (Mismo color para institucional y campaña)
+   4 PALETAS COMPLETAS (ORIGINALES DEL PROYECTO ASTRO)
    ══════════════════════════════════════════ */
 
-/* ── CLARO (por defecto) ── */
+/* ── INSTITUCIONAL + CLARO (por defecto) ── */
 :root {
   --color-primario: #1e3a5f;
   --color-primario-dark: #0f2744;
@@ -10569,8 +10555,8 @@ export default function ProyectosPage() {
   --color-rol: #1a3a6a;
 }
 
-/* ── OSCURO ── */
-[data-tema="oscuro"] {
+/* ── INSTITUCIONAL + OSCURO ── */
+[data-modo="institucional"][data-tema="oscuro"] {
   --color-primario: #1a3352;
   --color-primario-dark: #0c1e35;
   --color-destacado: #8fc4e8;
@@ -10586,39 +10572,38 @@ export default function ProyectosPage() {
   --color-rol: #a8d4f0;
 }
 
-/* ── CAMPAÑA + CLARO (Mismos colores que institucional) ── */
+/* ── CAMPAÑA + CLARO ── */
 [data-modo="campaña"] {
-  --color-primario: #1e3a5f;
-  --color-primario-dark: #0f2744;
-  --color-destacado: #74acdf;
-  --color-destacado-fondo: var(--color-destacado);
-  --color-destacado-pastilla: var(--color-destacado);
+  --color-primario: #6c3fa0;
+  --color-primario-dark: #4c1d95;
+  --color-destacado: #d4a017;
+  --color-destacado-fondo: #96750f;
+  --color-destacado-pastilla: #ddb830;
   --color-fondo: #ffffff;
-  --color-fondo-alt: #f8f9fa;
-  --color-texto: #1a1a2e;
-  --color-texto-sec: #4a4a6a;
-  --color-blanco-suave: rgba(255, 255, 255, 0.85);
-  --color-borde: #94a3b8;
+  --color-fondo-alt: #f0e8ff;
+  --color-texto: #1a1a1a;
+  --color-texto-sec: #374151;
+  --color-borde: #9a8ab0;
   --color-nav: rgba(255, 255, 255, 0.85);
-  --color-nav-scrolled: #1e3a5f;
-  --color-rol: #1a3a6a;
+  --color-nav-scrolled: #6c3fa0;
+  --color-rol: #3a2a7a;
 }
 
-/* ── CAMPAÑA + OSCURO (Mismos colores que institucional) ── */
+/* ── CAMPAÑA + OSCURO ── */
 [data-modo="campaña"][data-tema="oscuro"] {
-  --color-primario: #1a3352;
-  --color-primario-dark: #0c1e35;
-  --color-destacado: #8fc4e8;
-  --color-destacado-fondo: var(--color-destacado);
-  --color-destacado-pastilla: var(--color-destacado);
-  --color-fondo: #0f172a;
-  --color-fondo-alt: #1e293b;
+  --color-primario: #4c1d95;
+  --color-primario-dark: #2e1065;
+  --color-destacado: #f0c040;
+  --color-destacado-fondo: #a08015;
+  --color-destacado-pastilla: #d4a017;
+  --color-fondo: #1a1025;
+  --color-fondo-alt: #2d1b4e;
   --color-texto: #f1f5f9;
-  --color-texto-sec: #cbd5e1;
-  --color-borde: #64748b;
-  --color-nav: rgba(15, 23, 42, 0.85);
-  --color-nav-scrolled: #1a3352;
-  --color-rol: #a8d4f0;
+  --color-texto-sec: #c4b5fd;
+  --color-borde: #7a6a9a;
+  --color-nav: rgba(26, 16, 37, 0.85);
+  --color-nav-scrolled: #4c1d95;
+  --color-rol: #d4c0f0;
 }
 
 /* ══════════════════════════════════════════
@@ -10717,7 +10702,7 @@ body {
 }
 
 /* ══════════════════════════════════════════
-   NAVEGACIÓN
+   NAVEGACIÓN - Clases necesarias
    ══════════════════════════════════════════ */
 .nav-container {
   position: fixed;
@@ -10844,7 +10829,7 @@ body {
 
 /* ══════════════════════════════════════════
    PILL MÁGICA
-   ══════════════════════════════════════ */
+   ══════════════════════════════════════════ */
 .pill-magica {
   background-color: var(--color-texto);
   color: #ffffff;
@@ -11134,29 +11119,30 @@ html[data-tema="oscuro"] .contador-resultados strong {
   flex-shrink: 0;
 }
 
+/* ✅ Colores de estado - Texto en BLANCO para probar */
 .estado-aprobada {
   background-color: #16a34a !important;
-  color: #ffffff !important;
+  color: #ffffff !important; /* ✅ Blanco */
 }
 
 .estado-no-aprobada {
   background-color: #dc2626 !important;
-  color: #ffffff !important;
+  color: #ffffff !important; /* ✅ Blanco */
 }
 
 .estado-en-tratamiento {
   background-color: #ca8a04 !important;
-  color: #ffffff !important;
+  color: #ffffff !important; /* ✅ Blanco */
 }
 
 .estado-en-comision {
   background-color: #2563eb !important;
-  color: #ffffff !important;
+  color: #ffffff !important; /* ✅ Blanco */
 }
 
 .estado-vetada {
   background-color: #7c3aed !important;
-  color: #ffffff !important;
+  color: #ffffff !important; /* ✅ Blanco */
 }
 
 .gestion-card .fecha {
@@ -11469,13 +11455,14 @@ html[data-tema="oscuro"] .gestion-card .btn-expediente {
   cursor: not-allowed;
 }
 
-/* Dark Mode: fondo blanco, borde blanco, texto azul oscuro */
+/* ✅ Dark Mode: fondo blanco, borde blanco, texto azul oscuro */
 html[data-tema="oscuro"] .btn-voluntario {
   background-color: #ffffff !important;
   color: #1a1a2e !important;
   border: 2px solid #ffffff !important;
 }
 
+/* ✅ Dark Mode Hover: solo escala, sin cambio de color */
 html[data-tema="oscuro"] .btn-voluntario:hover:not(:disabled) {
   background-color: #ffffff !important;
   color: #1a1a2e !important;
@@ -11505,13 +11492,14 @@ html[data-tema="oscuro"] .btn-voluntario:hover:not(:disabled) {
   cursor: not-allowed;
 }
 
-/* Dark Mode: fondo blanco, borde blanco, texto azul oscuro */
+/* ✅ Dark Mode: fondo blanco, borde blanco, texto azul oscuro */
 html[data-tema="oscuro"] .btn-enviar {
   background-color: #ffffff !important;
   color: #1a1a2e !important;
   border: 2px solid #ffffff !important;
 }
 
+/* ✅ Dark Mode Hover: solo escala, sin cambio de color */
 html[data-tema="oscuro"] .btn-enviar:hover:not(:disabled) {
   background-color: #ffffff !important;
   color: #1a1a2e !important;
@@ -11584,26 +11572,26 @@ html[data-tema="oscuro"] .btn-enviar:hover:not(:disabled) {
   }
 }
 
+
 --- File: src\app\layout.tsx ---
+// src/app/layout.tsx
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
+import { AppProvider } from "@/context/AppContext";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { AppProvider } from "@/context/AppContext";
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const dmSerif = DM_Serif_Display({ 
+  subsets: ["latin"], 
+  weight: "400", 
+  variable: "--font-dm-serif" 
 });
 
 export const metadata: Metadata = {
-  title: "La Libertad Avanza — Santo Tomé",
-  description:
-    "Sitio oficial de Giselle Miravete, Concejal de Santo Tomé, Santa Fe.",
-  icons: {
-    icon: "/favicon.ico",
-  },
+  title: "Giselle Miravete - Concejal Santo Tomé",
+  description: "Sitio oficial de Giselle Miravete, Concejal de Santo Tomé",
 };
 
 export default function RootLayout({
@@ -11613,28 +11601,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-        />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300..700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body
-        className={`${inter.className} font-body bg-(--color-fondo) text-(--color-texto)`}
-      >
-        <a href="#inicio" className="skip-link">
-          Saltar al contenido
-        </a>
+      <body className={`${inter.variable} ${dmSerif.variable} antialiased`}>
         <AppProvider>
           <Nav />
           <main>{children}</main>
@@ -11689,6 +11656,7 @@ export default function Home() {
   );
 }
 
+
 --- File: src\components\Contacto.tsx ---
 "use client";
 
@@ -12502,6 +12470,7 @@ export default function Footer() {
   );
 }
 
+
 --- File: src\components\Hero.tsx ---
 "use client";
 
@@ -12665,19 +12634,19 @@ export default function Hero() {
 
 
 --- File: src\components\Nav.tsx ---
+// src/components/Nav.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useApp } from "@/context/AppContext";
+import { useApp } from "../context/AppContext";
 
 export default function Nav() {
-  const { tema, setTema } = useApp();
+  const { modo, tema, setTema } = useApp();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const [modoLocal, setModoLocal] = useState("institucional");
 
   useEffect(() => {
     setIsMounted(true);
@@ -12685,27 +12654,7 @@ export default function Nav() {
 
   useEffect(() => {
     if (!isMounted) return;
-    const modoActual =
-      document.documentElement.getAttribute("data-modo") || "institucional";
-    setModoLocal(modoActual);
-  }, [isMounted]);
 
-  useEffect(() => {
-    if (!isMounted) return;
-    const observer = new MutationObserver(() => {
-      const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || "institucional";
-      setModoLocal(nuevoModo);
-    });
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-modo"],
-    });
-    return () => observer.disconnect();
-  }, [isMounted]);
-
-  useEffect(() => {
-    if (!isMounted) return;
     const handleScroll = () => {
       if (tema === "oscuro") {
         setScrolled(window.scrollY > 60);
@@ -12713,6 +12662,7 @@ export default function Nav() {
         setScrolled(false);
       }
     };
+
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
@@ -12739,11 +12689,11 @@ export default function Nav() {
 
   return (
     <>
-      {/* ✅ NAV CON COLOR ELEGIDO */}
       <nav
         className={`nav-container ${scrolled ? "scrolled" : ""}`}
         style={{
-          backgroundColor: "var(--color-fondo)",
+          backgroundColor:
+            "color-mix(in srgb, var(--color-nav) 90%, var(--color-texto) 20%)",
           backdropFilter: "blur(16px)",
           borderBottom: "3px solid var(--color-destacado)",
         }}
@@ -12788,7 +12738,8 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
-          {modoLocal === "campania" ? (
+          {/* ✅ Lógica corregida: Propuestas solo en campaña */}
+          {modo === "campania" ? (
             <>
               <Link href="/proyectos" className="nav-link">
                 Proyectos
@@ -12885,7 +12836,8 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
-          {modoLocal === "campania" ? (
+          {/* ✅ Misma lógica en mobile */}
+          {modo === "campania" ? (
             <>
               <Link
                 href="/proyectos"
@@ -12931,7 +12883,6 @@ export default function Nav() {
     </>
   );
 }
-
 
 --- File: src\components\Pilares.tsx ---
 "use client";
@@ -14314,6 +14265,7 @@ export default function Footer() {
   );
 }
 
+
 --- File: src\components\Hero.tsx ---
 "use client";
 
@@ -14477,19 +14429,19 @@ export default function Hero() {
 
 
 --- File: src\components\Nav.tsx ---
+// src/components/Nav.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useApp } from "@/context/AppContext";
+import { useApp } from "../context/AppContext";
 
 export default function Nav() {
-  const { tema, setTema } = useApp();
+  const { modo, tema, setTema } = useApp();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const [modoLocal, setModoLocal] = useState("institucional");
 
   useEffect(() => {
     setIsMounted(true);
@@ -14497,27 +14449,7 @@ export default function Nav() {
 
   useEffect(() => {
     if (!isMounted) return;
-    const modoActual =
-      document.documentElement.getAttribute("data-modo") || "institucional";
-    setModoLocal(modoActual);
-  }, [isMounted]);
 
-  useEffect(() => {
-    if (!isMounted) return;
-    const observer = new MutationObserver(() => {
-      const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || "institucional";
-      setModoLocal(nuevoModo);
-    });
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-modo"],
-    });
-    return () => observer.disconnect();
-  }, [isMounted]);
-
-  useEffect(() => {
-    if (!isMounted) return;
     const handleScroll = () => {
       if (tema === "oscuro") {
         setScrolled(window.scrollY > 60);
@@ -14525,6 +14457,7 @@ export default function Nav() {
         setScrolled(false);
       }
     };
+
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
@@ -14551,11 +14484,11 @@ export default function Nav() {
 
   return (
     <>
-      {/* ✅ NAV CON COLOR ELEGIDO */}
       <nav
         className={`nav-container ${scrolled ? "scrolled" : ""}`}
         style={{
-          backgroundColor: "var(--color-fondo)",
+          backgroundColor:
+            "color-mix(in srgb, var(--color-nav) 90%, var(--color-texto) 20%)",
           backdropFilter: "blur(16px)",
           borderBottom: "3px solid var(--color-destacado)",
         }}
@@ -14600,7 +14533,8 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
-          {modoLocal === "campania" ? (
+          {/* ✅ Lógica corregida: Propuestas solo en campaña */}
+          {modo === "campania" ? (
             <>
               <Link href="/proyectos" className="nav-link">
                 Proyectos
@@ -14697,7 +14631,8 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
-          {modoLocal === "campania" ? (
+          {/* ✅ Misma lógica en mobile */}
+          {modo === "campania" ? (
             <>
               <Link
                 href="/proyectos"
@@ -14743,7 +14678,6 @@ export default function Nav() {
     </>
   );
 }
-
 
 --- File: src\components\Pilares.tsx ---
 "use client";
@@ -15314,53 +15248,55 @@ export default function Voluntariado() {
 }
 
 --- File: src\context\AppContext.tsx ---
+// src/context/AppContext.tsx
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-type AppContextType = {
-  modo: string;
-  setModo: (modo: string) => void;
-  tema: string;
-  setTema: (tema: string) => void;
-};
+type Modo = "institucional" | "campania";
+type Tema = "claro" | "oscuro";
+
+interface AppContextType {
+  modo: Modo;
+  tema: Tema;
+  setModo: (modo: Modo) => void;
+  setTema: (tema: Tema) => void;
+  toggleTema: () => void;
+}
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [modo, setModoState] = useState("campania");
-  const [tema, setTemaState] = useState("claro");
+export function AppProvider({ children }: { children: ReactNode }) {
+  const [modo, setModo] = useState<Modo>("institucional");
+  const [tema, setTema] = useState<Tema>("claro");
 
-  // Cargar estado inicial desde localStorage
   useEffect(() => {
-    const modoGuardado = localStorage.getItem("gm-modo") || "campania";
-    const temaGuardado = localStorage.getItem("gm-tema") || "claro";
-    setModoState(modoGuardado);
-    setTemaState(temaGuardado);
-    document.documentElement.setAttribute("data-modo", modoGuardado);
-    document.documentElement.setAttribute("data-tema", temaGuardado);
+    const storedModo = localStorage.getItem("modo") as Modo | null;
+    const storedTema = localStorage.getItem("tema") as Tema | null;
+
+    if (storedModo) setModo(storedModo);
+    if (storedTema) setTema(storedTema);
   }, []);
 
-  // Sincronizar cambios con el DOM y localStorage
-  const setModo = (nuevoModo: string) => {
-    setModoState(nuevoModo);
-    localStorage.setItem("gm-modo", nuevoModo);
-    document.documentElement.setAttribute("data-modo", nuevoModo);
-  };
+  useEffect(() => {
+    document.documentElement.setAttribute("data-modo", modo);
+    document.documentElement.setAttribute("data-tema", tema);
+    localStorage.setItem("modo", modo);
+    localStorage.setItem("tema", tema);
+  }, [modo, tema]);
 
-  const setTema = (nuevoTema: string) => {
-    setTemaState(nuevoTema);
-    localStorage.setItem("gm-tema", nuevoTema);
-    document.documentElement.setAttribute("data-tema", nuevoTema);
+  const toggleTema = () => {
+    setTema((prev) => (prev === "claro" ? "oscuro" : "claro"));
   };
 
   return (
-    <AppContext.Provider value={{ modo, setModo, tema, setTema }}>
+    <AppContext.Provider value={{ modo, tema, setModo, setTema, toggleTema }}>
       {children}
     </AppContext.Provider>
   );
 }
 
+// ✅ Exportar como useApp (para coincidir con el original)
 export function useApp() {
   const context = useContext(AppContext);
   if (context === undefined) {
@@ -15369,55 +15305,61 @@ export function useApp() {
   return context;
 }
 
+// ✅ También mantener useAppContext para compatibilidad
+export function useAppContext() {
+  return useApp();
+}
 
 --- File: src\context\AppContext.tsx ---
+// src/context/AppContext.tsx
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-type AppContextType = {
-  modo: string;
-  setModo: (modo: string) => void;
-  tema: string;
-  setTema: (tema: string) => void;
-};
+type Modo = "institucional" | "campania";
+type Tema = "claro" | "oscuro";
+
+interface AppContextType {
+  modo: Modo;
+  tema: Tema;
+  setModo: (modo: Modo) => void;
+  setTema: (tema: Tema) => void;
+  toggleTema: () => void;
+}
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [modo, setModoState] = useState("campania");
-  const [tema, setTemaState] = useState("claro");
+export function AppProvider({ children }: { children: ReactNode }) {
+  const [modo, setModo] = useState<Modo>("institucional");
+  const [tema, setTema] = useState<Tema>("claro");
 
-  // Cargar estado inicial desde localStorage
   useEffect(() => {
-    const modoGuardado = localStorage.getItem("gm-modo") || "campania";
-    const temaGuardado = localStorage.getItem("gm-tema") || "claro";
-    setModoState(modoGuardado);
-    setTemaState(temaGuardado);
-    document.documentElement.setAttribute("data-modo", modoGuardado);
-    document.documentElement.setAttribute("data-tema", temaGuardado);
+    const storedModo = localStorage.getItem("modo") as Modo | null;
+    const storedTema = localStorage.getItem("tema") as Tema | null;
+
+    if (storedModo) setModo(storedModo);
+    if (storedTema) setTema(storedTema);
   }, []);
 
-  // Sincronizar cambios con el DOM y localStorage
-  const setModo = (nuevoModo: string) => {
-    setModoState(nuevoModo);
-    localStorage.setItem("gm-modo", nuevoModo);
-    document.documentElement.setAttribute("data-modo", nuevoModo);
-  };
+  useEffect(() => {
+    document.documentElement.setAttribute("data-modo", modo);
+    document.documentElement.setAttribute("data-tema", tema);
+    localStorage.setItem("modo", modo);
+    localStorage.setItem("tema", tema);
+  }, [modo, tema]);
 
-  const setTema = (nuevoTema: string) => {
-    setTemaState(nuevoTema);
-    localStorage.setItem("gm-tema", nuevoTema);
-    document.documentElement.setAttribute("data-tema", nuevoTema);
+  const toggleTema = () => {
+    setTema((prev) => (prev === "claro" ? "oscuro" : "claro"));
   };
 
   return (
-    <AppContext.Provider value={{ modo, setModo, tema, setTema }}>
+    <AppContext.Provider value={{ modo, tema, setModo, setTema, toggleTema }}>
       {children}
     </AppContext.Provider>
   );
 }
 
+// ✅ Exportar como useApp (para coincidir con el original)
 export function useApp() {
   const context = useContext(AppContext);
   if (context === undefined) {
@@ -15426,6 +15368,10 @@ export function useApp() {
   return context;
 }
 
+// ✅ También mantener useAppContext para compatibilidad
+export function useAppContext() {
+  return useApp();
+}
 
 --- File: src\data\gestion-meta.json ---
 {

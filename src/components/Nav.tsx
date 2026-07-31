@@ -1,39 +1,40 @@
+// src/components/Nav.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useApp } from "@/context/AppContext";
+import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 export default function Nav() {
   const { tema, setTema } = useApp();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const [modoLocal, setModoLocal] = useState("institucional");
+  const [modoLocal, setModoLocal] = useState(MODO_ACTUAL);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
+  // ✅ Detectar cambios de modo en el DOM
   useEffect(() => {
     if (!isMounted) return;
-    const modoActual =
-      document.documentElement.getAttribute("data-modo") || "institucional";
+    
+    const modoActual = document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
     setModoLocal(modoActual);
-  }, [isMounted]);
-
-  useEffect(() => {
-    if (!isMounted) return;
+    
     const observer = new MutationObserver(() => {
-      const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || "institucional";
+      const nuevoModo = document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
       setModoLocal(nuevoModo);
     });
+    
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["data-modo"],
     });
+    
     return () => observer.disconnect();
   }, [isMounted]);
 
@@ -58,6 +59,9 @@ export default function Nav() {
 
   const toggleMobile = () => setMobileOpen(!mobileOpen);
 
+  // ✅ Determinar si mostrar Propuestas (comparación segura)
+  const mostrarPropuestas = modoLocal === TIPO_MODO.CAMPANIA;
+
   if (!isMounted) {
     return (
       <nav className="nav-container">
@@ -72,7 +76,6 @@ export default function Nav() {
 
   return (
     <>
-      {/* ✅ NAV CON COLOR ELEGIDO */}
       <nav
         className={`nav-container ${scrolled ? "scrolled" : ""}`}
         style={{
@@ -96,6 +99,7 @@ export default function Nav() {
             width={40}
             height={40}
             className="h-9 w-auto"
+            style={{ width: "auto", height: "36px" }}
             priority
           />
           <div className="h-8 w-0.75 bg-current opacity-60"></div>
@@ -109,6 +113,7 @@ export default function Nav() {
             width={120}
             height={32}
             className="h-8 w-auto"
+            style={{ width: "auto", height: "32px" }}
             priority
           />
         </Link>
@@ -121,18 +126,13 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
-          {modoLocal === "campania" ? (
-            <>
-              <Link href="/proyectos" className="nav-link">
-                Proyectos
-              </Link>
-              <Link href="/propuestas" className="nav-link">
-                Propuestas
-              </Link>
-            </>
-          ) : (
-            <Link href="/proyectos" className="nav-link">
-              Proyectos
+          <Link href="/proyectos" className="nav-link">
+            Proyectos
+          </Link>
+          
+          {mostrarPropuestas && (
+            <Link href="/propuestas" className="nav-link">
+              Propuestas
             </Link>
           )}
 
@@ -218,30 +218,21 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
-          {modoLocal === "campania" ? (
-            <>
-              <Link
-                href="/proyectos"
-                className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
-                onClick={() => setMobileOpen(false)}
-              >
-                Proyectos
-              </Link>
-              <Link
-                href="/propuestas"
-                className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
-                onClick={() => setMobileOpen(false)}
-              >
-                Propuestas
-              </Link>
-            </>
-          ) : (
+          <Link
+            href="/proyectos"
+            className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
+            onClick={() => setMobileOpen(false)}
+          >
+            Proyectos
+          </Link>
+
+          {mostrarPropuestas && (
             <Link
-              href="/proyectos"
+              href="/propuestas"
               className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
               onClick={() => setMobileOpen(false)}
             >
-              Proyectos
+              Propuestas
             </Link>
           )}
 
