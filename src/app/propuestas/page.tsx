@@ -1,18 +1,20 @@
+// src/app/propuestas/page.tsx - Versión KANBAN con contador mejorado
 "use client";
 
 import { useEffect, useState } from "react";
 import { propuestas } from "@/data/propuestas";
+import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 export default function PropuestasPage() {
-  const [modo, setModo] = useState("institucional");
+  const [modo, setModo] = useState(MODO_ACTUAL);
 
   useEffect(() => {
-    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
-    setModo(modoGuardado);
+    const modoActual = MODO_ACTUAL;
+    setModo(modoActual);
 
     const observer = new MutationObserver(() => {
       const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || "institucional";
+        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
       setModo(nuevoModo);
     });
     observer.observe(document.documentElement, {
@@ -22,8 +24,9 @@ export default function PropuestasPage() {
     return () => observer.disconnect();
   }, []);
 
-  // ✅ Si no está en modo campaña, mostrar mensaje
-  if (modo !== "campania") {
+  const esCampania = modo === TIPO_MODO.CAMPANIA;
+
+  if (!esCampania) {
     return (
       <section
         className="pt-36 pb-25 px-4 sm:px-8"
@@ -47,13 +50,46 @@ export default function PropuestasPage() {
     );
   }
 
+  // ✅ ÍCONOS - Mismos que Pilares
+  const iconosPorPilar = {
+    transparencia: "fa-balance-scale",
+    libertad: "fa-chain-broken",
+    territorio: "fa-map-marked-alt",
+    orden: "fa-tree-city"
+  };
+
+  // ✅ Colores para cada pilar
+  const coloresPilar = {
+    transparencia: "#3b82f6",
+    libertad: "#8b5cf6",
+    territorio: "#22c55e",
+    orden: "#f59e0b"
+  };
+
+  // ✅ Nombres en español para mostrar
+  const nombresPilar = {
+    transparencia: "Transparencia",
+    libertad: "Libertad",
+    territorio: "Territorio",
+    orden: "Orden"
+  };
+
+  // ✅ Agrupar propuestas por pilar
+  const propuestasPorPilar = {
+    transparencia: propuestas.filter(p => p.pilar === "transparencia"),
+    libertad: propuestas.filter(p => p.pilar === "libertad"),
+    territorio: propuestas.filter(p => p.pilar === "territorio"),
+    orden: propuestas.filter(p => p.pilar === "orden")
+  };
+
   return (
     <section
       className="pt-36 pb-25 px-4 sm:px-8"
       style={{ backgroundColor: "var(--color-fondo)" }}
     >
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-10">
+        {/* Header */}
+        <div className="text-center mb-12">
           <div className="pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-3">
             Propuestas
           </div>
@@ -64,60 +100,128 @@ export default function PropuestasPage() {
             Nuestras propuestas para Santo Tomé
           </h1>
           <p
-            className="mt-3 text-base"
+            className="mt-3 text-base max-w-2xl mx-auto"
             style={{ color: "var(--color-texto-sec)" }}
           >
             Conocé nuestras propuestas organizadas por pilares.
           </p>
         </div>
 
-        <div className="space-y-12">
-          {["transparencia", "libertad", "territorio", "orden"].map((pilar) => {
-            const propuestasPilar = propuestas.filter(
-              (p) => p.pilar === pilar
-            );
+        {/* ✅ TABLERO KANBAN - Columnas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          {Object.entries(propuestasPorPilar).map(([pilar, propuestasPilar]) => {
             if (propuestasPilar.length === 0) return null;
+
             return (
-              <div key={pilar}>
-                <h2
-                  className="font-head text-2xl lg:text-3xl font-semibold mb-4 capitalize"
-                  style={{ color: "var(--color-texto)" }}
+              <div
+                key={pilar}
+                className="rounded-2xl p-4 flex flex-col"
+                style={{
+                  backgroundColor: "var(--color-fondo-alt)",
+                  border: "2px solid var(--color-borde)",
+                }}
+              >
+                {/* Cabecera de la columna - MEJORADA */}
+                <div 
+                  className="flex items-center gap-3 mb-4 pb-3 border-b-2"
+                  style={{ borderColor: "var(--color-borde)" }}
                 >
-                  {pilar}
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                    style={{
+                      backgroundColor:
+                        coloresPilar[pilar as keyof typeof coloresPilar],
+                    }}
+                  >
+                    <i
+                      className={`fas ${
+                        iconosPorPilar[pilar as keyof typeof iconosPorPilar]
+                      } text-white text-sm`}
+                    ></i>
+                  </div>
+                  <h2
+                    className="font-head text-base font-semibold capitalize flex-1"
+                    style={{ color: "var(--color-texto)" }}
+                  >
+                    {nombresPilar[pilar as keyof typeof nombresPilar]}
+                  </h2>
+                  {/* ✅ CONTADOR MÁS GRANDE Y LEGIBLE */}
+                  <span
+                    className="text-sm font-bold px-3 py-1 rounded-full"
+                    style={{
+                      backgroundColor: "var(--color-destacado)",
+                      color: "#ffffff",
+                      minWidth: "28px",
+                      textAlign: "center",
+                    }}
+                  >
+                    {propuestasPilar.length}
+                  </span>
+                </div>
+
+                {/* Lista de propuestas en la columna */}
+                <div className="space-y-3 flex-1">
                   {propuestasPilar.map((propuesta, index) => (
                     <div
                       key={index}
-                      className="p-4 rounded-xl border"
+                      className="p-3 rounded-xl border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
                       style={{
-                        backgroundColor: "var(--color-fondo-alt)",
+                        backgroundColor: "var(--color-fondo)",
                         borderColor: "var(--color-borde)",
                       }}
                     >
-                      <img
-                        src={propuesta.imagen}
-                        alt={propuesta.titulo}
-                        className="w-full h-48 object-cover rounded-lg mb-3"
-                      />
-                      <h3
-                        className="font-head text-lg font-semibold"
-                        style={{ color: "var(--color-texto)" }}
-                      >
-                        {propuesta.titulo}
-                      </h3>
-                      <p
-                        className="text-sm"
-                        style={{ color: "var(--color-texto-sec)" }}
-                      >
-                        {propuesta.descripcion}
-                      </p>
+                      <div className="flex items-start gap-2">
+                        <span
+                          className="text-xs font-bold mt-0.5 opacity-60 group-hover:opacity-100 transition-opacity"
+                          style={{ color: "var(--color-destacado)" }}
+                        >
+                          #{index + 1}
+                        </span>
+                        <div className="flex-1">
+                          <h3
+                            className="font-head text-sm font-semibold"
+                            style={{ color: "var(--color-texto)" }}
+                          >
+                            {propuesta.titulo}
+                          </h3>
+                          <p
+                            className="text-xs mt-1 leading-relaxed"
+                            style={{ color: "var(--color-texto-sec)" }}
+                          >
+                            {propuesta.descripcion}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   ))}
+                </div>
+
+                {/* Footer de la columna - MEJORADO */}
+                <div className="mt-3 pt-2 text-center border-t" style={{ borderColor: "var(--color-borde)" }}>
+                  <span
+                    className="text-xs font-medium"
+                    style={{ color: "var(--color-texto-sec)" }}
+                  >
+                    {propuestasPilar.length} propuesta{propuestasPilar.length > 1 ? "s" : ""}
+                  </span>
                 </div>
               </div>
             );
           })}
+        </div>
+
+        {/* Footer de la página */}
+        <div className="text-center mt-12 pt-6 border-t" style={{ borderColor: "var(--color-borde)" }}>
+          <p
+            className="text-sm"
+            style={{ color: "var(--color-texto-sec)" }}
+          >
+            <i className="fas fa-lightbulb mr-2" style={{ color: "var(--color-destacado)" }}></i>
+            Total de propuestas:{" "}
+            <strong style={{ color: "var(--color-texto)" }}>
+              {propuestas.length}
+            </strong>
+          </p>
         </div>
       </div>
     </section>

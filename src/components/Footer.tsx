@@ -3,18 +3,31 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 export default function Footer() {
-  const [modo, setModo] = useState(MODO_ACTUAL);
+  const [tema, setTema] = useState("claro");
+  const [modo, setModo] = useState("institucional");
 
   useEffect(() => {
-    const modoActual = MODO_ACTUAL;
-    setModo(modoActual);
+    const temaGuardado = localStorage.getItem("gm-tema") || "claro";
+    setTema(temaGuardado);
+
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
+    setModo(modoGuardado);
+
+    const observerTema = new MutationObserver(() => {
+      const nuevoTema =
+        document.documentElement.getAttribute("data-tema") || "claro";
+      setTema(nuevoTema);
+    });
+    observerTema.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-tema"],
+    });
 
     const observerModo = new MutationObserver(() => {
       const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+        document.documentElement.getAttribute("data-modo") || "institucional";
       setModo(nuevoModo);
     });
     observerModo.observe(document.documentElement, {
@@ -23,14 +36,17 @@ export default function Footer() {
     });
 
     return () => {
+      observerTema.disconnect();
       observerModo.disconnect();
     };
   }, []);
 
   const getLogoPath = () => {
-    return modo === TIPO_MODO.CAMPANIA
-      ? "/images/leon-amarillo.png"
-      : "/images/sol-amarillo.png";
+    if (modo === "campania") {
+      return "/images/leon-amarillo.png";
+    } else {
+      return "/images/sol-amarillo.png";
+    }
   };
 
   return (
@@ -45,13 +61,14 @@ export default function Footer() {
           Santo Tomé, Santa Fe, Argentina.
         </p>
         <div className="h-12 md:h-14 flex items-center overflow-hidden">
+          {/* ✅ LOGO CON width y height específicos Y AUTO para mantener proporción */}
           <Image
             src={getLogoPath()}
-            alt={modo === TIPO_MODO.CAMPANIA ? "León - Campaña" : "Sol - Institucional"}
+            alt={modo === "campania" ? "León - Campaña" : "Sol - Institucional"}
             width={56}
             height={56}
             className="h-14 md:h-15 object-contain opacity-80 md:opacity-80 -my-2 md:-my-4"
-            style={{ width: "auto", height: "56px" }}
+            style={{ width: "auto", height: "56px" }} // ✅ Mantiene proporción
           />
         </div>
       </div>

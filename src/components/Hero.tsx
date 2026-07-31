@@ -1,4 +1,4 @@
-// src/components/Hero.tsx
+// src/components/Hero.tsx - CORREGIDO
 "use client";
 
 import Link from "next/link";
@@ -10,10 +10,10 @@ export default function Hero() {
   const [heroBg, setHeroBg] = useState("/images/hero-bg-institucional.webp");
 
   useEffect(() => {
-    const modoActual = MODO_ACTUAL;
+    const modoActual = document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
     setModo(modoActual);
     setHeroBg(
-      modoActual === TIPO_MODO.INSTITUCIONAL
+      modoActual === "institucional"
         ? "/images/hero-bg-institucional.webp"
         : "/images/hero-bg-campana.webp",
     );
@@ -23,7 +23,7 @@ export default function Hero() {
         document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
       setModo(nuevoModo);
       setHeroBg(
-        nuevoModo === TIPO_MODO.INSTITUCIONAL
+        nuevoModo === "institucional"
           ? "/images/hero-bg-institucional.webp"
           : "/images/hero-bg-campana.webp",
       );
@@ -35,7 +35,7 @@ export default function Hero() {
     return () => observer.disconnect();
   }, []);
 
-  const esCampania = modo === TIPO_MODO.CAMPANIA;
+  const esCampania = modo === "campania";
 
   return (
     <section
