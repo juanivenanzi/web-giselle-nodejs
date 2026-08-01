@@ -62,13 +62,13 @@ export default function ProyectosPage() {
   const [vistaGrid, setVistaGrid] = useState(true);
   const [tema, setTema] = useState("claro");
 
-  // ✅ Filtros del panel
+  // Filtros del panel
   const [filtroAño, setFiltroAño] = useState("Todos");
   const [filtroTipo, setFiltroTipo] = useState("Todos");
   const [filtroEstado, setFiltroEstado] = useState("Todos");
   const [busqueda, setBusqueda] = useState("");
 
-  // ✅ Detectar cambios de modo y tema
+  // Detectar cambios de modo y tema
   useEffect(() => {
     const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
     setModo(modoGuardado);
@@ -124,7 +124,7 @@ export default function ProyectosPage() {
     cargarDatos();
   }, []);
 
-  // ✅ Memoizar años únicos
+  // Memoizar años únicos
   const años = useMemo(() => {
     return [
       "Todos",
@@ -134,7 +134,7 @@ export default function ProyectosPage() {
     );
   }, [proyectos]);
 
-  // ✅ Memoizar tipos únicos
+  // Memoizar tipos únicos
   const tipos = useMemo(() => {
     return [
       "Todos",
@@ -144,7 +144,7 @@ export default function ProyectosPage() {
     ];
   }, [proyectos]);
 
-  // ✅ Memoizar estados únicos
+  // Memoizar estados únicos
   const estados = useMemo(() => {
     return [
       "Todos",
@@ -154,7 +154,7 @@ export default function ProyectosPage() {
     ];
   }, [proyectos]);
 
-  // ✅ Filtrar proyectos con useMemo
+  // Filtrar proyectos con useMemo
   const proyectosFiltrados = useMemo(() => {
     return proyectos.filter((proyecto) => {
       const matchAño =
@@ -169,7 +169,7 @@ export default function ProyectosPage() {
     });
   }, [proyectos, filtroAño, filtroTipo, filtroEstado, busqueda]);
 
-  // ✅ Callback para limpiar filtros
+  // Callback para limpiar filtros
   const limpiarFiltros = useCallback(() => {
     setFiltroAño("Todos");
     setFiltroTipo("Todos");
@@ -181,7 +181,7 @@ export default function ProyectosPage() {
     return ESTADO_CLASES[estado] || "bg-gray-100 text-gray-600";
   };
 
-  // ✅ Función para obtener los estilos de los botones según el tema
+  // Función para obtener los estilos de los botones según el tema
   const getButtonStyles = (isActive: boolean) => {
     const isDark = tema === "oscuro";
     return {
@@ -310,15 +310,21 @@ export default function ProyectosPage() {
               </h3>
 
               <div className="flex flex-wrap lg:flex-col gap-3 lg:gap-4">
-                {/* Búsqueda */}
+                {/* ✅ Búsqueda - CON LABEL como los demás */}
                 <div className="flex-1 min-w-30 lg:w-full">
-                  <div className="relative">
+                  <label
+                    className="text-xs font-medium block"
+                    style={{ color: "var(--color-texto)" }}
+                  >
+                    Buscar
+                  </label>
+                  <div className="relative mt-1">
                     <input
                       type="text"
-                      placeholder="Buscar proyectos..."
+                      placeholder="Título o descripción..."
                       value={busqueda}
                       onChange={(e) => setBusqueda(e.target.value)}
-                      className="w-full mt-0 lg:mt-0 p-2 pl-8 rounded-lg text-sm"
+                      className="w-full p-2 pl-8 rounded-lg text-sm"
                       style={{
                         backgroundColor: "var(--color-fondo)",
                         border: "2px solid var(--color-borde)",
