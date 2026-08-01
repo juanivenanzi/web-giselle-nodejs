@@ -112,7 +112,6 @@
   --color-nav: rgba(15, 23, 42, 0.85);
   --color-nav-scrolled: #1a3352;
   --color-rol: #a8d4f0;
-  /* ✅ NUEVO: Colores suaves para tarjetas */
   --color-tarjeta: #1a2332;
   --color-tarjeta-hover: #243042;
   --color-tarjeta-borde: #334155;
@@ -133,27 +132,9 @@
   --color-nav: rgba(15, 23, 42, 0.85);
   --color-nav-scrolled: #1a3352;
   --color-rol: #a8d4f0;
-  /* ✅ NUEVO: Colores suaves para tarjetas */
   --color-tarjeta: #1a2332;
   --color-tarjeta-hover: #243042;
   --color-tarjeta-borde: #334155;
-}
-
-/* ── CAMPAÑA + OSCURO (Mismos colores que institucional) ── */
-[data-modo="campaña"][data-tema="oscuro"] {
-  --color-primario: #1a3352;
-  --color-primario-dark: #0c1e35;
-  --color-destacado: #8fc4e8;
-  --color-destacado-fondo: var(--color-destacado);
-  --color-destacado-pastilla: var(--color-destacado);
-  --color-fondo: #0f172a;
-  --color-fondo-alt: #1e293b;
-  --color-texto: #f1f5f9;
-  --color-texto-sec: #cbd5e1;
-  --color-borde: #64748b;
-  --color-nav: rgba(15, 23, 42, 0.85);
-  --color-nav-scrolled: #1a3352;
-  --color-rol: #a8d4f0;
 }
 
 /* ══════════════════════════════════════════
@@ -276,6 +257,20 @@ body {
     box-shadow 0.6s ease;
 }
 
+@media (max-width: 480px) {
+  .nav-container {
+    padding: 0 0.75rem;
+    height: 4rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .nav-container {
+    padding: 0 0.5rem;
+    height: 3.75rem;
+  }
+}
+
 .nav-container .nav-link {
   color: var(--color-texto);
   font-size: 0.875rem;
@@ -305,26 +300,62 @@ body {
   transform: translateY(-8px) rotate(-45deg);
 }
 
+/* ══════════════════════════════════════════
+   MENÚ MÓVIL - CON FLUJO NORMAL
+   ══════════════════════════════════════════ */
+
+/* ✅ El menú está en el flujo normal, NO fixed/absolute */
 .mobile-menu {
+  /* ✅ FIX: compensa la altura del nav-container (fixed), que no ocupa
+     espacio real en el flujo del documento. Sin esto, el menú desplegable
+     arranca en y=0 y el link "Inicio" queda tapado detrás del nav. */
+  margin-top: 4.5rem;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease-in-out;
+  transition: max-height 0.3s ease;
 }
 
 .mobile-menu.open {
-  max-height: 100vh; /* ✅ 100% del viewport height */
-  overflow-y: auto;
+  /* cada opción ocupa ~48px (py-3 + texto) + padding del contenedor (py-4 = 32px) */
+  max-height: calc(var(--nav-items, 6) * 48px + 32px);
 }
 
 .mobile-link {
   color: var(--color-texto);
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
+  transition: background-color 0.2s ease;
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
 }
 
 .mobile-link:hover {
   background-color: color-mix(in srgb, var(--color-texto) 10%, transparent);
+}
+
+/* ✅ Móviles pequeños */
+@media (max-width: 480px) {
+  /* ✅ FIX: coincide con .nav-container en este breakpoint (height: 4rem) */
+  .mobile-menu {
+    margin-top: 4rem;
+  }
+  .mobile-link {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.9rem;
+  }
+  .mobile-menu.open {
+    max-height: 500px;
+  }
+}
+
+@media (max-width: 380px) {
+  /* ✅ FIX: coincide con .nav-container en este breakpoint (height: 3.75rem) */
+  .mobile-menu {
+    margin-top: 3.75rem;
+  }
 }
 
 /* ══════════════════════════════════════════

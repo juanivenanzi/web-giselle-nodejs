@@ -18,10 +18,8 @@ export default function Nav() {
     setIsMounted(true);
   }, []);
 
-  // Detectar cambios de modo en el DOM
   useEffect(() => {
     if (!isMounted) return;
-
     const modoActual =
       document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
     setModoLocal(modoActual);
@@ -63,6 +61,18 @@ export default function Nav() {
 
   // Determinar si mostrar Propuestas (comparación segura)
   const mostrarPropuestas = modoLocal === TIPO_MODO.CAMPANIA;
+
+  // ✅ Lista única de opciones: institucional = 5, campaña = 6
+  const navLinks = [
+    { href: "/", label: "Inicio" },
+    { href: "/#sobre-mi", label: "Sobre Mí" },
+    { href: "/proyectos", label: "Proyectos" },
+    ...(mostrarPropuestas
+      ? [{ href: "/propuestas", label: "Propuestas" }]
+      : []),
+    { href: "/mapa", label: "Mapa" },
+    { href: "/#contacto", label: "Contacto" },
+  ];
 
   if (!isMounted) {
     return (
@@ -121,29 +131,12 @@ export default function Nav() {
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
-          <Link href="/" className="nav-link">
-            Inicio
-          </Link>
-          <Link href="/#sobre-mi" className="nav-link">
-            Sobre Mí
-          </Link>
-
-          <Link href="/proyectos" className="nav-link">
-            Proyectos
-          </Link>
-
-          {mostrarPropuestas && (
-            <Link href="/propuestas" className="nav-link">
-              Propuestas
+          {navLinks.map((link) => (
+            <Link key={link.href} href={link.href} className="nav-link">
+              {link.label}
             </Link>
-          )}
+          ))}
 
-          <Link href="/mapa" className="nav-link">
-            Mapa
-          </Link>
-          <Link href="/#contacto" className="nav-link">
-            Contacto
-          </Link>
           <button
             onClick={toggleTema}
             className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 hover:shadow-[0_0_0_3px_var(--color-destacado)]"
@@ -167,6 +160,7 @@ export default function Nav() {
               className={`fas ${tema === "oscuro" ? "fa-sun" : "fa-moon"} text-sm`}
             ></i>
           </button>
+
           <button
             onClick={toggleMobile}
             className="flex flex-col gap-1.5 p-1"
@@ -199,62 +193,28 @@ export default function Nav() {
       <div
         id="mobileMenu"
         className={`mobile-menu ${mobileOpen ? "open" : ""}`}
-        style={{
-          backgroundColor: "var(--color-fondo)",
-          borderBottom: "1px solid var(--color-borde)",
-        }}
+        style={
+          {
+            backgroundColor: "var(--color-fondo)",
+            borderBottom: "1px solid var(--color-borde)",
+            // ✅ Le pasamos la cantidad real de opciones al CSS,
+            // así el alto/tamaño se puede calcular con esta variable
+            // en vez de un max-height fijo.
+            "--nav-items": navLinks.length,
+          } as React.CSSProperties
+        }
       >
         <div className="flex flex-col items-center py-4 gap-1">
-          {/* ✅ LINK "INICIO" - SIEMPRE VISIBLE */}
-          <Link
-            href="/"
-            className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
-            onClick={() => setMobileOpen(false)}
-          >
-            Inicio
-          </Link>
-
-          <Link
-            href="/#sobre-mi"
-            className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
-            onClick={() => setMobileOpen(false)}
-          >
-            Sobre Mí
-          </Link>
-
-          <Link
-            href="/proyectos"
-            className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
-            onClick={() => setMobileOpen(false)}
-          >
-            Proyectos
-          </Link>
-
-          {/* ✅ "PROPUESTAS" - SOLO EN MODO CAMPAÑA */}
-          {mostrarPropuestas && (
+          {navLinks.map((link) => (
             <Link
-              href="/propuestas"
+              key={link.href}
+              href={link.href}
               className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
               onClick={() => setMobileOpen(false)}
             >
-              Propuestas
+              {link.label}
             </Link>
-          )}
-
-          <Link
-            href="/mapa"
-            className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
-            onClick={() => setMobileOpen(false)}
-          >
-            Mapa
-          </Link>
-          <Link
-            href="/#contacto"
-            className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
-            onClick={() => setMobileOpen(false)}
-          >
-            Contacto
-          </Link>
+          ))}
         </div>
       </div>
     </>
