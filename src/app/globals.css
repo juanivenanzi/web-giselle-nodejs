@@ -118,7 +118,10 @@
 }
 
 /* ── CAMPAÑA + OSCURO (Mismos colores que institucional) ── */
-[data-modo="campaña"][data-tema="oscuro"] {
+/* ✅ FIX: el atributo real que setea la app es data-modo="campania" (sin tilde,
+   ver src/config/modo.ts). Antes decía [data-modo="campaña"] y esta regla
+   nunca se aplicaba. */
+[data-modo="campania"][data-tema="oscuro"] {
   --color-primario: #1a3352;
   --color-primario-dark: #0c1e35;
   --color-destacado: #8fc4e8;
@@ -257,6 +260,13 @@ body {
     box-shadow 0.6s ease;
 }
 
+/* ✅ FIX: Nav.tsx aplica esta clase cuando window.scrollY > 60 (en tema
+   oscuro) pero no existía ninguna regla para ella; el efecto de scroll
+   nunca se veía. */
+.nav-container.scrolled {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
 @media (max-width: 480px) {
   .nav-container {
     padding: 0 0.75rem;
@@ -384,13 +394,16 @@ body {
   background-image: url("/images/hero-bg-institucional.webp");
 }
 
-[data-modo="campaña"] .hero-bg {
+/* ✅ FIX: era [data-modo="campaña"] (con tilde), no coincidía nunca con el
+   valor real "campania" que setean config/modo.ts y AppContext.tsx. */
+[data-modo="campania"] .hero-bg {
   background-image: url("/images/hero-bg-campana.webp");
   background-position: center 40%;
 }
 
 @media (max-width: 640px) {
-  [data-modo="campaña"] .hero-bg {
+  /* ✅ FIX */
+  [data-modo="campania"] .hero-bg {
     background-size: 100% auto;
   }
 }
@@ -845,7 +858,8 @@ html[data-tema="oscuro"] .gestion-card .btn-expediente {
   display: block;
 }
 
-[data-modo="campaña"] .contenido-campaña {
+/* ✅ FIX: era [data-modo="campaña"] */
+[data-modo="campania"] .contenido-campaña {
   display: block;
 }
 
@@ -1104,11 +1118,12 @@ html[data-tema="oscuro"] .btn-enviar:hover:not(:disabled) {
     --color-texto-sec: #d1d5db;
     --color-borde: #f1f5f9;
   }
-  [data-modo="campaña"] {
+  /* ✅ FIX: eran [data-modo="campaña"] */
+  [data-modo="campania"] {
     --color-fondo: #ffffff;
     --color-fondo-alt: #f0f0f0;
   }
-  [data-modo="campaña"][data-tema="oscuro"] {
+  [data-modo="campania"][data-tema="oscuro"] {
     --color-texto: #f1f5f9;
     --color-texto-sec: #d1d5db;
     --color-borde: #f1f5f9;

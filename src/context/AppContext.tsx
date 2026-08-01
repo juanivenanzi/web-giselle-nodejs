@@ -2,7 +2,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
+import { MODO_ACTUAL } from "@/config/modo";
 
 type AppContextType = {
   modo: string;
@@ -18,21 +18,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [tema, setTemaState] = useState("claro");
 
   useEffect(() => {
-    // ✅ Forzar modo y tema desde la configuración
+    // ✅ El modo es fijo por configuración de build (src/config/modo.ts)
     const modoActual = MODO_ACTUAL;
-    const temaActual = "claro";
-    
+
+    // ✅ FIX: antes esto SIEMPRE seteaba "claro", ignorando lo que el
+    // usuario había elegido en una visita anterior. Ahora se respeta
+    // localStorage, igual que hace Nav.tsx al alternar el tema.
+    const temaGuardado = localStorage.getItem("gm-tema") || "claro";
+
     // Establecer en DOM
     document.documentElement.setAttribute("data-modo", modoActual);
-    document.documentElement.setAttribute("data-tema", temaActual);
-    
+    document.documentElement.setAttribute("data-tema", temaGuardado);
+
     // Guardar en localStorage (por si acaso)
     localStorage.setItem("gm-modo", modoActual);
-    localStorage.setItem("gm-tema", temaActual);
-    
+    localStorage.setItem("gm-tema", temaGuardado);
+
     // Actualizar estado
     setModoState(modoActual);
-    setTemaState(temaActual);
+    setTemaState(temaGuardado);
   }, []);
 
   const setModo = (nuevoModo: string) => {

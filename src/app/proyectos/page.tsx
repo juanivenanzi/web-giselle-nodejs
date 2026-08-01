@@ -2,57 +2,20 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { 
-  GestionItem, 
-  TIPO_LABEL, 
-  ESTADO_LABEL, 
-  ESTADO_ICONO,
-  ESTADO_CLASES 
+// ✅ FIX: GestionItem es una interface (no existe en runtime), debe
+// importarse con `import type` para evitar el warning/error de bundler
+// bajo isolatedModules: true (ver tsconfig.json).
+import type { GestionItem } from "@/lib/types";
+import {
+  TIPO_LABEL,
+  ESTADO_LABEL,
+  ESTADO_CLASES,
 } from "@/lib/types";
 
-function TarjetaGestion({ item }: { item: GestionItem }) {
-  const tieneEnlace =
-    item.enlacePdf && item.enlacePdf !== "" && item.enlacePdf !== "#";
-  const estadoClass = `estado-${item.estado}`;
-  const icono = ESTADO_ICONO[item.estado] || "fa-circle-question";
-
-  return (
-    <article
-      className="gestion-card"
-      style={{
-        backgroundColor: "var(--color-fondo-alt)",
-        borderColor: "var(--color-borde)",
-      }}
-    >
-      <div className="cabecera">
-        <span className="tipo">{TIPO_LABEL[item.tipo] || item.tipo}</span>
-        <span className={`estado ${estadoClass}`}>
-          <i className={`fas ${icono} text-white text-[0.75rem]`}></i>
-          {ESTADO_LABEL[item.estado] || item.estado}
-        </span>
-      </div>
-      <div className="fecha">
-        <i className="fas fa-calendar-day"></i> {item.fecha}
-      </div>
-      <div className="titulo">{item.titulo}</div>
-      <div className="descripcion">{item.descripcion}</div>
-      {tieneEnlace ? (
-        <a
-          href={item.enlacePdf}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-expediente"
-        >
-          <i className="fas fa-file-pdf"></i> Ver expediente
-        </a>
-      ) : (
-        <span className="btn-expediente-disabled">
-          <i className="fas fa-file-pdf"></i> No disponible
-        </span>
-      )}
-    </article>
-  );
-}
+// ✅ FIX: se eliminó el componente `TarjetaGestion` que estaba definido acá
+// arriba (usaba ESTADO_ICONO) pero nunca se renderizaba en ningún lado —
+// el render real de las tarjetas es el JSX inline más abajo (vista Grid y
+// vista Lista). Era código muerto.
 
 export default function ProyectosPage() {
   const [proyectos, setProyectos] = useState<GestionItem[]>([]);
