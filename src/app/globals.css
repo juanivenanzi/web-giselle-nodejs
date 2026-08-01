@@ -312,7 +312,8 @@ body {
 }
 
 .mobile-menu.open {
-  max-height: 400px;
+  max-height: 100vh; /* ✅ 100% del viewport height */
+  overflow-y: auto;
 }
 
 .mobile-link {

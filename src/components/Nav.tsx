@@ -21,20 +21,22 @@ export default function Nav() {
   // Detectar cambios de modo en el DOM
   useEffect(() => {
     if (!isMounted) return;
-    
-    const modoActual = document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+
+    const modoActual =
+      document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
     setModoLocal(modoActual);
-    
+
     const observer = new MutationObserver(() => {
-      const nuevoModo = document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+      const nuevoModo =
+        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
       setModoLocal(nuevoModo);
     });
-    
+
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["data-modo"],
     });
-    
+
     return () => observer.disconnect();
   }, [isMounted]);
 
@@ -129,7 +131,7 @@ export default function Nav() {
           <Link href="/proyectos" className="nav-link">
             Proyectos
           </Link>
-          
+
           {mostrarPropuestas && (
             <Link href="/propuestas" className="nav-link">
               Propuestas
@@ -203,7 +205,7 @@ export default function Nav() {
         }}
       >
         <div className="flex flex-col items-center py-4 gap-1">
-          {/* ✅ AGREGADO: Enlace a Inicio en menú móvil */}
+          {/* ✅ LINK "INICIO" - SIEMPRE VISIBLE */}
           <Link
             href="/"
             className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
@@ -211,7 +213,7 @@ export default function Nav() {
           >
             Inicio
           </Link>
-          
+
           <Link
             href="/#sobre-mi"
             className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
@@ -228,6 +230,7 @@ export default function Nav() {
             Proyectos
           </Link>
 
+          {/* ✅ "PROPUESTAS" - SOLO EN MODO CAMPAÑA */}
           {mostrarPropuestas && (
             <Link
               href="/propuestas"
