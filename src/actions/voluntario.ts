@@ -1,9 +1,10 @@
+// src/actions/voluntario.ts
 "use server";
 
 import { z } from "zod";
 import { google } from "googleapis";
 
-// --- Esquema de validación mejorado ---
+// --- Esquema de validación ---
 const voluntarioSchema = z.object({
   nombre: z
     .string()
@@ -12,7 +13,7 @@ const voluntarioSchema = z.object({
     .regex(
       /^[a-zA-ZáéíóúñÑüÜ\s]+$/,
       "El nombre solo puede contener letras y espacios",
-    ), // ✅ Validación específica
+    ),
   email: z.string().email("Email inválido. Usá formato: nombre@dominio.com"),
   telefono: z
     .string()
@@ -40,10 +41,7 @@ const voluntarioSchema = z.object({
   timestamp: z.string().optional(),
 });
 
-// ✅ Tipo inferido del esquema (EXPORTADO)
 export type VoluntarioData = z.infer<typeof voluntarioSchema>;
-
-// --- Tipo de respuesta (EXPORTADO) ---
 export type VoluntarioState = {
   errors?: Partial<Record<keyof VoluntarioData, string[]>>;
   message?: string;
@@ -114,7 +112,6 @@ async function saveVoluntarioToSheets(data: VoluntarioData) {
     const fecha = now.toLocaleDateString("es-AR");
     const hora = now.toLocaleTimeString("es-AR");
 
-    // 1. Escribir los datos (con columna de estado)
     const response = await sheets.spreadsheets.values.append({
       spreadsheetId,
       range: "Voluntarios!A:G",
@@ -129,7 +126,7 @@ async function saveVoluntarioToSheets(data: VoluntarioData) {
             data.email,
             data.telefono || "",
             data.mensaje || "",
-            "Pendiente", // Estado inicial
+            "Pendiente",
           ],
         ],
       },
@@ -139,7 +136,6 @@ async function saveVoluntarioToSheets(data: VoluntarioData) {
       throw new Error("No se recibió respuesta de Google Sheets");
     }
 
-    // 2. Ajustar automáticamente el ancho de las columnas (7 columnas: A-G)
     await autoResizeColumns(sheets, spreadsheetId, "Voluntarios", 7);
 
     console.log(
@@ -155,13 +151,22 @@ async function saveVoluntarioToSheets(data: VoluntarioData) {
   }
 }
 
-// --- Server Action (EXPORTADA) ---
+// --- Server Action ---
 export async function enviarVoluntario(
   prevState: VoluntarioState,
   formData: FormData,
 ): Promise<VoluntarioState> {
   try {
-    // 1. Validar honeypot (anti-spam)
+    // ✅ Validación de entorno en producción
+    if (process.env.NODE_ENV === "production" && !process.env.GOOGLE_SHEETS_FORMULARIOS_ID) {
+      console.error("❌ GOOGLE_SHEETS_FORMULARIOS_ID no configurado en producción");
+      return {
+        success: false,
+        message: "Error de configuración. Contacta al administrador.",
+      };
+    }
+
+    // 1. Validar honeypot
     const website = formData.get("website");
     if (website) {
       return {
@@ -200,7 +205,7 @@ export async function enviarVoluntario(
       throw parseError;
     }
 
-    // 4. Verificar timestamp (anti-spam, mínimo 3 segundos)
+    // 4. Verificar timestamp (anti-spam)
     if (rawData.timestamp) {
       const elapsed = Date.now() - parseInt(rawData.timestamp);
       if (elapsed < 3000) {

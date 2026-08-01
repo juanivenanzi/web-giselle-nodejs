@@ -1,9 +1,31 @@
-// src/app/propuestas/page.tsx - Versión KANBAN con contador mejorado
+// src/app/propuestas/page.tsx - Versión KANBAN mejorada
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { propuestas } from "@/data/propuestas";
 import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
+
+// ✅ Constantes extraídas
+const ICONOS_PILAR = {
+  transparencia: "fa-balance-scale",
+  libertad: "fa-chain-broken",
+  territorio: "fa-map-marked-alt",
+  orden: "fa-tree-city"
+} as const;
+
+const COLORES_PILAR = {
+  transparencia: "#3b82f6",
+  libertad: "#8b5cf6",
+  territorio: "#22c55e",
+  orden: "#f59e0b"
+} as const;
+
+const NOMBRES_PILAR = {
+  transparencia: "Transparencia",
+  libertad: "Libertad",
+  territorio: "Territorio",
+  orden: "Orden"
+} as const;
 
 export default function PropuestasPage() {
   const [modo, setModo] = useState(MODO_ACTUAL);
@@ -25,6 +47,16 @@ export default function PropuestasPage() {
   }, []);
 
   const esCampania = modo === TIPO_MODO.CAMPANIA;
+
+  // ✅ Agrupar propuestas por pilar con useMemo
+  const propuestasPorPilar = useMemo(() => {
+    return {
+      transparencia: propuestas.filter(p => p.pilar === "transparencia"),
+      libertad: propuestas.filter(p => p.pilar === "libertad"),
+      territorio: propuestas.filter(p => p.pilar === "territorio"),
+      orden: propuestas.filter(p => p.pilar === "orden")
+    };
+  }, []);
 
   if (!esCampania) {
     return (
@@ -49,38 +81,6 @@ export default function PropuestasPage() {
       </section>
     );
   }
-
-  // ✅ ÍCONOS - Mismos que Pilares
-  const iconosPorPilar = {
-    transparencia: "fa-balance-scale",
-    libertad: "fa-chain-broken",
-    territorio: "fa-map-marked-alt",
-    orden: "fa-tree-city"
-  };
-
-  // ✅ Colores para cada pilar
-  const coloresPilar = {
-    transparencia: "#3b82f6",
-    libertad: "#8b5cf6",
-    territorio: "#22c55e",
-    orden: "#f59e0b"
-  };
-
-  // ✅ Nombres en español para mostrar
-  const nombresPilar = {
-    transparencia: "Transparencia",
-    libertad: "Libertad",
-    territorio: "Territorio",
-    orden: "Orden"
-  };
-
-  // ✅ Agrupar propuestas por pilar
-  const propuestasPorPilar = {
-    transparencia: propuestas.filter(p => p.pilar === "transparencia"),
-    libertad: propuestas.filter(p => p.pilar === "libertad"),
-    territorio: propuestas.filter(p => p.pilar === "territorio"),
-    orden: propuestas.filter(p => p.pilar === "orden")
-  };
 
   return (
     <section
@@ -121,7 +121,7 @@ export default function PropuestasPage() {
                   border: "2px solid var(--color-borde)",
                 }}
               >
-                {/* Cabecera de la columna - MEJORADA */}
+                {/* Cabecera de la columna */}
                 <div 
                   className="flex items-center gap-3 mb-4 pb-3 border-b-2"
                   style={{ borderColor: "var(--color-borde)" }}
@@ -130,12 +130,12 @@ export default function PropuestasPage() {
                     className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
                     style={{
                       backgroundColor:
-                        coloresPilar[pilar as keyof typeof coloresPilar],
+                        COLORES_PILAR[pilar as keyof typeof COLORES_PILAR],
                     }}
                   >
                     <i
                       className={`fas ${
-                        iconosPorPilar[pilar as keyof typeof iconosPorPilar]
+                        ICONOS_PILAR[pilar as keyof typeof ICONOS_PILAR]
                       } text-white text-sm`}
                     ></i>
                   </div>
@@ -143,9 +143,8 @@ export default function PropuestasPage() {
                     className="font-head text-base font-semibold capitalize flex-1"
                     style={{ color: "var(--color-texto)" }}
                   >
-                    {nombresPilar[pilar as keyof typeof nombresPilar]}
+                    {NOMBRES_PILAR[pilar as keyof typeof NOMBRES_PILAR]}
                   </h2>
-                  {/* ✅ CONTADOR MÁS GRANDE Y LEGIBLE */}
                   <span
                     className="text-sm font-bold px-3 py-1 rounded-full"
                     style={{
@@ -196,7 +195,7 @@ export default function PropuestasPage() {
                   ))}
                 </div>
 
-                {/* Footer de la columna - MEJORADO */}
+                {/* Footer de la columna */}
                 <div className="mt-3 pt-2 text-center border-t" style={{ borderColor: "var(--color-borde)" }}>
                   <span
                     className="text-xs font-medium"

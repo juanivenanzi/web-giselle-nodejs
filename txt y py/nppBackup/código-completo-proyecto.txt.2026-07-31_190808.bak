@@ -1,4 +1,4 @@
---- File: fetch-gestion-data.ts ---
+--- File: scripts\fetch-gestion-data.ts ---
 #!/usr/bin/env node
 import { google } from "googleapis";
 import fs from "fs/promises";
@@ -104,7 +104,7 @@ async function fetchAndProcessData() {
 fetchAndProcessData();
 
 
---- File: test-formularios.ts ---
+--- File: scripts\test-formularios.ts ---
 import { google } from "googleapis";
 import dotenv from "dotenv";
 import path from "path";
@@ -206,7 +206,7 @@ async function testFormularios() {
 testFormularios();
 
 
---- File: update-gestion-data.ts ---
+--- File: scripts\update-gestion-data.ts ---
 #!/usr/bin/env node
 import { exec } from 'child_process'
 import { promisify } from 'util'
@@ -225,7 +225,234 @@ async function updateGestionData() {
 }
 updateGestionData()
 
---- File: ..\src\actions\contacto.ts ---
+--- File: scripts\fetch-gestion-data.ts ---
+#!/usr/bin/env node
+import { google } from "googleapis";
+import fs from "fs/promises";
+import path from "path";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
+const RANGE = process.env.GOOGLE_SHEETS_RANGE || "Gestion!A:G";
+const CLIENT_EMAIL = process.env.GOOGLE_SHEETS_CLIENT_EMAIL;
+const PRIVATE_KEY = process.env.GOOGLE_SHEETS_PRIVATE_KEY;
+
+async function fetchAndProcessData() {
+  console.log("📊 Iniciando fetch de datos de gestión...");
+
+  if (!SPREADSHEET_ID || !CLIENT_EMAIL || !PRIVATE_KEY) {
+    console.error("❌ Faltan variables de entorno");
+    return;
+  }
+
+  try {
+    const cleanPrivateKey = PRIVATE_KEY.replace(/\\n/g, "\n")
+      .replace(/^"|"$/g, "")
+      .trim();
+
+    console.log("🔑 Conectando a Google Sheets...");
+
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email: CLIENT_EMAIL.trim(),
+        private_key: cleanPrivateKey,
+      },
+      scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
+    });
+
+    const sheets = google.sheets({ version: "v4", auth });
+
+    console.log(`📤 Leyendo datos de: ${SPREADSHEET_ID}`);
+
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID.trim(),
+      range: RANGE,
+    });
+
+    const rows = response.data.values || [];
+
+    if (rows.length < 2) {
+      console.warn("⚠️ No se encontraron datos en el Excel");
+      return;
+    }
+
+    console.log(`📥 Encontradas ${rows.length - 1} filas de datos`);
+
+    const data = rows
+      .slice(1)
+      .filter(
+        (row) => row.length > 0 && row.some((cell) => cell?.toString().trim()),
+      )
+      .map((row) => ({
+        fecha: row[0]?.toString().trim() || "",
+        año: parseInt(row[1]) || 0,
+        tipo: row[2]?.toString().trim().toLowerCase() || "sin-tipo",
+        titulo: row[3]?.toString().trim() || "Sin título",
+        descripcion: row[4]?.toString().trim() || "",
+        estado: row[5]?.toString().trim().toLowerCase() || "sin-estado",
+        enlacePdf: row[6]?.toString().trim() || undefined,
+      }))
+      .filter((item) => item.año > 0 && item.titulo !== "Sin título")
+      .sort((a, b) => b.año - a.año || b.fecha.localeCompare(a.fecha));
+
+    const dataDir = path.join(process.cwd(), "src", "data");
+    await fs.mkdir(dataDir, { recursive: true });
+
+    const jsonPath = path.join(dataDir, "gestion.json");
+    await fs.writeFile(jsonPath, JSON.stringify(data, null, 2));
+    console.log(`✅ ${data.length} proyectos guardados en ${jsonPath}`);
+
+    const metaPath = path.join(dataDir, "gestion-meta.json");
+    await fs.writeFile(
+      metaPath,
+      JSON.stringify(
+        {
+          lastUpdate: new Date().toISOString(),
+          count: data.length,
+          source: SPREADSHEET_ID,
+          version: "1.0.0",
+        },
+        null,
+        2,
+      ),
+    );
+    console.log(`✅ Metadata guardada en ${metaPath}`);
+    console.log(`📊 Total de proyectos: ${data.length}`);
+  } catch (error) {
+    console.error("❌ Error:", error);
+    if (error instanceof Error) {
+      console.error("Detalles:", error.message);
+    }
+  }
+}
+
+fetchAndProcessData();
+
+
+--- File: scripts\test-formularios.ts ---
+import { google } from "googleapis";
+import dotenv from "dotenv";
+import path from "path";
+
+// Cargar variables de entorno
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+
+async function testFormularios() {
+  try {
+    console.log("🔍 Probando conexión a Google Sheets...");
+
+    const auth = new google.auth.JWT({
+      email: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
+      key: process.env.GOOGLE_SHEETS_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    });
+
+    const sheets = google.sheets({ version: "v4", auth });
+    const spreadsheetId = process.env.GOOGLE_SHEETS_FORMULARIOS_ID;
+
+    if (!spreadsheetId) {
+      throw new Error("GOOGLE_SHEETS_FORMULARIOS_ID no configurado");
+    }
+
+    console.log(`📊 Spreadsheet ID: ${spreadsheetId}`);
+
+    // Verificar hojas
+    const metadata = await sheets.spreadsheets.get({
+      spreadsheetId,
+    });
+
+    const sheetsList =
+      metadata.data.sheets?.map((s) => s.properties?.title) || [];
+    console.log("📋 Hojas disponibles:", sheetsList);
+
+    // Verificar hoja Voluntarios
+    if (sheetsList.includes("Voluntarios")) {
+      console.log('✅ Hoja "Voluntarios" encontrada');
+
+      // Probar escritura en Voluntarios
+      const testData = [
+        [
+          new Date().toLocaleDateString("es-AR"),
+          new Date().toLocaleTimeString("es-AR"),
+          "Test Usuario",
+          "test@example.com",
+          "123456789",
+          "Mensaje de prueba",
+        ],
+      ];
+
+      const result = await sheets.spreadsheets.values.append({
+        spreadsheetId,
+        range: "Voluntarios!A:F",
+        valueInputOption: "USER_ENTERED",
+        insertDataOption: "INSERT_ROWS",
+        requestBody: { values: testData },
+      });
+
+      console.log("✅ Datos escritos en Voluntarios:", result.data);
+    } else {
+      console.log('❌ Hoja "Voluntarios" NO encontrada');
+    }
+
+    // Verificar hoja Contactos
+    if (sheetsList.includes("Contactos")) {
+      console.log('✅ Hoja "Contactos" encontrada');
+
+      // Probar escritura en Contactos
+      const testData = [
+        [
+          new Date().toLocaleDateString("es-AR"),
+          new Date().toLocaleTimeString("es-AR"),
+          "Test Contacto",
+          "contacto@example.com",
+          "987654321",
+          "Consulta general",
+          "Mensaje de prueba de contacto",
+        ],
+      ];
+
+      const result = await sheets.spreadsheets.values.append({
+        spreadsheetId,
+        range: "Contactos!A:G",
+        valueInputOption: "USER_ENTERED",
+        insertDataOption: "INSERT_ROWS",
+        requestBody: { values: testData },
+      });
+
+      console.log("✅ Datos escritos en Contactos:", result.data);
+    } else {
+      console.log('❌ Hoja "Contactos" NO encontrada');
+    }
+  } catch (error) {
+    console.error("❌ Error:", error);
+  }
+}
+
+testFormularios();
+
+
+--- File: scripts\update-gestion-data.ts ---
+#!/usr/bin/env node
+import { exec } from 'child_process'
+import { promisify } from 'util'
+const execAsync = promisify(exec)
+async function updateGestionData() {
+  console.log('🔄 Iniciando actualización de datos...')
+  console.log(`📅 ${new Date().toISOString()}`)
+  try {
+    const { stdout, stderr } = await execAsync('npm run fetch-data')
+    if (stderr) console.error('❌ Error:', stderr)
+    console.log(stdout)
+    console.log('✅ Datos actualizados exitosamente')
+  } catch (error) {
+    console.error('❌ Error actualizando datos:', error)
+  }
+}
+updateGestionData()
+
+--- File: src\actions\contacto.ts ---
 "use server";
 
 import { z } from "zod";
@@ -467,7 +694,7 @@ export async function enviarContacto(
 }
 
 
---- File: ..\src\actions\voluntario.ts ---
+--- File: src\actions\voluntario.ts ---
 "use server";
 
 import { z } from "zod";
@@ -707,7 +934,7 @@ export async function enviarVoluntario(
 }
 
 
---- File: ..\src\app\api\gestion\route.ts ---
+--- File: src\app\api\gestion\route.ts ---
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
@@ -740,7 +967,7 @@ export async function GET() {
 }
 
 
---- File: ..\src\app\globals.css ---
+--- File: src\app\globals.css ---
 @import "tailwindcss";
 
 /* ══════════════════════════════════════════
@@ -1855,7 +2082,7 @@ html[data-tema="oscuro"] .btn-enviar:hover:not(:disabled) {
   }
 }
 
---- File: ..\src\app\layout.tsx ---
+--- File: src\app\layout.tsx ---
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -1916,7 +2143,7 @@ export default function RootLayout({
   );
 }
 
---- File: ..\src\app\mapa\page.tsx ---
+--- File: src\app\mapa\page.tsx ---
 export default function MapaPage() {
   return (
     <main
@@ -1975,8 +2202,7 @@ export default function MapaPage() {
   );
 }
 
---- File: ..\src\app\page.tsx ---
-// src/app/page.tsx
+--- File: src\app\page.tsx ---
 "use client";
 
 import { useEffect } from "react";
@@ -1986,15 +2212,26 @@ import Equipo from "@/components/Equipo";
 import Pilares from "@/components/Pilares";
 import Voluntariado from "@/components/Voluntariado";
 import Contacto from "@/components/Contacto";
-import { MODO_ACTUAL } from "@/config/modo";
 
 export default function Home() {
   useEffect(() => {
-    // ✅ Forzar modo desde configuración
-    document.documentElement.setAttribute("data-modo", MODO_ACTUAL);
-    document.documentElement.setAttribute("data-tema", "claro");
-    localStorage.setItem("gm-modo", MODO_ACTUAL);
-    localStorage.setItem("gm-tema", "claro");
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
+    document.documentElement.setAttribute("data-modo", modoGuardado);
+
+    const temaGuardado = localStorage.getItem("gm-tema") || "claro";
+    document.documentElement.setAttribute("data-tema", temaGuardado);
+
+    const observer = new MutationObserver(() => {
+      const nuevoModo =
+        document.documentElement.getAttribute("data-modo") || "institucional";
+      localStorage.setItem("gm-modo", nuevoModo);
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-modo"],
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -2009,24 +2246,22 @@ export default function Home() {
   );
 }
 
---- File: ..\src\app\propuestas\page.tsx ---
-// src/app/propuestas/page.tsx - Versión KANBAN con contador mejorado
+--- File: src\app\propuestas\page.tsx ---
 "use client";
 
 import { useEffect, useState } from "react";
 import { propuestas } from "@/data/propuestas";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 export default function PropuestasPage() {
-  const [modo, setModo] = useState(MODO_ACTUAL);
+  const [modo, setModo] = useState("institucional");
 
   useEffect(() => {
-    const modoActual = MODO_ACTUAL;
-    setModo(modoActual);
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
+    setModo(modoGuardado);
 
     const observer = new MutationObserver(() => {
       const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+        document.documentElement.getAttribute("data-modo") || "institucional";
       setModo(nuevoModo);
     });
     observer.observe(document.documentElement, {
@@ -2036,9 +2271,8 @@ export default function PropuestasPage() {
     return () => observer.disconnect();
   }, []);
 
-  const esCampania = modo === TIPO_MODO.CAMPANIA;
-
-  if (!esCampania) {
+  // ✅ Si no está en modo campaña, mostrar mensaje
+  if (modo !== "campania") {
     return (
       <section
         className="pt-36 pb-25 px-4 sm:px-8"
@@ -2062,46 +2296,13 @@ export default function PropuestasPage() {
     );
   }
 
-  // ✅ ÍCONOS - Mismos que Pilares
-  const iconosPorPilar = {
-    transparencia: "fa-balance-scale",
-    libertad: "fa-chain-broken",
-    territorio: "fa-map-marked-alt",
-    orden: "fa-tree-city"
-  };
-
-  // ✅ Colores para cada pilar
-  const coloresPilar = {
-    transparencia: "#3b82f6",
-    libertad: "#8b5cf6",
-    territorio: "#22c55e",
-    orden: "#f59e0b"
-  };
-
-  // ✅ Nombres en español para mostrar
-  const nombresPilar = {
-    transparencia: "Transparencia",
-    libertad: "Libertad",
-    territorio: "Territorio",
-    orden: "Orden"
-  };
-
-  // ✅ Agrupar propuestas por pilar
-  const propuestasPorPilar = {
-    transparencia: propuestas.filter(p => p.pilar === "transparencia"),
-    libertad: propuestas.filter(p => p.pilar === "libertad"),
-    territorio: propuestas.filter(p => p.pilar === "territorio"),
-    orden: propuestas.filter(p => p.pilar === "orden")
-  };
-
   return (
     <section
       className="pt-36 pb-25 px-4 sm:px-8"
       style={{ backgroundColor: "var(--color-fondo)" }}
     >
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <div className="pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-3">
             Propuestas
           </div>
@@ -2112,135 +2313,67 @@ export default function PropuestasPage() {
             Nuestras propuestas para Santo Tomé
           </h1>
           <p
-            className="mt-3 text-base max-w-2xl mx-auto"
+            className="mt-3 text-base"
             style={{ color: "var(--color-texto-sec)" }}
           >
             Conocé nuestras propuestas organizadas por pilares.
           </p>
         </div>
 
-        {/* ✅ TABLERO KANBAN - Columnas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          {Object.entries(propuestasPorPilar).map(([pilar, propuestasPilar]) => {
+        <div className="space-y-12">
+          {["transparencia", "libertad", "territorio", "orden"].map((pilar) => {
+            const propuestasPilar = propuestas.filter(
+              (p) => p.pilar === pilar
+            );
             if (propuestasPilar.length === 0) return null;
-
             return (
-              <div
-                key={pilar}
-                className="rounded-2xl p-4 flex flex-col"
-                style={{
-                  backgroundColor: "var(--color-fondo-alt)",
-                  border: "2px solid var(--color-borde)",
-                }}
-              >
-                {/* Cabecera de la columna - MEJORADA */}
-                <div 
-                  className="flex items-center gap-3 mb-4 pb-3 border-b-2"
-                  style={{ borderColor: "var(--color-borde)" }}
+              <div key={pilar}>
+                <h2
+                  className="font-head text-2xl lg:text-3xl font-semibold mb-4 capitalize"
+                  style={{ color: "var(--color-texto)" }}
                 >
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                    style={{
-                      backgroundColor:
-                        coloresPilar[pilar as keyof typeof coloresPilar],
-                    }}
-                  >
-                    <i
-                      className={`fas ${
-                        iconosPorPilar[pilar as keyof typeof iconosPorPilar]
-                      } text-white text-sm`}
-                    ></i>
-                  </div>
-                  <h2
-                    className="font-head text-base font-semibold capitalize flex-1"
-                    style={{ color: "var(--color-texto)" }}
-                  >
-                    {nombresPilar[pilar as keyof typeof nombresPilar]}
-                  </h2>
-                  {/* ✅ CONTADOR MÁS GRANDE Y LEGIBLE */}
-                  <span
-                    className="text-sm font-bold px-3 py-1 rounded-full"
-                    style={{
-                      backgroundColor: "var(--color-destacado)",
-                      color: "#ffffff",
-                      minWidth: "28px",
-                      textAlign: "center",
-                    }}
-                  >
-                    {propuestasPilar.length}
-                  </span>
-                </div>
-
-                {/* Lista de propuestas en la columna */}
-                <div className="space-y-3 flex-1">
+                  {pilar}
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {propuestasPilar.map((propuesta, index) => (
                     <div
                       key={index}
-                      className="p-3 rounded-xl border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
+                      className="p-4 rounded-xl border"
                       style={{
-                        backgroundColor: "var(--color-fondo)",
+                        backgroundColor: "var(--color-fondo-alt)",
                         borderColor: "var(--color-borde)",
                       }}
                     >
-                      <div className="flex items-start gap-2">
-                        <span
-                          className="text-xs font-bold mt-0.5 opacity-60 group-hover:opacity-100 transition-opacity"
-                          style={{ color: "var(--color-destacado)" }}
-                        >
-                          #{index + 1}
-                        </span>
-                        <div className="flex-1">
-                          <h3
-                            className="font-head text-sm font-semibold"
-                            style={{ color: "var(--color-texto)" }}
-                          >
-                            {propuesta.titulo}
-                          </h3>
-                          <p
-                            className="text-xs mt-1 leading-relaxed"
-                            style={{ color: "var(--color-texto-sec)" }}
-                          >
-                            {propuesta.descripcion}
-                          </p>
-                        </div>
-                      </div>
+                      <img
+                        src={propuesta.imagen}
+                        alt={propuesta.titulo}
+                        className="w-full h-48 object-cover rounded-lg mb-3"
+                      />
+                      <h3
+                        className="font-head text-lg font-semibold"
+                        style={{ color: "var(--color-texto)" }}
+                      >
+                        {propuesta.titulo}
+                      </h3>
+                      <p
+                        className="text-sm"
+                        style={{ color: "var(--color-texto-sec)" }}
+                      >
+                        {propuesta.descripcion}
+                      </p>
                     </div>
                   ))}
-                </div>
-
-                {/* Footer de la columna - MEJORADO */}
-                <div className="mt-3 pt-2 text-center border-t" style={{ borderColor: "var(--color-borde)" }}>
-                  <span
-                    className="text-xs font-medium"
-                    style={{ color: "var(--color-texto-sec)" }}
-                  >
-                    {propuestasPilar.length} propuesta{propuestasPilar.length > 1 ? "s" : ""}
-                  </span>
                 </div>
               </div>
             );
           })}
-        </div>
-
-        {/* Footer de la página */}
-        <div className="text-center mt-12 pt-6 border-t" style={{ borderColor: "var(--color-borde)" }}>
-          <p
-            className="text-sm"
-            style={{ color: "var(--color-texto-sec)" }}
-          >
-            <i className="fas fa-lightbulb mr-2" style={{ color: "var(--color-destacado)" }}></i>
-            Total de propuestas:{" "}
-            <strong style={{ color: "var(--color-texto)" }}>
-              {propuestas.length}
-            </strong>
-          </p>
         </div>
       </div>
     </section>
   );
 }
 
---- File: ..\src\app\proyectos\page.tsx ---
+--- File: src\app\proyectos\page.tsx ---
 "use client";
 
 import { useState, useEffect } from "react";
@@ -2972,7 +3105,7 @@ export default function ProyectosPage() {
 }
 
 
---- File: ..\src\components\Contacto.tsx ---
+--- File: src\components\Contacto.tsx ---
 "use client";
 
 import {
@@ -3582,7 +3715,7 @@ export default function Contacto() {
 }
 
 
---- File: ..\src\components\Equipo.tsx ---
+--- File: src\components\Equipo.tsx ---
 "use client";
 
 import { useEffect } from "react";
@@ -3709,8 +3842,7 @@ export default function Equipo() {
 }
 
 
---- File: ..\src\components\Footer.tsx ---
-// src/components/Footer.tsx
+--- File: src\components\Footer.tsx ---
 "use client";
 
 import { useEffect, useState } from "react";
@@ -3773,14 +3905,12 @@ export default function Footer() {
           Santo Tomé, Santa Fe, Argentina.
         </p>
         <div className="h-12 md:h-14 flex items-center overflow-hidden">
-          {/* ✅ LOGO CON width y height específicos Y AUTO para mantener proporción */}
           <Image
             src={getLogoPath()}
             alt={modo === "campania" ? "León - Campaña" : "Sol - Institucional"}
             width={56}
             height={56}
             className="h-14 md:h-15 object-contain opacity-80 md:opacity-80 -my-2 md:-my-4"
-            style={{ width: "auto", height: "56px" }} // ✅ Mantiene proporción
           />
         </div>
       </div>
@@ -3788,30 +3918,28 @@ export default function Footer() {
   );
 }
 
---- File: ..\src\components\Hero.tsx ---
-// src/components/Hero.tsx - CORREGIDO
+--- File: src\components\Hero.tsx ---
 "use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 export default function Hero() {
-  const [modo, setModo] = useState(MODO_ACTUAL);
+  const [modo, setModo] = useState("institucional");
   const [heroBg, setHeroBg] = useState("/images/hero-bg-institucional.webp");
 
   useEffect(() => {
-    const modoActual = document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
-    setModo(modoActual);
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
+    setModo(modoGuardado);
     setHeroBg(
-      modoActual === "institucional"
+      modoGuardado === "institucional"
         ? "/images/hero-bg-institucional.webp"
         : "/images/hero-bg-campana.webp",
     );
 
     const observer = new MutationObserver(() => {
       const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+        document.documentElement.getAttribute("data-modo") || "institucional";
       setModo(nuevoModo);
       setHeroBg(
         nuevoModo === "institucional"
@@ -3825,8 +3953,6 @@ export default function Hero() {
     });
     return () => observer.disconnect();
   }, []);
-
-  const esCampania = modo === "campania";
 
   return (
     <section
@@ -3849,6 +3975,7 @@ export default function Hero() {
         }}
       ></div>
       <div className="relative z-10 max-w-300 mx-auto px-6 pt-36 pb-20 text-center sm:text-left">
+        {/* ✅ TÍTULO PRINCIPAL - El más claro */}
         <h1
           className="font-head leading-[1.05] mb-2"
           style={{
@@ -3863,6 +3990,7 @@ export default function Hero() {
           </span>
         </h1>
 
+        {/* ✅ SUBTÍTULO - Tono intermedio */}
         <p
           className="font-head italic mb-5"
           style={{
@@ -3871,9 +3999,12 @@ export default function Hero() {
           }}
           id="heroRol"
         >
-          {esCampania ? "Candidata a Intendente" : "Concejal de Santo Tomé"}
+          {modo === "institucional"
+            ? "Concejal de Santo Tomé"
+            : "Candidata a Intendente"}
         </p>
 
+        {/* ✅ DESCRIPCIÓN - Tono más suave */}
         <p
           className="max-w-140 leading-relaxed mb-9"
           style={{
@@ -3882,12 +4013,14 @@ export default function Hero() {
           }}
           id="heroDesc"
         >
-          {esCampania
-            ? "Santo Tomé merece más. Juntos podemos construir la ciudad que soñamos. ¡Sumate!"
-            : "Trabajando con compromiso por una comunidad más justa, segura y con oportunidades para todos los vecinos."}
+          {modo === "institucional"
+            ? "Trabajando con compromiso por una comunidad más justa, segura y con oportunidades para todos los vecinos."
+            : "Santo Tomé merece más. Juntos podemos construir la ciudad que soñamos. ¡Sumate!"}
         </p>
 
+        {/* ✅ BOTONES - Con colores invertidos en light/dark mode */}
         <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
+          {/* ✅ BOTÓN "VER MI GESTIÓN" - Mismo color en light y dark mode */}
           <Link
             href="/proyectos"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold shadow-lg t-modo hover:scale-105 hover:shadow-2xl transition-all"
@@ -3896,8 +4029,9 @@ export default function Hero() {
               color: "#ffffff",
             }}
           >
-            {esCampania ? "Mis propuestas" : "Ver mi gestión"}
+            {modo === "institucional" ? "Ver mi gestión" : "Mis propuestas"}
           </Link>
+          {/* ✅ BOTÓN "CONTACTAME" - Invierte colores según el tema */}
           <Link
             href="#contacto"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold border-2 t-modo hover:scale-105 hover:shadow-lg transition-all"
@@ -3912,6 +4046,7 @@ export default function Hero() {
         </div>
       </div>
 
+      {/* ✅ TEXTOS SECUNDARIOS - Los más tenues */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5">
         <a
           href="https://www.microsoft.com/es-es/accessible-windows/accessibility-in-windows-11-22-05-30"
@@ -3944,44 +4079,44 @@ export default function Hero() {
   );
 }
 
---- File: ..\src\components\Nav.tsx ---
-// src/components/Nav.tsx
+
+--- File: src\components\Nav.tsx ---
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useApp } from "@/context/AppContext";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 export default function Nav() {
   const { tema, setTema } = useApp();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const [modoLocal, setModoLocal] = useState(MODO_ACTUAL);
+  const [modoLocal, setModoLocal] = useState("institucional");
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // ✅ Detectar cambios de modo en el DOM
   useEffect(() => {
     if (!isMounted) return;
-    
-    const modoActual = document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+    const modoActual =
+      document.documentElement.getAttribute("data-modo") || "institucional";
     setModoLocal(modoActual);
-    
+  }, [isMounted]);
+
+  useEffect(() => {
+    if (!isMounted) return;
     const observer = new MutationObserver(() => {
-      const nuevoModo = document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+      const nuevoModo =
+        document.documentElement.getAttribute("data-modo") || "institucional";
       setModoLocal(nuevoModo);
     });
-    
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["data-modo"],
     });
-    
     return () => observer.disconnect();
   }, [isMounted]);
 
@@ -4006,9 +4141,6 @@ export default function Nav() {
 
   const toggleMobile = () => setMobileOpen(!mobileOpen);
 
-  // ✅ Determinar si mostrar Propuestas (comparación segura)
-  const mostrarPropuestas = modoLocal === TIPO_MODO.CAMPANIA;
-
   if (!isMounted) {
     return (
       <nav className="nav-container">
@@ -4023,6 +4155,7 @@ export default function Nav() {
 
   return (
     <>
+      {/* ✅ NAV CON COLOR ELEGIDO */}
       <nav
         className={`nav-container ${scrolled ? "scrolled" : ""}`}
         style={{
@@ -4046,7 +4179,6 @@ export default function Nav() {
             width={40}
             height={40}
             className="h-9 w-auto"
-            style={{ width: "auto", height: "36px" }}
             priority
           />
           <div className="h-8 w-0.75 bg-current opacity-60"></div>
@@ -4060,7 +4192,6 @@ export default function Nav() {
             width={120}
             height={32}
             className="h-8 w-auto"
-            style={{ width: "auto", height: "32px" }}
             priority
           />
         </Link>
@@ -4073,13 +4204,18 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
-          <Link href="/proyectos" className="nav-link">
-            Proyectos
-          </Link>
-          
-          {mostrarPropuestas && (
-            <Link href="/propuestas" className="nav-link">
-              Propuestas
+          {modoLocal === "campania" ? (
+            <>
+              <Link href="/proyectos" className="nav-link">
+                Proyectos
+              </Link>
+              <Link href="/propuestas" className="nav-link">
+                Propuestas
+              </Link>
+            </>
+          ) : (
+            <Link href="/proyectos" className="nav-link">
+              Proyectos
             </Link>
           )}
 
@@ -4165,21 +4301,30 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
-          <Link
-            href="/proyectos"
-            className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
-            onClick={() => setMobileOpen(false)}
-          >
-            Proyectos
-          </Link>
-
-          {mostrarPropuestas && (
+          {modoLocal === "campania" ? (
+            <>
+              <Link
+                href="/proyectos"
+                className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
+                onClick={() => setMobileOpen(false)}
+              >
+                Proyectos
+              </Link>
+              <Link
+                href="/propuestas"
+                className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
+                onClick={() => setMobileOpen(false)}
+              >
+                Propuestas
+              </Link>
+            </>
+          ) : (
             <Link
-              href="/propuestas"
+              href="/proyectos"
               className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
               onClick={() => setMobileOpen(false)}
             >
-              Propuestas
+              Proyectos
             </Link>
           )}
 
@@ -4203,7 +4348,8 @@ export default function Nav() {
   );
 }
 
---- File: ..\src\components\Pilares.tsx ---
+
+--- File: src\components\Pilares.tsx ---
 "use client";
 
 import { useEffect } from "react";
@@ -4323,7 +4469,7 @@ export default function Pilares() {
   );
 }
 
---- File: ..\src\components\SobreMi.tsx ---
+--- File: src\components\SobreMi.tsx ---
 "use client";
 
 import { useEffect } from "react";
@@ -4415,20 +4561,22 @@ export default function SobreMi() {
   );
 }
 
---- File: ..\src\components\Voluntariado.tsx ---
-// src/components/Voluntariado.tsx
+--- File: src\components\Voluntariado.tsx ---
 "use client";
 
 import { useState, useEffect, useTransition, useRef } from "react";
 import { enviarVoluntario, type VoluntarioState } from "@/actions/voluntario";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 // ✅ Constantes de validación (compartidas con Contacto)
 const VALIDACIONES = {
+  // 📧 Email
   email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+  // 📞 Teléfono argentino (con formato flexible)
   telefono:
     /^(?:(?:\(?(?:0?11|0?[1-9][0-9]{2})\)?[\s-]?)?(?:15)?[\s-]?[0-9]{7,8}|[0-9]{7,10})$/,
+  // 👤 Nombre (solo letras y espacios)
   nombre: /^[a-zA-ZáéíóúñÑüÜ\s]+$/,
+  // 🛡️ Patrones de spam
   spam: [
     /http[s]?:\/\//i,
     /www\./i,
@@ -4439,6 +4587,7 @@ const VALIDACIONES = {
   ],
 };
 
+// Función de validación en cliente mejorada
 const validateForm = (formData: FormData) => {
   const nombre = formData.get("nombre")?.toString().trim() || "";
   const email = formData.get("email")?.toString().trim() || "";
@@ -4447,6 +4596,7 @@ const validateForm = (formData: FormData) => {
 
   const errors: Record<string, string> = {};
 
+  // 👤 Validación de nombre
   if (!nombre || nombre.length < 2) {
     errors.nombre = "El nombre es requerido (mínimo 2 caracteres)";
   } else if (!VALIDACIONES.nombre.test(nombre)) {
@@ -4455,12 +4605,14 @@ const validateForm = (formData: FormData) => {
     errors.nombre = "El nombre no puede superar los 100 caracteres";
   }
 
+  // 📧 Validación de email
   if (!email) {
     errors.email = "El email es requerido";
   } else if (!VALIDACIONES.email.test(email)) {
     errors.email = "Email inválido. Usá formato: nombre@dominio.com";
   }
 
+  // 📞 Validación de teléfono (opcional pero con formato)
   if (telefono) {
     const telefonoLimpio = telefono.replace(/\s/g, "");
     if (!VALIDACIONES.telefono.test(telefonoLimpio)) {
@@ -4469,6 +4621,7 @@ const validateForm = (formData: FormData) => {
     }
   }
 
+  // 💬 Validación de mensaje
   if (mensaje) {
     if (mensaje.length > 500) {
       errors.mensaje = "El mensaje no puede superar los 500 caracteres";
@@ -4490,18 +4643,18 @@ const initialState: VoluntarioState = {
 export default function Voluntariado() {
   const [enviando, setEnviando] = useState(false);
   const [mensaje, setMensaje] = useState("");
-  const [modo, setModo] = useState(MODO_ACTUAL);
+  const [modo, setModo] = useState("institucional");
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    const modoActual = MODO_ACTUAL;
-    setModo(modoActual);
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
+    setModo(modoGuardado);
 
     const observer = new MutationObserver(() => {
       const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+        document.documentElement.getAttribute("data-modo") || "institucional";
       setModo(nuevoModo);
     });
     observer.observe(document.documentElement, {
@@ -4510,8 +4663,6 @@ export default function Voluntariado() {
     });
     return () => observer.disconnect();
   }, []);
-
-  const esCampania = modo === TIPO_MODO.CAMPANIA;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -4581,7 +4732,7 @@ export default function Voluntariado() {
               className="font-head text-4xl lg:text-5xl font-semibold mb-4"
               style={{ color: "var(--color-texto)" }}
             >
-              {esCampania ? "Sumate" : "Anotate"}
+              {modo === "institucional" ? "Anotate" : "Sumate"}
             </h2>
             <div className="w-20 h-1 bg-(--color-destacado) rounded-full mb-4 lg:mx-0 mx-auto" />
             <p
@@ -4590,18 +4741,20 @@ export default function Voluntariado() {
                 color: "color-mix(in srgb, var(--color-texto) 75%, transparent)",
               }}
             >
-              {esCampania
-                ? "Santo Tomé se construye entre todos. Anotate."
-                : "Si querés participar activamente, dejá tus datos."}
+              {modo === "institucional"
+                ? "Si querés participar activamente, dejá tus datos."
+                : "Santo Tomé se construye entre todos. Anotate."}
             </p>
           </div>
 
+          {/* ✅ FORMULARIO SIN TARJETA - Mismo estilo que Contacto */}
           <div className="lg:col-span-3">
             <form
               ref={formRef}
               onSubmit={handleSubmit}
               className="reveal reveal-delay-1 flex flex-col gap-4 relative"
             >
+              {/* Honeypot oculto */}
               <div className="absolute left-[-9999px]" aria-hidden="true">
                 <input
                   type="text"
@@ -4764,26 +4917,10 @@ export default function Voluntariado() {
   );
 }
 
---- File: ..\src\config\modo.ts ---
-// src/config/modo.ts
-// 🔧 CAMBIA ESTE VALOR PARA CAMBIAR EL MODO
-// Opciones: "institucional" | "campania"
-export const MODO_ACTUAL = "campania";
-
-// ✅ Constantes para usar en los componentes (sin comparaciones problemáticas)
-export const TIPO_MODO = {
-  INSTITUCIONAL: "institucional",
-  CAMPANIA: "campania"
-} as const;
-
-export type TipoModo = typeof TIPO_MODO[keyof typeof TIPO_MODO];
-
---- File: ..\src\context\AppContext.tsx ---
-// src/context/AppContext.tsx
+--- File: src\context\AppContext.tsx ---
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 type AppContextType = {
   modo: string;
@@ -4795,35 +4932,24 @@ type AppContextType = {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [modo, setModoState] = useState(MODO_ACTUAL);
+  const [modo, setModoState] = useState("campania");
   const [tema, setTemaState] = useState("claro");
 
+  // Cargar estado inicial desde localStorage
   useEffect(() => {
-    // ✅ Forzar modo y tema desde la configuración
-    const modoActual = MODO_ACTUAL;
-    const temaActual = "claro";
-    
-    // Establecer en DOM
-    document.documentElement.setAttribute("data-modo", modoActual);
-    document.documentElement.setAttribute("data-tema", temaActual);
-    
-    // Guardar en localStorage (por si acaso)
-    localStorage.setItem("gm-modo", modoActual);
-    localStorage.setItem("gm-tema", temaActual);
-    
-    // Actualizar estado
-    setModoState(modoActual);
-    setTemaState(temaActual);
+    const modoGuardado = localStorage.getItem("gm-modo") || "campania";
+    const temaGuardado = localStorage.getItem("gm-tema") || "claro";
+    setModoState(modoGuardado);
+    setTemaState(temaGuardado);
+    document.documentElement.setAttribute("data-modo", modoGuardado);
+    document.documentElement.setAttribute("data-tema", temaGuardado);
   }, []);
 
+  // Sincronizar cambios con el DOM y localStorage
   const setModo = (nuevoModo: string) => {
     setModoState(nuevoModo);
     localStorage.setItem("gm-modo", nuevoModo);
     document.documentElement.setAttribute("data-modo", nuevoModo);
-    // ✅ Recargar para asegurar que todos los componentes se actualicen
-    if (typeof window !== "undefined") {
-      window.location.reload();
-    }
   };
 
   const setTema = (nuevoTema: string) => {
@@ -4847,7 +4973,8 @@ export function useApp() {
   return context;
 }
 
---- File: ..\src\data\gestion-meta.json ---
+
+--- File: src\data\gestion-meta.json ---
 {
   "lastUpdate": "2026-07-28T20:40:18.489Z",
   "count": 36,
@@ -4855,7 +4982,7 @@ export function useApp() {
   "version": "1.0.0"
 }
 
---- File: ..\src\data\gestion.json ---
+--- File: src\data\gestion.json ---
 [
   {
     "fecha": "25/03/2022",
@@ -5155,7 +5282,7 @@ export function useApp() {
   }
 ]
 
---- File: ..\src\data\propuestas.ts ---
+--- File: src\data\propuestas.ts ---
 export interface Propuesta {
   pilar: string;
   titulo: string;
@@ -5259,7 +5386,7 @@ export const propuestas: Propuesta[] = [
   },
 ];
 
---- File: ..\src\globals.d.ts ---
+--- File: src\globals.d.ts ---
 // src/globals.d.ts
 declare module "*.css" {
   const content: { [className: string]: string };
@@ -5267,7 +5394,7 @@ declare module "*.css" {
 }
 
 
---- File: ..\src\lib\types.ts ---
+--- File: src\lib\types.ts ---
 export interface GestionItem {
   fecha: string;
   año: number;
@@ -5305,7 +5432,7 @@ export type GestionTipo =
   | "sin-tipo";
 
 
---- File: ..\src\actions\contacto.ts ---
+--- File: src\actions\contacto.ts ---
 "use server";
 
 import { z } from "zod";
@@ -5547,7 +5674,7 @@ export async function enviarContacto(
 }
 
 
---- File: ..\src\actions\voluntario.ts ---
+--- File: src\actions\voluntario.ts ---
 "use server";
 
 import { z } from "zod";
@@ -5787,7 +5914,7 @@ export async function enviarVoluntario(
 }
 
 
---- File: ..\src\actions\contacto.ts ---
+--- File: src\actions\contacto.ts ---
 "use server";
 
 import { z } from "zod";
@@ -6029,7 +6156,7 @@ export async function enviarContacto(
 }
 
 
---- File: ..\src\actions\voluntario.ts ---
+--- File: src\actions\voluntario.ts ---
 "use server";
 
 import { z } from "zod";
@@ -6269,7 +6396,7 @@ export async function enviarVoluntario(
 }
 
 
---- File: ..\src\app\api\gestion\route.ts ---
+--- File: src\app\api\gestion\route.ts ---
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
@@ -6302,7 +6429,7 @@ export async function GET() {
 }
 
 
---- File: ..\src\app\globals.css ---
+--- File: src\app\globals.css ---
 @import "tailwindcss";
 
 /* ══════════════════════════════════════════
@@ -7417,7 +7544,7 @@ html[data-tema="oscuro"] .btn-enviar:hover:not(:disabled) {
   }
 }
 
---- File: ..\src\app\layout.tsx ---
+--- File: src\app\layout.tsx ---
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -7478,7 +7605,7 @@ export default function RootLayout({
   );
 }
 
---- File: ..\src\app\mapa\page.tsx ---
+--- File: src\app\mapa\page.tsx ---
 export default function MapaPage() {
   return (
     <main
@@ -7537,8 +7664,7 @@ export default function MapaPage() {
   );
 }
 
---- File: ..\src\app\page.tsx ---
-// src/app/page.tsx
+--- File: src\app\page.tsx ---
 "use client";
 
 import { useEffect } from "react";
@@ -7548,15 +7674,26 @@ import Equipo from "@/components/Equipo";
 import Pilares from "@/components/Pilares";
 import Voluntariado from "@/components/Voluntariado";
 import Contacto from "@/components/Contacto";
-import { MODO_ACTUAL } from "@/config/modo";
 
 export default function Home() {
   useEffect(() => {
-    // ✅ Forzar modo desde configuración
-    document.documentElement.setAttribute("data-modo", MODO_ACTUAL);
-    document.documentElement.setAttribute("data-tema", "claro");
-    localStorage.setItem("gm-modo", MODO_ACTUAL);
-    localStorage.setItem("gm-tema", "claro");
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
+    document.documentElement.setAttribute("data-modo", modoGuardado);
+
+    const temaGuardado = localStorage.getItem("gm-tema") || "claro";
+    document.documentElement.setAttribute("data-tema", temaGuardado);
+
+    const observer = new MutationObserver(() => {
+      const nuevoModo =
+        document.documentElement.getAttribute("data-modo") || "institucional";
+      localStorage.setItem("gm-modo", nuevoModo);
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-modo"],
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -7571,24 +7708,22 @@ export default function Home() {
   );
 }
 
---- File: ..\src\app\propuestas\page.tsx ---
-// src/app/propuestas/page.tsx - Versión KANBAN con contador mejorado
+--- File: src\app\propuestas\page.tsx ---
 "use client";
 
 import { useEffect, useState } from "react";
 import { propuestas } from "@/data/propuestas";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 export default function PropuestasPage() {
-  const [modo, setModo] = useState(MODO_ACTUAL);
+  const [modo, setModo] = useState("institucional");
 
   useEffect(() => {
-    const modoActual = MODO_ACTUAL;
-    setModo(modoActual);
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
+    setModo(modoGuardado);
 
     const observer = new MutationObserver(() => {
       const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+        document.documentElement.getAttribute("data-modo") || "institucional";
       setModo(nuevoModo);
     });
     observer.observe(document.documentElement, {
@@ -7598,9 +7733,8 @@ export default function PropuestasPage() {
     return () => observer.disconnect();
   }, []);
 
-  const esCampania = modo === TIPO_MODO.CAMPANIA;
-
-  if (!esCampania) {
+  // ✅ Si no está en modo campaña, mostrar mensaje
+  if (modo !== "campania") {
     return (
       <section
         className="pt-36 pb-25 px-4 sm:px-8"
@@ -7624,46 +7758,13 @@ export default function PropuestasPage() {
     );
   }
 
-  // ✅ ÍCONOS - Mismos que Pilares
-  const iconosPorPilar = {
-    transparencia: "fa-balance-scale",
-    libertad: "fa-chain-broken",
-    territorio: "fa-map-marked-alt",
-    orden: "fa-tree-city"
-  };
-
-  // ✅ Colores para cada pilar
-  const coloresPilar = {
-    transparencia: "#3b82f6",
-    libertad: "#8b5cf6",
-    territorio: "#22c55e",
-    orden: "#f59e0b"
-  };
-
-  // ✅ Nombres en español para mostrar
-  const nombresPilar = {
-    transparencia: "Transparencia",
-    libertad: "Libertad",
-    territorio: "Territorio",
-    orden: "Orden"
-  };
-
-  // ✅ Agrupar propuestas por pilar
-  const propuestasPorPilar = {
-    transparencia: propuestas.filter(p => p.pilar === "transparencia"),
-    libertad: propuestas.filter(p => p.pilar === "libertad"),
-    territorio: propuestas.filter(p => p.pilar === "territorio"),
-    orden: propuestas.filter(p => p.pilar === "orden")
-  };
-
   return (
     <section
       className="pt-36 pb-25 px-4 sm:px-8"
       style={{ backgroundColor: "var(--color-fondo)" }}
     >
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <div className="pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-3">
             Propuestas
           </div>
@@ -7674,135 +7775,67 @@ export default function PropuestasPage() {
             Nuestras propuestas para Santo Tomé
           </h1>
           <p
-            className="mt-3 text-base max-w-2xl mx-auto"
+            className="mt-3 text-base"
             style={{ color: "var(--color-texto-sec)" }}
           >
             Conocé nuestras propuestas organizadas por pilares.
           </p>
         </div>
 
-        {/* ✅ TABLERO KANBAN - Columnas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          {Object.entries(propuestasPorPilar).map(([pilar, propuestasPilar]) => {
+        <div className="space-y-12">
+          {["transparencia", "libertad", "territorio", "orden"].map((pilar) => {
+            const propuestasPilar = propuestas.filter(
+              (p) => p.pilar === pilar
+            );
             if (propuestasPilar.length === 0) return null;
-
             return (
-              <div
-                key={pilar}
-                className="rounded-2xl p-4 flex flex-col"
-                style={{
-                  backgroundColor: "var(--color-fondo-alt)",
-                  border: "2px solid var(--color-borde)",
-                }}
-              >
-                {/* Cabecera de la columna - MEJORADA */}
-                <div 
-                  className="flex items-center gap-3 mb-4 pb-3 border-b-2"
-                  style={{ borderColor: "var(--color-borde)" }}
+              <div key={pilar}>
+                <h2
+                  className="font-head text-2xl lg:text-3xl font-semibold mb-4 capitalize"
+                  style={{ color: "var(--color-texto)" }}
                 >
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                    style={{
-                      backgroundColor:
-                        coloresPilar[pilar as keyof typeof coloresPilar],
-                    }}
-                  >
-                    <i
-                      className={`fas ${
-                        iconosPorPilar[pilar as keyof typeof iconosPorPilar]
-                      } text-white text-sm`}
-                    ></i>
-                  </div>
-                  <h2
-                    className="font-head text-base font-semibold capitalize flex-1"
-                    style={{ color: "var(--color-texto)" }}
-                  >
-                    {nombresPilar[pilar as keyof typeof nombresPilar]}
-                  </h2>
-                  {/* ✅ CONTADOR MÁS GRANDE Y LEGIBLE */}
-                  <span
-                    className="text-sm font-bold px-3 py-1 rounded-full"
-                    style={{
-                      backgroundColor: "var(--color-destacado)",
-                      color: "#ffffff",
-                      minWidth: "28px",
-                      textAlign: "center",
-                    }}
-                  >
-                    {propuestasPilar.length}
-                  </span>
-                </div>
-
-                {/* Lista de propuestas en la columna */}
-                <div className="space-y-3 flex-1">
+                  {pilar}
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {propuestasPilar.map((propuesta, index) => (
                     <div
                       key={index}
-                      className="p-3 rounded-xl border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
+                      className="p-4 rounded-xl border"
                       style={{
-                        backgroundColor: "var(--color-fondo)",
+                        backgroundColor: "var(--color-fondo-alt)",
                         borderColor: "var(--color-borde)",
                       }}
                     >
-                      <div className="flex items-start gap-2">
-                        <span
-                          className="text-xs font-bold mt-0.5 opacity-60 group-hover:opacity-100 transition-opacity"
-                          style={{ color: "var(--color-destacado)" }}
-                        >
-                          #{index + 1}
-                        </span>
-                        <div className="flex-1">
-                          <h3
-                            className="font-head text-sm font-semibold"
-                            style={{ color: "var(--color-texto)" }}
-                          >
-                            {propuesta.titulo}
-                          </h3>
-                          <p
-                            className="text-xs mt-1 leading-relaxed"
-                            style={{ color: "var(--color-texto-sec)" }}
-                          >
-                            {propuesta.descripcion}
-                          </p>
-                        </div>
-                      </div>
+                      <img
+                        src={propuesta.imagen}
+                        alt={propuesta.titulo}
+                        className="w-full h-48 object-cover rounded-lg mb-3"
+                      />
+                      <h3
+                        className="font-head text-lg font-semibold"
+                        style={{ color: "var(--color-texto)" }}
+                      >
+                        {propuesta.titulo}
+                      </h3>
+                      <p
+                        className="text-sm"
+                        style={{ color: "var(--color-texto-sec)" }}
+                      >
+                        {propuesta.descripcion}
+                      </p>
                     </div>
                   ))}
-                </div>
-
-                {/* Footer de la columna - MEJORADO */}
-                <div className="mt-3 pt-2 text-center border-t" style={{ borderColor: "var(--color-borde)" }}>
-                  <span
-                    className="text-xs font-medium"
-                    style={{ color: "var(--color-texto-sec)" }}
-                  >
-                    {propuestasPilar.length} propuesta{propuestasPilar.length > 1 ? "s" : ""}
-                  </span>
                 </div>
               </div>
             );
           })}
-        </div>
-
-        {/* Footer de la página */}
-        <div className="text-center mt-12 pt-6 border-t" style={{ borderColor: "var(--color-borde)" }}>
-          <p
-            className="text-sm"
-            style={{ color: "var(--color-texto-sec)" }}
-          >
-            <i className="fas fa-lightbulb mr-2" style={{ color: "var(--color-destacado)" }}></i>
-            Total de propuestas:{" "}
-            <strong style={{ color: "var(--color-texto)" }}>
-              {propuestas.length}
-            </strong>
-          </p>
         </div>
       </div>
     </section>
   );
 }
 
---- File: ..\src\app\proyectos\page.tsx ---
+--- File: src\app\proyectos\page.tsx ---
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8534,7 +8567,7 @@ export default function ProyectosPage() {
 }
 
 
---- File: ..\src\app\api\gestion\route.ts ---
+--- File: src\app\api\gestion\route.ts ---
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
@@ -8567,7 +8600,7 @@ export async function GET() {
 }
 
 
---- File: ..\src\app\api\gestion\route.ts ---
+--- File: src\app\api\gestion\route.ts ---
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
@@ -8600,7 +8633,7 @@ export async function GET() {
 }
 
 
---- File: ..\src\app\mapa\page.tsx ---
+--- File: src\app\mapa\page.tsx ---
 export default function MapaPage() {
   return (
     <main
@@ -8659,7 +8692,7 @@ export default function MapaPage() {
   );
 }
 
---- File: ..\src\app\mapa\page.tsx ---
+--- File: src\app\mapa\page.tsx ---
 export default function MapaPage() {
   return (
     <main
@@ -8718,24 +8751,22 @@ export default function MapaPage() {
   );
 }
 
---- File: ..\src\app\propuestas\page.tsx ---
-// src/app/propuestas/page.tsx - Versión KANBAN con contador mejorado
+--- File: src\app\propuestas\page.tsx ---
 "use client";
 
 import { useEffect, useState } from "react";
 import { propuestas } from "@/data/propuestas";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 export default function PropuestasPage() {
-  const [modo, setModo] = useState(MODO_ACTUAL);
+  const [modo, setModo] = useState("institucional");
 
   useEffect(() => {
-    const modoActual = MODO_ACTUAL;
-    setModo(modoActual);
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
+    setModo(modoGuardado);
 
     const observer = new MutationObserver(() => {
       const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+        document.documentElement.getAttribute("data-modo") || "institucional";
       setModo(nuevoModo);
     });
     observer.observe(document.documentElement, {
@@ -8745,9 +8776,8 @@ export default function PropuestasPage() {
     return () => observer.disconnect();
   }, []);
 
-  const esCampania = modo === TIPO_MODO.CAMPANIA;
-
-  if (!esCampania) {
+  // ✅ Si no está en modo campaña, mostrar mensaje
+  if (modo !== "campania") {
     return (
       <section
         className="pt-36 pb-25 px-4 sm:px-8"
@@ -8771,46 +8801,13 @@ export default function PropuestasPage() {
     );
   }
 
-  // ✅ ÍCONOS - Mismos que Pilares
-  const iconosPorPilar = {
-    transparencia: "fa-balance-scale",
-    libertad: "fa-chain-broken",
-    territorio: "fa-map-marked-alt",
-    orden: "fa-tree-city"
-  };
-
-  // ✅ Colores para cada pilar
-  const coloresPilar = {
-    transparencia: "#3b82f6",
-    libertad: "#8b5cf6",
-    territorio: "#22c55e",
-    orden: "#f59e0b"
-  };
-
-  // ✅ Nombres en español para mostrar
-  const nombresPilar = {
-    transparencia: "Transparencia",
-    libertad: "Libertad",
-    territorio: "Territorio",
-    orden: "Orden"
-  };
-
-  // ✅ Agrupar propuestas por pilar
-  const propuestasPorPilar = {
-    transparencia: propuestas.filter(p => p.pilar === "transparencia"),
-    libertad: propuestas.filter(p => p.pilar === "libertad"),
-    territorio: propuestas.filter(p => p.pilar === "territorio"),
-    orden: propuestas.filter(p => p.pilar === "orden")
-  };
-
   return (
     <section
       className="pt-36 pb-25 px-4 sm:px-8"
       style={{ backgroundColor: "var(--color-fondo)" }}
     >
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <div className="pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-3">
             Propuestas
           </div>
@@ -8821,152 +8818,82 @@ export default function PropuestasPage() {
             Nuestras propuestas para Santo Tomé
           </h1>
           <p
-            className="mt-3 text-base max-w-2xl mx-auto"
+            className="mt-3 text-base"
             style={{ color: "var(--color-texto-sec)" }}
           >
             Conocé nuestras propuestas organizadas por pilares.
           </p>
         </div>
 
-        {/* ✅ TABLERO KANBAN - Columnas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          {Object.entries(propuestasPorPilar).map(([pilar, propuestasPilar]) => {
+        <div className="space-y-12">
+          {["transparencia", "libertad", "territorio", "orden"].map((pilar) => {
+            const propuestasPilar = propuestas.filter(
+              (p) => p.pilar === pilar
+            );
             if (propuestasPilar.length === 0) return null;
-
             return (
-              <div
-                key={pilar}
-                className="rounded-2xl p-4 flex flex-col"
-                style={{
-                  backgroundColor: "var(--color-fondo-alt)",
-                  border: "2px solid var(--color-borde)",
-                }}
-              >
-                {/* Cabecera de la columna - MEJORADA */}
-                <div 
-                  className="flex items-center gap-3 mb-4 pb-3 border-b-2"
-                  style={{ borderColor: "var(--color-borde)" }}
+              <div key={pilar}>
+                <h2
+                  className="font-head text-2xl lg:text-3xl font-semibold mb-4 capitalize"
+                  style={{ color: "var(--color-texto)" }}
                 >
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                    style={{
-                      backgroundColor:
-                        coloresPilar[pilar as keyof typeof coloresPilar],
-                    }}
-                  >
-                    <i
-                      className={`fas ${
-                        iconosPorPilar[pilar as keyof typeof iconosPorPilar]
-                      } text-white text-sm`}
-                    ></i>
-                  </div>
-                  <h2
-                    className="font-head text-base font-semibold capitalize flex-1"
-                    style={{ color: "var(--color-texto)" }}
-                  >
-                    {nombresPilar[pilar as keyof typeof nombresPilar]}
-                  </h2>
-                  {/* ✅ CONTADOR MÁS GRANDE Y LEGIBLE */}
-                  <span
-                    className="text-sm font-bold px-3 py-1 rounded-full"
-                    style={{
-                      backgroundColor: "var(--color-destacado)",
-                      color: "#ffffff",
-                      minWidth: "28px",
-                      textAlign: "center",
-                    }}
-                  >
-                    {propuestasPilar.length}
-                  </span>
-                </div>
-
-                {/* Lista de propuestas en la columna */}
-                <div className="space-y-3 flex-1">
+                  {pilar}
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {propuestasPilar.map((propuesta, index) => (
                     <div
                       key={index}
-                      className="p-3 rounded-xl border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
+                      className="p-4 rounded-xl border"
                       style={{
-                        backgroundColor: "var(--color-fondo)",
+                        backgroundColor: "var(--color-fondo-alt)",
                         borderColor: "var(--color-borde)",
                       }}
                     >
-                      <div className="flex items-start gap-2">
-                        <span
-                          className="text-xs font-bold mt-0.5 opacity-60 group-hover:opacity-100 transition-opacity"
-                          style={{ color: "var(--color-destacado)" }}
-                        >
-                          #{index + 1}
-                        </span>
-                        <div className="flex-1">
-                          <h3
-                            className="font-head text-sm font-semibold"
-                            style={{ color: "var(--color-texto)" }}
-                          >
-                            {propuesta.titulo}
-                          </h3>
-                          <p
-                            className="text-xs mt-1 leading-relaxed"
-                            style={{ color: "var(--color-texto-sec)" }}
-                          >
-                            {propuesta.descripcion}
-                          </p>
-                        </div>
-                      </div>
+                      <img
+                        src={propuesta.imagen}
+                        alt={propuesta.titulo}
+                        className="w-full h-48 object-cover rounded-lg mb-3"
+                      />
+                      <h3
+                        className="font-head text-lg font-semibold"
+                        style={{ color: "var(--color-texto)" }}
+                      >
+                        {propuesta.titulo}
+                      </h3>
+                      <p
+                        className="text-sm"
+                        style={{ color: "var(--color-texto-sec)" }}
+                      >
+                        {propuesta.descripcion}
+                      </p>
                     </div>
                   ))}
-                </div>
-
-                {/* Footer de la columna - MEJORADO */}
-                <div className="mt-3 pt-2 text-center border-t" style={{ borderColor: "var(--color-borde)" }}>
-                  <span
-                    className="text-xs font-medium"
-                    style={{ color: "var(--color-texto-sec)" }}
-                  >
-                    {propuestasPilar.length} propuesta{propuestasPilar.length > 1 ? "s" : ""}
-                  </span>
                 </div>
               </div>
             );
           })}
-        </div>
-
-        {/* Footer de la página */}
-        <div className="text-center mt-12 pt-6 border-t" style={{ borderColor: "var(--color-borde)" }}>
-          <p
-            className="text-sm"
-            style={{ color: "var(--color-texto-sec)" }}
-          >
-            <i className="fas fa-lightbulb mr-2" style={{ color: "var(--color-destacado)" }}></i>
-            Total de propuestas:{" "}
-            <strong style={{ color: "var(--color-texto)" }}>
-              {propuestas.length}
-            </strong>
-          </p>
         </div>
       </div>
     </section>
   );
 }
 
---- File: ..\src\app\propuestas\page.tsx ---
-// src/app/propuestas/page.tsx - Versión KANBAN con contador mejorado
+--- File: src\app\propuestas\page.tsx ---
 "use client";
 
 import { useEffect, useState } from "react";
 import { propuestas } from "@/data/propuestas";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 export default function PropuestasPage() {
-  const [modo, setModo] = useState(MODO_ACTUAL);
+  const [modo, setModo] = useState("institucional");
 
   useEffect(() => {
-    const modoActual = MODO_ACTUAL;
-    setModo(modoActual);
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
+    setModo(modoGuardado);
 
     const observer = new MutationObserver(() => {
       const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+        document.documentElement.getAttribute("data-modo") || "institucional";
       setModo(nuevoModo);
     });
     observer.observe(document.documentElement, {
@@ -8976,9 +8903,8 @@ export default function PropuestasPage() {
     return () => observer.disconnect();
   }, []);
 
-  const esCampania = modo === TIPO_MODO.CAMPANIA;
-
-  if (!esCampania) {
+  // ✅ Si no está en modo campaña, mostrar mensaje
+  if (modo !== "campania") {
     return (
       <section
         className="pt-36 pb-25 px-4 sm:px-8"
@@ -9002,46 +8928,13 @@ export default function PropuestasPage() {
     );
   }
 
-  // ✅ ÍCONOS - Mismos que Pilares
-  const iconosPorPilar = {
-    transparencia: "fa-balance-scale",
-    libertad: "fa-chain-broken",
-    territorio: "fa-map-marked-alt",
-    orden: "fa-tree-city"
-  };
-
-  // ✅ Colores para cada pilar
-  const coloresPilar = {
-    transparencia: "#3b82f6",
-    libertad: "#8b5cf6",
-    territorio: "#22c55e",
-    orden: "#f59e0b"
-  };
-
-  // ✅ Nombres en español para mostrar
-  const nombresPilar = {
-    transparencia: "Transparencia",
-    libertad: "Libertad",
-    territorio: "Territorio",
-    orden: "Orden"
-  };
-
-  // ✅ Agrupar propuestas por pilar
-  const propuestasPorPilar = {
-    transparencia: propuestas.filter(p => p.pilar === "transparencia"),
-    libertad: propuestas.filter(p => p.pilar === "libertad"),
-    territorio: propuestas.filter(p => p.pilar === "territorio"),
-    orden: propuestas.filter(p => p.pilar === "orden")
-  };
-
   return (
     <section
       className="pt-36 pb-25 px-4 sm:px-8"
       style={{ backgroundColor: "var(--color-fondo)" }}
     >
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <div className="pill-magica inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-3">
             Propuestas
           </div>
@@ -9052,135 +8945,67 @@ export default function PropuestasPage() {
             Nuestras propuestas para Santo Tomé
           </h1>
           <p
-            className="mt-3 text-base max-w-2xl mx-auto"
+            className="mt-3 text-base"
             style={{ color: "var(--color-texto-sec)" }}
           >
             Conocé nuestras propuestas organizadas por pilares.
           </p>
         </div>
 
-        {/* ✅ TABLERO KANBAN - Columnas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          {Object.entries(propuestasPorPilar).map(([pilar, propuestasPilar]) => {
+        <div className="space-y-12">
+          {["transparencia", "libertad", "territorio", "orden"].map((pilar) => {
+            const propuestasPilar = propuestas.filter(
+              (p) => p.pilar === pilar
+            );
             if (propuestasPilar.length === 0) return null;
-
             return (
-              <div
-                key={pilar}
-                className="rounded-2xl p-4 flex flex-col"
-                style={{
-                  backgroundColor: "var(--color-fondo-alt)",
-                  border: "2px solid var(--color-borde)",
-                }}
-              >
-                {/* Cabecera de la columna - MEJORADA */}
-                <div 
-                  className="flex items-center gap-3 mb-4 pb-3 border-b-2"
-                  style={{ borderColor: "var(--color-borde)" }}
+              <div key={pilar}>
+                <h2
+                  className="font-head text-2xl lg:text-3xl font-semibold mb-4 capitalize"
+                  style={{ color: "var(--color-texto)" }}
                 >
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                    style={{
-                      backgroundColor:
-                        coloresPilar[pilar as keyof typeof coloresPilar],
-                    }}
-                  >
-                    <i
-                      className={`fas ${
-                        iconosPorPilar[pilar as keyof typeof iconosPorPilar]
-                      } text-white text-sm`}
-                    ></i>
-                  </div>
-                  <h2
-                    className="font-head text-base font-semibold capitalize flex-1"
-                    style={{ color: "var(--color-texto)" }}
-                  >
-                    {nombresPilar[pilar as keyof typeof nombresPilar]}
-                  </h2>
-                  {/* ✅ CONTADOR MÁS GRANDE Y LEGIBLE */}
-                  <span
-                    className="text-sm font-bold px-3 py-1 rounded-full"
-                    style={{
-                      backgroundColor: "var(--color-destacado)",
-                      color: "#ffffff",
-                      minWidth: "28px",
-                      textAlign: "center",
-                    }}
-                  >
-                    {propuestasPilar.length}
-                  </span>
-                </div>
-
-                {/* Lista de propuestas en la columna */}
-                <div className="space-y-3 flex-1">
+                  {pilar}
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {propuestasPilar.map((propuesta, index) => (
                     <div
                       key={index}
-                      className="p-3 rounded-xl border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
+                      className="p-4 rounded-xl border"
                       style={{
-                        backgroundColor: "var(--color-fondo)",
+                        backgroundColor: "var(--color-fondo-alt)",
                         borderColor: "var(--color-borde)",
                       }}
                     >
-                      <div className="flex items-start gap-2">
-                        <span
-                          className="text-xs font-bold mt-0.5 opacity-60 group-hover:opacity-100 transition-opacity"
-                          style={{ color: "var(--color-destacado)" }}
-                        >
-                          #{index + 1}
-                        </span>
-                        <div className="flex-1">
-                          <h3
-                            className="font-head text-sm font-semibold"
-                            style={{ color: "var(--color-texto)" }}
-                          >
-                            {propuesta.titulo}
-                          </h3>
-                          <p
-                            className="text-xs mt-1 leading-relaxed"
-                            style={{ color: "var(--color-texto-sec)" }}
-                          >
-                            {propuesta.descripcion}
-                          </p>
-                        </div>
-                      </div>
+                      <img
+                        src={propuesta.imagen}
+                        alt={propuesta.titulo}
+                        className="w-full h-48 object-cover rounded-lg mb-3"
+                      />
+                      <h3
+                        className="font-head text-lg font-semibold"
+                        style={{ color: "var(--color-texto)" }}
+                      >
+                        {propuesta.titulo}
+                      </h3>
+                      <p
+                        className="text-sm"
+                        style={{ color: "var(--color-texto-sec)" }}
+                      >
+                        {propuesta.descripcion}
+                      </p>
                     </div>
                   ))}
-                </div>
-
-                {/* Footer de la columna - MEJORADO */}
-                <div className="mt-3 pt-2 text-center border-t" style={{ borderColor: "var(--color-borde)" }}>
-                  <span
-                    className="text-xs font-medium"
-                    style={{ color: "var(--color-texto-sec)" }}
-                  >
-                    {propuestasPilar.length} propuesta{propuestasPilar.length > 1 ? "s" : ""}
-                  </span>
                 </div>
               </div>
             );
           })}
-        </div>
-
-        {/* Footer de la página */}
-        <div className="text-center mt-12 pt-6 border-t" style={{ borderColor: "var(--color-borde)" }}>
-          <p
-            className="text-sm"
-            style={{ color: "var(--color-texto-sec)" }}
-          >
-            <i className="fas fa-lightbulb mr-2" style={{ color: "var(--color-destacado)" }}></i>
-            Total de propuestas:{" "}
-            <strong style={{ color: "var(--color-texto)" }}>
-              {propuestas.length}
-            </strong>
-          </p>
         </div>
       </div>
     </section>
   );
 }
 
---- File: ..\src\app\proyectos\page.tsx ---
+--- File: src\app\proyectos\page.tsx ---
 "use client";
 
 import { useState, useEffect } from "react";
@@ -9912,7 +9737,7 @@ export default function ProyectosPage() {
 }
 
 
---- File: ..\src\app\proyectos\page.tsx ---
+--- File: src\app\proyectos\page.tsx ---
 "use client";
 
 import { useState, useEffect } from "react";
@@ -10644,7 +10469,7 @@ export default function ProyectosPage() {
 }
 
 
---- File: ..\src\app\globals.css ---
+--- File: src\app\globals.css ---
 @import "tailwindcss";
 
 /* ══════════════════════════════════════════
@@ -11759,7 +11584,7 @@ html[data-tema="oscuro"] .btn-enviar:hover:not(:disabled) {
   }
 }
 
---- File: ..\src\app\layout.tsx ---
+--- File: src\app\layout.tsx ---
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -11820,8 +11645,7 @@ export default function RootLayout({
   );
 }
 
---- File: ..\src\app\page.tsx ---
-// src/app/page.tsx
+--- File: src\app\page.tsx ---
 "use client";
 
 import { useEffect } from "react";
@@ -11831,15 +11655,26 @@ import Equipo from "@/components/Equipo";
 import Pilares from "@/components/Pilares";
 import Voluntariado from "@/components/Voluntariado";
 import Contacto from "@/components/Contacto";
-import { MODO_ACTUAL } from "@/config/modo";
 
 export default function Home() {
   useEffect(() => {
-    // ✅ Forzar modo desde configuración
-    document.documentElement.setAttribute("data-modo", MODO_ACTUAL);
-    document.documentElement.setAttribute("data-tema", "claro");
-    localStorage.setItem("gm-modo", MODO_ACTUAL);
-    localStorage.setItem("gm-tema", "claro");
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
+    document.documentElement.setAttribute("data-modo", modoGuardado);
+
+    const temaGuardado = localStorage.getItem("gm-tema") || "claro";
+    document.documentElement.setAttribute("data-tema", temaGuardado);
+
+    const observer = new MutationObserver(() => {
+      const nuevoModo =
+        document.documentElement.getAttribute("data-modo") || "institucional";
+      localStorage.setItem("gm-modo", nuevoModo);
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-modo"],
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -11854,7 +11689,7 @@ export default function Home() {
   );
 }
 
---- File: ..\src\components\Contacto.tsx ---
+--- File: src\components\Contacto.tsx ---
 "use client";
 
 import {
@@ -12464,7 +12299,7 @@ export default function Contacto() {
 }
 
 
---- File: ..\src\components\Equipo.tsx ---
+--- File: src\components\Equipo.tsx ---
 "use client";
 
 import { useEffect } from "react";
@@ -12591,8 +12426,7 @@ export default function Equipo() {
 }
 
 
---- File: ..\src\components\Footer.tsx ---
-// src/components/Footer.tsx
+--- File: src\components\Footer.tsx ---
 "use client";
 
 import { useEffect, useState } from "react";
@@ -12655,14 +12489,12 @@ export default function Footer() {
           Santo Tomé, Santa Fe, Argentina.
         </p>
         <div className="h-12 md:h-14 flex items-center overflow-hidden">
-          {/* ✅ LOGO CON width y height específicos Y AUTO para mantener proporción */}
           <Image
             src={getLogoPath()}
             alt={modo === "campania" ? "León - Campaña" : "Sol - Institucional"}
             width={56}
             height={56}
             className="h-14 md:h-15 object-contain opacity-80 md:opacity-80 -my-2 md:-my-4"
-            style={{ width: "auto", height: "56px" }} // ✅ Mantiene proporción
           />
         </div>
       </div>
@@ -12670,30 +12502,28 @@ export default function Footer() {
   );
 }
 
---- File: ..\src\components\Hero.tsx ---
-// src/components/Hero.tsx - CORREGIDO
+--- File: src\components\Hero.tsx ---
 "use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 export default function Hero() {
-  const [modo, setModo] = useState(MODO_ACTUAL);
+  const [modo, setModo] = useState("institucional");
   const [heroBg, setHeroBg] = useState("/images/hero-bg-institucional.webp");
 
   useEffect(() => {
-    const modoActual = document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
-    setModo(modoActual);
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
+    setModo(modoGuardado);
     setHeroBg(
-      modoActual === "institucional"
+      modoGuardado === "institucional"
         ? "/images/hero-bg-institucional.webp"
         : "/images/hero-bg-campana.webp",
     );
 
     const observer = new MutationObserver(() => {
       const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+        document.documentElement.getAttribute("data-modo") || "institucional";
       setModo(nuevoModo);
       setHeroBg(
         nuevoModo === "institucional"
@@ -12707,8 +12537,6 @@ export default function Hero() {
     });
     return () => observer.disconnect();
   }, []);
-
-  const esCampania = modo === "campania";
 
   return (
     <section
@@ -12731,6 +12559,7 @@ export default function Hero() {
         }}
       ></div>
       <div className="relative z-10 max-w-300 mx-auto px-6 pt-36 pb-20 text-center sm:text-left">
+        {/* ✅ TÍTULO PRINCIPAL - El más claro */}
         <h1
           className="font-head leading-[1.05] mb-2"
           style={{
@@ -12745,6 +12574,7 @@ export default function Hero() {
           </span>
         </h1>
 
+        {/* ✅ SUBTÍTULO - Tono intermedio */}
         <p
           className="font-head italic mb-5"
           style={{
@@ -12753,9 +12583,12 @@ export default function Hero() {
           }}
           id="heroRol"
         >
-          {esCampania ? "Candidata a Intendente" : "Concejal de Santo Tomé"}
+          {modo === "institucional"
+            ? "Concejal de Santo Tomé"
+            : "Candidata a Intendente"}
         </p>
 
+        {/* ✅ DESCRIPCIÓN - Tono más suave */}
         <p
           className="max-w-140 leading-relaxed mb-9"
           style={{
@@ -12764,12 +12597,14 @@ export default function Hero() {
           }}
           id="heroDesc"
         >
-          {esCampania
-            ? "Santo Tomé merece más. Juntos podemos construir la ciudad que soñamos. ¡Sumate!"
-            : "Trabajando con compromiso por una comunidad más justa, segura y con oportunidades para todos los vecinos."}
+          {modo === "institucional"
+            ? "Trabajando con compromiso por una comunidad más justa, segura y con oportunidades para todos los vecinos."
+            : "Santo Tomé merece más. Juntos podemos construir la ciudad que soñamos. ¡Sumate!"}
         </p>
 
+        {/* ✅ BOTONES - Con colores invertidos en light/dark mode */}
         <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
+          {/* ✅ BOTÓN "VER MI GESTIÓN" - Mismo color en light y dark mode */}
           <Link
             href="/proyectos"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold shadow-lg t-modo hover:scale-105 hover:shadow-2xl transition-all"
@@ -12778,8 +12613,9 @@ export default function Hero() {
               color: "#ffffff",
             }}
           >
-            {esCampania ? "Mis propuestas" : "Ver mi gestión"}
+            {modo === "institucional" ? "Ver mi gestión" : "Mis propuestas"}
           </Link>
+          {/* ✅ BOTÓN "CONTACTAME" - Invierte colores según el tema */}
           <Link
             href="#contacto"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold border-2 t-modo hover:scale-105 hover:shadow-lg transition-all"
@@ -12794,6 +12630,7 @@ export default function Hero() {
         </div>
       </div>
 
+      {/* ✅ TEXTOS SECUNDARIOS - Los más tenues */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5">
         <a
           href="https://www.microsoft.com/es-es/accessible-windows/accessibility-in-windows-11-22-05-30"
@@ -12826,44 +12663,44 @@ export default function Hero() {
   );
 }
 
---- File: ..\src\components\Nav.tsx ---
-// src/components/Nav.tsx
+
+--- File: src\components\Nav.tsx ---
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useApp } from "@/context/AppContext";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 export default function Nav() {
   const { tema, setTema } = useApp();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const [modoLocal, setModoLocal] = useState(MODO_ACTUAL);
+  const [modoLocal, setModoLocal] = useState("institucional");
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // ✅ Detectar cambios de modo en el DOM
   useEffect(() => {
     if (!isMounted) return;
-    
-    const modoActual = document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+    const modoActual =
+      document.documentElement.getAttribute("data-modo") || "institucional";
     setModoLocal(modoActual);
-    
+  }, [isMounted]);
+
+  useEffect(() => {
+    if (!isMounted) return;
     const observer = new MutationObserver(() => {
-      const nuevoModo = document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+      const nuevoModo =
+        document.documentElement.getAttribute("data-modo") || "institucional";
       setModoLocal(nuevoModo);
     });
-    
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["data-modo"],
     });
-    
     return () => observer.disconnect();
   }, [isMounted]);
 
@@ -12888,9 +12725,6 @@ export default function Nav() {
 
   const toggleMobile = () => setMobileOpen(!mobileOpen);
 
-  // ✅ Determinar si mostrar Propuestas (comparación segura)
-  const mostrarPropuestas = modoLocal === TIPO_MODO.CAMPANIA;
-
   if (!isMounted) {
     return (
       <nav className="nav-container">
@@ -12905,6 +12739,7 @@ export default function Nav() {
 
   return (
     <>
+      {/* ✅ NAV CON COLOR ELEGIDO */}
       <nav
         className={`nav-container ${scrolled ? "scrolled" : ""}`}
         style={{
@@ -12928,7 +12763,6 @@ export default function Nav() {
             width={40}
             height={40}
             className="h-9 w-auto"
-            style={{ width: "auto", height: "36px" }}
             priority
           />
           <div className="h-8 w-0.75 bg-current opacity-60"></div>
@@ -12942,7 +12776,6 @@ export default function Nav() {
             width={120}
             height={32}
             className="h-8 w-auto"
-            style={{ width: "auto", height: "32px" }}
             priority
           />
         </Link>
@@ -12955,13 +12788,18 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
-          <Link href="/proyectos" className="nav-link">
-            Proyectos
-          </Link>
-          
-          {mostrarPropuestas && (
-            <Link href="/propuestas" className="nav-link">
-              Propuestas
+          {modoLocal === "campania" ? (
+            <>
+              <Link href="/proyectos" className="nav-link">
+                Proyectos
+              </Link>
+              <Link href="/propuestas" className="nav-link">
+                Propuestas
+              </Link>
+            </>
+          ) : (
+            <Link href="/proyectos" className="nav-link">
+              Proyectos
             </Link>
           )}
 
@@ -13047,21 +12885,30 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
-          <Link
-            href="/proyectos"
-            className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
-            onClick={() => setMobileOpen(false)}
-          >
-            Proyectos
-          </Link>
-
-          {mostrarPropuestas && (
+          {modoLocal === "campania" ? (
+            <>
+              <Link
+                href="/proyectos"
+                className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
+                onClick={() => setMobileOpen(false)}
+              >
+                Proyectos
+              </Link>
+              <Link
+                href="/propuestas"
+                className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
+                onClick={() => setMobileOpen(false)}
+              >
+                Propuestas
+              </Link>
+            </>
+          ) : (
             <Link
-              href="/propuestas"
+              href="/proyectos"
               className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
               onClick={() => setMobileOpen(false)}
             >
-              Propuestas
+              Proyectos
             </Link>
           )}
 
@@ -13085,7 +12932,8 @@ export default function Nav() {
   );
 }
 
---- File: ..\src\components\Pilares.tsx ---
+
+--- File: src\components\Pilares.tsx ---
 "use client";
 
 import { useEffect } from "react";
@@ -13205,7 +13053,7 @@ export default function Pilares() {
   );
 }
 
---- File: ..\src\components\SobreMi.tsx ---
+--- File: src\components\SobreMi.tsx ---
 "use client";
 
 import { useEffect } from "react";
@@ -13297,20 +13145,22 @@ export default function SobreMi() {
   );
 }
 
---- File: ..\src\components\Voluntariado.tsx ---
-// src/components/Voluntariado.tsx
+--- File: src\components\Voluntariado.tsx ---
 "use client";
 
 import { useState, useEffect, useTransition, useRef } from "react";
 import { enviarVoluntario, type VoluntarioState } from "@/actions/voluntario";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 // ✅ Constantes de validación (compartidas con Contacto)
 const VALIDACIONES = {
+  // 📧 Email
   email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+  // 📞 Teléfono argentino (con formato flexible)
   telefono:
     /^(?:(?:\(?(?:0?11|0?[1-9][0-9]{2})\)?[\s-]?)?(?:15)?[\s-]?[0-9]{7,8}|[0-9]{7,10})$/,
+  // 👤 Nombre (solo letras y espacios)
   nombre: /^[a-zA-ZáéíóúñÑüÜ\s]+$/,
+  // 🛡️ Patrones de spam
   spam: [
     /http[s]?:\/\//i,
     /www\./i,
@@ -13321,6 +13171,7 @@ const VALIDACIONES = {
   ],
 };
 
+// Función de validación en cliente mejorada
 const validateForm = (formData: FormData) => {
   const nombre = formData.get("nombre")?.toString().trim() || "";
   const email = formData.get("email")?.toString().trim() || "";
@@ -13329,6 +13180,7 @@ const validateForm = (formData: FormData) => {
 
   const errors: Record<string, string> = {};
 
+  // 👤 Validación de nombre
   if (!nombre || nombre.length < 2) {
     errors.nombre = "El nombre es requerido (mínimo 2 caracteres)";
   } else if (!VALIDACIONES.nombre.test(nombre)) {
@@ -13337,12 +13189,14 @@ const validateForm = (formData: FormData) => {
     errors.nombre = "El nombre no puede superar los 100 caracteres";
   }
 
+  // 📧 Validación de email
   if (!email) {
     errors.email = "El email es requerido";
   } else if (!VALIDACIONES.email.test(email)) {
     errors.email = "Email inválido. Usá formato: nombre@dominio.com";
   }
 
+  // 📞 Validación de teléfono (opcional pero con formato)
   if (telefono) {
     const telefonoLimpio = telefono.replace(/\s/g, "");
     if (!VALIDACIONES.telefono.test(telefonoLimpio)) {
@@ -13351,6 +13205,7 @@ const validateForm = (formData: FormData) => {
     }
   }
 
+  // 💬 Validación de mensaje
   if (mensaje) {
     if (mensaje.length > 500) {
       errors.mensaje = "El mensaje no puede superar los 500 caracteres";
@@ -13372,18 +13227,18 @@ const initialState: VoluntarioState = {
 export default function Voluntariado() {
   const [enviando, setEnviando] = useState(false);
   const [mensaje, setMensaje] = useState("");
-  const [modo, setModo] = useState(MODO_ACTUAL);
+  const [modo, setModo] = useState("institucional");
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    const modoActual = MODO_ACTUAL;
-    setModo(modoActual);
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
+    setModo(modoGuardado);
 
     const observer = new MutationObserver(() => {
       const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+        document.documentElement.getAttribute("data-modo") || "institucional";
       setModo(nuevoModo);
     });
     observer.observe(document.documentElement, {
@@ -13392,8 +13247,6 @@ export default function Voluntariado() {
     });
     return () => observer.disconnect();
   }, []);
-
-  const esCampania = modo === TIPO_MODO.CAMPANIA;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -13463,7 +13316,7 @@ export default function Voluntariado() {
               className="font-head text-4xl lg:text-5xl font-semibold mb-4"
               style={{ color: "var(--color-texto)" }}
             >
-              {esCampania ? "Sumate" : "Anotate"}
+              {modo === "institucional" ? "Anotate" : "Sumate"}
             </h2>
             <div className="w-20 h-1 bg-(--color-destacado) rounded-full mb-4 lg:mx-0 mx-auto" />
             <p
@@ -13472,18 +13325,20 @@ export default function Voluntariado() {
                 color: "color-mix(in srgb, var(--color-texto) 75%, transparent)",
               }}
             >
-              {esCampania
-                ? "Santo Tomé se construye entre todos. Anotate."
-                : "Si querés participar activamente, dejá tus datos."}
+              {modo === "institucional"
+                ? "Si querés participar activamente, dejá tus datos."
+                : "Santo Tomé se construye entre todos. Anotate."}
             </p>
           </div>
 
+          {/* ✅ FORMULARIO SIN TARJETA - Mismo estilo que Contacto */}
           <div className="lg:col-span-3">
             <form
               ref={formRef}
               onSubmit={handleSubmit}
               className="reveal reveal-delay-1 flex flex-col gap-4 relative"
             >
+              {/* Honeypot oculto */}
               <div className="absolute left-[-9999px]" aria-hidden="true">
                 <input
                   type="text"
@@ -13646,7 +13501,7 @@ export default function Voluntariado() {
   );
 }
 
---- File: ..\src\components\Contacto.tsx ---
+--- File: src\components\Contacto.tsx ---
 "use client";
 
 import {
@@ -14256,7 +14111,7 @@ export default function Contacto() {
 }
 
 
---- File: ..\src\components\Equipo.tsx ---
+--- File: src\components\Equipo.tsx ---
 "use client";
 
 import { useEffect } from "react";
@@ -14383,8 +14238,7 @@ export default function Equipo() {
 }
 
 
---- File: ..\src\components\Footer.tsx ---
-// src/components/Footer.tsx
+--- File: src\components\Footer.tsx ---
 "use client";
 
 import { useEffect, useState } from "react";
@@ -14447,14 +14301,12 @@ export default function Footer() {
           Santo Tomé, Santa Fe, Argentina.
         </p>
         <div className="h-12 md:h-14 flex items-center overflow-hidden">
-          {/* ✅ LOGO CON width y height específicos Y AUTO para mantener proporción */}
           <Image
             src={getLogoPath()}
             alt={modo === "campania" ? "León - Campaña" : "Sol - Institucional"}
             width={56}
             height={56}
             className="h-14 md:h-15 object-contain opacity-80 md:opacity-80 -my-2 md:-my-4"
-            style={{ width: "auto", height: "56px" }} // ✅ Mantiene proporción
           />
         </div>
       </div>
@@ -14462,30 +14314,28 @@ export default function Footer() {
   );
 }
 
---- File: ..\src\components\Hero.tsx ---
-// src/components/Hero.tsx - CORREGIDO
+--- File: src\components\Hero.tsx ---
 "use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 export default function Hero() {
-  const [modo, setModo] = useState(MODO_ACTUAL);
+  const [modo, setModo] = useState("institucional");
   const [heroBg, setHeroBg] = useState("/images/hero-bg-institucional.webp");
 
   useEffect(() => {
-    const modoActual = document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
-    setModo(modoActual);
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
+    setModo(modoGuardado);
     setHeroBg(
-      modoActual === "institucional"
+      modoGuardado === "institucional"
         ? "/images/hero-bg-institucional.webp"
         : "/images/hero-bg-campana.webp",
     );
 
     const observer = new MutationObserver(() => {
       const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+        document.documentElement.getAttribute("data-modo") || "institucional";
       setModo(nuevoModo);
       setHeroBg(
         nuevoModo === "institucional"
@@ -14499,8 +14349,6 @@ export default function Hero() {
     });
     return () => observer.disconnect();
   }, []);
-
-  const esCampania = modo === "campania";
 
   return (
     <section
@@ -14523,6 +14371,7 @@ export default function Hero() {
         }}
       ></div>
       <div className="relative z-10 max-w-300 mx-auto px-6 pt-36 pb-20 text-center sm:text-left">
+        {/* ✅ TÍTULO PRINCIPAL - El más claro */}
         <h1
           className="font-head leading-[1.05] mb-2"
           style={{
@@ -14537,6 +14386,7 @@ export default function Hero() {
           </span>
         </h1>
 
+        {/* ✅ SUBTÍTULO - Tono intermedio */}
         <p
           className="font-head italic mb-5"
           style={{
@@ -14545,9 +14395,12 @@ export default function Hero() {
           }}
           id="heroRol"
         >
-          {esCampania ? "Candidata a Intendente" : "Concejal de Santo Tomé"}
+          {modo === "institucional"
+            ? "Concejal de Santo Tomé"
+            : "Candidata a Intendente"}
         </p>
 
+        {/* ✅ DESCRIPCIÓN - Tono más suave */}
         <p
           className="max-w-140 leading-relaxed mb-9"
           style={{
@@ -14556,12 +14409,14 @@ export default function Hero() {
           }}
           id="heroDesc"
         >
-          {esCampania
-            ? "Santo Tomé merece más. Juntos podemos construir la ciudad que soñamos. ¡Sumate!"
-            : "Trabajando con compromiso por una comunidad más justa, segura y con oportunidades para todos los vecinos."}
+          {modo === "institucional"
+            ? "Trabajando con compromiso por una comunidad más justa, segura y con oportunidades para todos los vecinos."
+            : "Santo Tomé merece más. Juntos podemos construir la ciudad que soñamos. ¡Sumate!"}
         </p>
 
+        {/* ✅ BOTONES - Con colores invertidos en light/dark mode */}
         <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
+          {/* ✅ BOTÓN "VER MI GESTIÓN" - Mismo color en light y dark mode */}
           <Link
             href="/proyectos"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold shadow-lg t-modo hover:scale-105 hover:shadow-2xl transition-all"
@@ -14570,8 +14425,9 @@ export default function Hero() {
               color: "#ffffff",
             }}
           >
-            {esCampania ? "Mis propuestas" : "Ver mi gestión"}
+            {modo === "institucional" ? "Ver mi gestión" : "Mis propuestas"}
           </Link>
+          {/* ✅ BOTÓN "CONTACTAME" - Invierte colores según el tema */}
           <Link
             href="#contacto"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold border-2 t-modo hover:scale-105 hover:shadow-lg transition-all"
@@ -14586,6 +14442,7 @@ export default function Hero() {
         </div>
       </div>
 
+      {/* ✅ TEXTOS SECUNDARIOS - Los más tenues */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5">
         <a
           href="https://www.microsoft.com/es-es/accessible-windows/accessibility-in-windows-11-22-05-30"
@@ -14618,44 +14475,44 @@ export default function Hero() {
   );
 }
 
---- File: ..\src\components\Nav.tsx ---
-// src/components/Nav.tsx
+
+--- File: src\components\Nav.tsx ---
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useApp } from "@/context/AppContext";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 export default function Nav() {
   const { tema, setTema } = useApp();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const [modoLocal, setModoLocal] = useState(MODO_ACTUAL);
+  const [modoLocal, setModoLocal] = useState("institucional");
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // ✅ Detectar cambios de modo en el DOM
   useEffect(() => {
     if (!isMounted) return;
-    
-    const modoActual = document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+    const modoActual =
+      document.documentElement.getAttribute("data-modo") || "institucional";
     setModoLocal(modoActual);
-    
+  }, [isMounted]);
+
+  useEffect(() => {
+    if (!isMounted) return;
     const observer = new MutationObserver(() => {
-      const nuevoModo = document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+      const nuevoModo =
+        document.documentElement.getAttribute("data-modo") || "institucional";
       setModoLocal(nuevoModo);
     });
-    
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["data-modo"],
     });
-    
     return () => observer.disconnect();
   }, [isMounted]);
 
@@ -14680,9 +14537,6 @@ export default function Nav() {
 
   const toggleMobile = () => setMobileOpen(!mobileOpen);
 
-  // ✅ Determinar si mostrar Propuestas (comparación segura)
-  const mostrarPropuestas = modoLocal === TIPO_MODO.CAMPANIA;
-
   if (!isMounted) {
     return (
       <nav className="nav-container">
@@ -14697,6 +14551,7 @@ export default function Nav() {
 
   return (
     <>
+      {/* ✅ NAV CON COLOR ELEGIDO */}
       <nav
         className={`nav-container ${scrolled ? "scrolled" : ""}`}
         style={{
@@ -14720,7 +14575,6 @@ export default function Nav() {
             width={40}
             height={40}
             className="h-9 w-auto"
-            style={{ width: "auto", height: "36px" }}
             priority
           />
           <div className="h-8 w-0.75 bg-current opacity-60"></div>
@@ -14734,7 +14588,6 @@ export default function Nav() {
             width={120}
             height={32}
             className="h-8 w-auto"
-            style={{ width: "auto", height: "32px" }}
             priority
           />
         </Link>
@@ -14747,13 +14600,18 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
-          <Link href="/proyectos" className="nav-link">
-            Proyectos
-          </Link>
-          
-          {mostrarPropuestas && (
-            <Link href="/propuestas" className="nav-link">
-              Propuestas
+          {modoLocal === "campania" ? (
+            <>
+              <Link href="/proyectos" className="nav-link">
+                Proyectos
+              </Link>
+              <Link href="/propuestas" className="nav-link">
+                Propuestas
+              </Link>
+            </>
+          ) : (
+            <Link href="/proyectos" className="nav-link">
+              Proyectos
             </Link>
           )}
 
@@ -14839,21 +14697,30 @@ export default function Nav() {
             Sobre Mí
           </Link>
 
-          <Link
-            href="/proyectos"
-            className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
-            onClick={() => setMobileOpen(false)}
-          >
-            Proyectos
-          </Link>
-
-          {mostrarPropuestas && (
+          {modoLocal === "campania" ? (
+            <>
+              <Link
+                href="/proyectos"
+                className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
+                onClick={() => setMobileOpen(false)}
+              >
+                Proyectos
+              </Link>
+              <Link
+                href="/propuestas"
+                className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
+                onClick={() => setMobileOpen(false)}
+              >
+                Propuestas
+              </Link>
+            </>
+          ) : (
             <Link
-              href="/propuestas"
+              href="/proyectos"
               className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
               onClick={() => setMobileOpen(false)}
             >
-              Propuestas
+              Proyectos
             </Link>
           )}
 
@@ -14877,7 +14744,8 @@ export default function Nav() {
   );
 }
 
---- File: ..\src\components\Pilares.tsx ---
+
+--- File: src\components\Pilares.tsx ---
 "use client";
 
 import { useEffect } from "react";
@@ -14997,7 +14865,7 @@ export default function Pilares() {
   );
 }
 
---- File: ..\src\components\SobreMi.tsx ---
+--- File: src\components\SobreMi.tsx ---
 "use client";
 
 import { useEffect } from "react";
@@ -15089,20 +14957,22 @@ export default function SobreMi() {
   );
 }
 
---- File: ..\src\components\Voluntariado.tsx ---
-// src/components/Voluntariado.tsx
+--- File: src\components\Voluntariado.tsx ---
 "use client";
 
 import { useState, useEffect, useTransition, useRef } from "react";
 import { enviarVoluntario, type VoluntarioState } from "@/actions/voluntario";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 // ✅ Constantes de validación (compartidas con Contacto)
 const VALIDACIONES = {
+  // 📧 Email
   email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+  // 📞 Teléfono argentino (con formato flexible)
   telefono:
     /^(?:(?:\(?(?:0?11|0?[1-9][0-9]{2})\)?[\s-]?)?(?:15)?[\s-]?[0-9]{7,8}|[0-9]{7,10})$/,
+  // 👤 Nombre (solo letras y espacios)
   nombre: /^[a-zA-ZáéíóúñÑüÜ\s]+$/,
+  // 🛡️ Patrones de spam
   spam: [
     /http[s]?:\/\//i,
     /www\./i,
@@ -15113,6 +14983,7 @@ const VALIDACIONES = {
   ],
 };
 
+// Función de validación en cliente mejorada
 const validateForm = (formData: FormData) => {
   const nombre = formData.get("nombre")?.toString().trim() || "";
   const email = formData.get("email")?.toString().trim() || "";
@@ -15121,6 +14992,7 @@ const validateForm = (formData: FormData) => {
 
   const errors: Record<string, string> = {};
 
+  // 👤 Validación de nombre
   if (!nombre || nombre.length < 2) {
     errors.nombre = "El nombre es requerido (mínimo 2 caracteres)";
   } else if (!VALIDACIONES.nombre.test(nombre)) {
@@ -15129,12 +15001,14 @@ const validateForm = (formData: FormData) => {
     errors.nombre = "El nombre no puede superar los 100 caracteres";
   }
 
+  // 📧 Validación de email
   if (!email) {
     errors.email = "El email es requerido";
   } else if (!VALIDACIONES.email.test(email)) {
     errors.email = "Email inválido. Usá formato: nombre@dominio.com";
   }
 
+  // 📞 Validación de teléfono (opcional pero con formato)
   if (telefono) {
     const telefonoLimpio = telefono.replace(/\s/g, "");
     if (!VALIDACIONES.telefono.test(telefonoLimpio)) {
@@ -15143,6 +15017,7 @@ const validateForm = (formData: FormData) => {
     }
   }
 
+  // 💬 Validación de mensaje
   if (mensaje) {
     if (mensaje.length > 500) {
       errors.mensaje = "El mensaje no puede superar los 500 caracteres";
@@ -15164,18 +15039,18 @@ const initialState: VoluntarioState = {
 export default function Voluntariado() {
   const [enviando, setEnviando] = useState(false);
   const [mensaje, setMensaje] = useState("");
-  const [modo, setModo] = useState(MODO_ACTUAL);
+  const [modo, setModo] = useState("institucional");
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    const modoActual = MODO_ACTUAL;
-    setModo(modoActual);
+    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
+    setModo(modoGuardado);
 
     const observer = new MutationObserver(() => {
       const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
+        document.documentElement.getAttribute("data-modo") || "institucional";
       setModo(nuevoModo);
     });
     observer.observe(document.documentElement, {
@@ -15184,8 +15059,6 @@ export default function Voluntariado() {
     });
     return () => observer.disconnect();
   }, []);
-
-  const esCampania = modo === TIPO_MODO.CAMPANIA;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -15255,7 +15128,7 @@ export default function Voluntariado() {
               className="font-head text-4xl lg:text-5xl font-semibold mb-4"
               style={{ color: "var(--color-texto)" }}
             >
-              {esCampania ? "Sumate" : "Anotate"}
+              {modo === "institucional" ? "Anotate" : "Sumate"}
             </h2>
             <div className="w-20 h-1 bg-(--color-destacado) rounded-full mb-4 lg:mx-0 mx-auto" />
             <p
@@ -15264,18 +15137,20 @@ export default function Voluntariado() {
                 color: "color-mix(in srgb, var(--color-texto) 75%, transparent)",
               }}
             >
-              {esCampania
-                ? "Santo Tomé se construye entre todos. Anotate."
-                : "Si querés participar activamente, dejá tus datos."}
+              {modo === "institucional"
+                ? "Si querés participar activamente, dejá tus datos."
+                : "Santo Tomé se construye entre todos. Anotate."}
             </p>
           </div>
 
+          {/* ✅ FORMULARIO SIN TARJETA - Mismo estilo que Contacto */}
           <div className="lg:col-span-3">
             <form
               ref={formRef}
               onSubmit={handleSubmit}
               className="reveal reveal-delay-1 flex flex-col gap-4 relative"
             >
+              {/* Honeypot oculto */}
               <div className="absolute left-[-9999px]" aria-hidden="true">
                 <input
                   type="text"
@@ -15438,40 +15313,10 @@ export default function Voluntariado() {
   );
 }
 
---- File: ..\src\config\modo.ts ---
-// src/config/modo.ts
-// 🔧 CAMBIA ESTE VALOR PARA CAMBIAR EL MODO
-// Opciones: "institucional" | "campania"
-export const MODO_ACTUAL = "campania";
-
-// ✅ Constantes para usar en los componentes (sin comparaciones problemáticas)
-export const TIPO_MODO = {
-  INSTITUCIONAL: "institucional",
-  CAMPANIA: "campania"
-} as const;
-
-export type TipoModo = typeof TIPO_MODO[keyof typeof TIPO_MODO];
-
---- File: ..\src\config\modo.ts ---
-// src/config/modo.ts
-// 🔧 CAMBIA ESTE VALOR PARA CAMBIAR EL MODO
-// Opciones: "institucional" | "campania"
-export const MODO_ACTUAL = "campania";
-
-// ✅ Constantes para usar en los componentes (sin comparaciones problemáticas)
-export const TIPO_MODO = {
-  INSTITUCIONAL: "institucional",
-  CAMPANIA: "campania"
-} as const;
-
-export type TipoModo = typeof TIPO_MODO[keyof typeof TIPO_MODO];
-
---- File: ..\src\context\AppContext.tsx ---
-// src/context/AppContext.tsx
+--- File: src\context\AppContext.tsx ---
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 type AppContextType = {
   modo: string;
@@ -15483,35 +15328,24 @@ type AppContextType = {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [modo, setModoState] = useState(MODO_ACTUAL);
+  const [modo, setModoState] = useState("campania");
   const [tema, setTemaState] = useState("claro");
 
+  // Cargar estado inicial desde localStorage
   useEffect(() => {
-    // ✅ Forzar modo y tema desde la configuración
-    const modoActual = MODO_ACTUAL;
-    const temaActual = "claro";
-    
-    // Establecer en DOM
-    document.documentElement.setAttribute("data-modo", modoActual);
-    document.documentElement.setAttribute("data-tema", temaActual);
-    
-    // Guardar en localStorage (por si acaso)
-    localStorage.setItem("gm-modo", modoActual);
-    localStorage.setItem("gm-tema", temaActual);
-    
-    // Actualizar estado
-    setModoState(modoActual);
-    setTemaState(temaActual);
+    const modoGuardado = localStorage.getItem("gm-modo") || "campania";
+    const temaGuardado = localStorage.getItem("gm-tema") || "claro";
+    setModoState(modoGuardado);
+    setTemaState(temaGuardado);
+    document.documentElement.setAttribute("data-modo", modoGuardado);
+    document.documentElement.setAttribute("data-tema", temaGuardado);
   }, []);
 
+  // Sincronizar cambios con el DOM y localStorage
   const setModo = (nuevoModo: string) => {
     setModoState(nuevoModo);
     localStorage.setItem("gm-modo", nuevoModo);
     document.documentElement.setAttribute("data-modo", nuevoModo);
-    // ✅ Recargar para asegurar que todos los componentes se actualicen
-    if (typeof window !== "undefined") {
-      window.location.reload();
-    }
   };
 
   const setTema = (nuevoTema: string) => {
@@ -15535,12 +15369,11 @@ export function useApp() {
   return context;
 }
 
---- File: ..\src\context\AppContext.tsx ---
-// src/context/AppContext.tsx
+
+--- File: src\context\AppContext.tsx ---
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
 type AppContextType = {
   modo: string;
@@ -15552,35 +15385,24 @@ type AppContextType = {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [modo, setModoState] = useState(MODO_ACTUAL);
+  const [modo, setModoState] = useState("campania");
   const [tema, setTemaState] = useState("claro");
 
+  // Cargar estado inicial desde localStorage
   useEffect(() => {
-    // ✅ Forzar modo y tema desde la configuración
-    const modoActual = MODO_ACTUAL;
-    const temaActual = "claro";
-    
-    // Establecer en DOM
-    document.documentElement.setAttribute("data-modo", modoActual);
-    document.documentElement.setAttribute("data-tema", temaActual);
-    
-    // Guardar en localStorage (por si acaso)
-    localStorage.setItem("gm-modo", modoActual);
-    localStorage.setItem("gm-tema", temaActual);
-    
-    // Actualizar estado
-    setModoState(modoActual);
-    setTemaState(temaActual);
+    const modoGuardado = localStorage.getItem("gm-modo") || "campania";
+    const temaGuardado = localStorage.getItem("gm-tema") || "claro";
+    setModoState(modoGuardado);
+    setTemaState(temaGuardado);
+    document.documentElement.setAttribute("data-modo", modoGuardado);
+    document.documentElement.setAttribute("data-tema", temaGuardado);
   }, []);
 
+  // Sincronizar cambios con el DOM y localStorage
   const setModo = (nuevoModo: string) => {
     setModoState(nuevoModo);
     localStorage.setItem("gm-modo", nuevoModo);
     document.documentElement.setAttribute("data-modo", nuevoModo);
-    // ✅ Recargar para asegurar que todos los componentes se actualicen
-    if (typeof window !== "undefined") {
-      window.location.reload();
-    }
   };
 
   const setTema = (nuevoTema: string) => {
@@ -15604,7 +15426,8 @@ export function useApp() {
   return context;
 }
 
---- File: ..\src\data\gestion-meta.json ---
+
+--- File: src\data\gestion-meta.json ---
 {
   "lastUpdate": "2026-07-28T20:40:18.489Z",
   "count": 36,
@@ -15612,7 +15435,7 @@ export function useApp() {
   "version": "1.0.0"
 }
 
---- File: ..\src\data\gestion.json ---
+--- File: src\data\gestion.json ---
 [
   {
     "fecha": "25/03/2022",
@@ -15912,7 +15735,7 @@ export function useApp() {
   }
 ]
 
---- File: ..\src\data\propuestas.ts ---
+--- File: src\data\propuestas.ts ---
 export interface Propuesta {
   pilar: string;
   titulo: string;
@@ -16016,7 +15839,7 @@ export const propuestas: Propuesta[] = [
   },
 ];
 
---- File: ..\src\data\gestion-meta.json ---
+--- File: src\data\gestion-meta.json ---
 {
   "lastUpdate": "2026-07-28T20:40:18.489Z",
   "count": 36,
@@ -16024,7 +15847,7 @@ export const propuestas: Propuesta[] = [
   "version": "1.0.0"
 }
 
---- File: ..\src\data\gestion.json ---
+--- File: src\data\gestion.json ---
 [
   {
     "fecha": "25/03/2022",
@@ -16324,7 +16147,7 @@ export const propuestas: Propuesta[] = [
   }
 ]
 
---- File: ..\src\data\propuestas.ts ---
+--- File: src\data\propuestas.ts ---
 export interface Propuesta {
   pilar: string;
   titulo: string;
@@ -16428,7 +16251,7 @@ export const propuestas: Propuesta[] = [
   },
 ];
 
---- File: ..\src\lib\types.ts ---
+--- File: src\lib\types.ts ---
 export interface GestionItem {
   fecha: string;
   año: number;
@@ -16466,7 +16289,7 @@ export type GestionTipo =
   | "sin-tipo";
 
 
---- File: ..\src\lib\types.ts ---
+--- File: src\lib\types.ts ---
 export interface GestionItem {
   fecha: string;
   año: number;
@@ -16504,7 +16327,7 @@ export type GestionTipo =
   | "sin-tipo";
 
 
---- File: ..\src\globals.d.ts ---
+--- File: src\globals.d.ts ---
 // src/globals.d.ts
 declare module "*.css" {
   const content: { [className: string]: string };

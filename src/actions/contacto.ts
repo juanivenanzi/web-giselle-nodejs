@@ -1,9 +1,10 @@
+// src/actions/contacto.ts
 "use server";
 
 import { z } from "zod";
 import { google } from "googleapis";
 
-// --- Esquema de validación mejorado ---
+// --- Esquema de validación ---
 const contactoSchema = z.object({
   nombre: z
     .string()
@@ -12,7 +13,7 @@ const contactoSchema = z.object({
     .regex(
       /^[a-zA-ZáéíóúñÑüÜ\s]+$/,
       "El nombre solo puede contener letras y espacios",
-    ), // ✅ Validación específica
+    ),
   email: z.string().email("Email inválido. Usá formato: nombre@dominio.com"),
   telefono: z
     .string()
@@ -40,10 +41,7 @@ const contactoSchema = z.object({
   timestamp: z.string().optional(),
 });
 
-// ✅ Tipo inferido del esquema (EXPORTADO)
 export type ContactoData = z.infer<typeof contactoSchema>;
-
-// --- Tipo de respuesta (EXPORTADO) ---
 export type ContactoState = {
   errors?: Partial<Record<keyof ContactoData, string[]>>;
   message?: string;
@@ -114,7 +112,6 @@ async function saveContactoToSheets(data: ContactoData) {
     const fecha = now.toLocaleDateString("es-AR");
     const hora = now.toLocaleTimeString("es-AR");
 
-    // 1. Escribir los datos (con columna de estado)
     const response = await sheets.spreadsheets.values.append({
       spreadsheetId,
       range: "Contactos!A:H",
@@ -130,7 +127,7 @@ async function saveContactoToSheets(data: ContactoData) {
             data.telefono || "",
             data.asunto,
             data.mensaje,
-            "Pendiente", // Estado inicial
+            "Pendiente",
           ],
         ],
       },
@@ -140,7 +137,6 @@ async function saveContactoToSheets(data: ContactoData) {
       throw new Error("No se recibió respuesta de Google Sheets");
     }
 
-    // 2. Ajustar automáticamente el ancho de las columnas (8 columnas: A-H)
     await autoResizeColumns(sheets, spreadsheetId, "Contactos", 8);
 
     console.log(
@@ -156,13 +152,22 @@ async function saveContactoToSheets(data: ContactoData) {
   }
 }
 
-// --- Server Action (EXPORTADA) ---
+// --- Server Action ---
 export async function enviarContacto(
   prevState: ContactoState,
   formData: FormData,
 ): Promise<ContactoState> {
   try {
-    // 1. Validar honeypot (anti-spam)
+    // ✅ Validación de entorno en producción
+    if (process.env.NODE_ENV === "production" && !process.env.GOOGLE_SHEETS_FORMULARIOS_ID) {
+      console.error("❌ GOOGLE_SHEETS_FORMULARIOS_ID no configurado en producción");
+      return {
+        success: false,
+        message: "Error de configuración. Contacta al administrador.",
+      };
+    }
+
+    // 1. Validar honeypot
     const website = formData.get("website");
     if (website) {
       return {
@@ -202,7 +207,7 @@ export async function enviarContacto(
       throw parseError;
     }
 
-    // 4. Verificar timestamp (anti-spam, mínimo 3 segundos)
+    // 4. Verificar timestamp (anti-spam)
     if (rawData.timestamp) {
       const elapsed = Date.now() - parseInt(rawData.timestamp);
       if (elapsed < 3000) {

@@ -5,25 +5,11 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 
 export default function Footer() {
-  const [tema, setTema] = useState("claro");
   const [modo, setModo] = useState("institucional");
 
   useEffect(() => {
-    const temaGuardado = localStorage.getItem("gm-tema") || "claro";
-    setTema(temaGuardado);
-
     const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
     setModo(modoGuardado);
-
-    const observerTema = new MutationObserver(() => {
-      const nuevoTema =
-        document.documentElement.getAttribute("data-tema") || "claro";
-      setTema(nuevoTema);
-    });
-    observerTema.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-tema"],
-    });
 
     const observerModo = new MutationObserver(() => {
       const nuevoModo =
@@ -36,17 +22,14 @@ export default function Footer() {
     });
 
     return () => {
-      observerTema.disconnect();
       observerModo.disconnect();
     };
   }, []);
 
   const getLogoPath = () => {
-    if (modo === "campania") {
-      return "/images/leon-amarillo.png";
-    } else {
-      return "/images/sol-amarillo.png";
-    }
+    return modo === "campania"
+      ? "/images/leon-amarillo.png"
+      : "/images/sol-amarillo.png";
   };
 
   return (
@@ -61,14 +44,13 @@ export default function Footer() {
           Santo Tomé, Santa Fe, Argentina.
         </p>
         <div className="h-12 md:h-14 flex items-center overflow-hidden">
-          {/* ✅ LOGO CON width y height específicos Y AUTO para mantener proporción */}
           <Image
             src={getLogoPath()}
             alt={modo === "campania" ? "León - Campaña" : "Sol - Institucional"}
             width={56}
             height={56}
             className="h-14 md:h-15 object-contain opacity-80 md:opacity-80 -my-2 md:-my-4"
-            style={{ width: "auto", height: "56px" }} // ✅ Mantiene proporción
+            style={{ width: "auto", height: "56px" }}
           />
         </div>
       </div>

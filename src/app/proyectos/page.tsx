@@ -1,49 +1,20 @@
+// src/app/proyectos/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
-
-type GestionItem = {
-  fecha: string;
-  año: number;
-  tipo: string;
-  titulo: string;
-  descripcion: string;
-  estado: string;
-  enlacePdf?: string;
-};
-
-const tipoLabel: Record<string, string> = {
-  ordenanza: "Ordenanza",
-  declaracion: "Declaración",
-  "pedido-informes": "Pedido de informes",
-  "notas-reclamo": "Nota de reclamo",
-  "proyectos-comunicacion": "Proyecto de Comunicación",
-  "proyectos-resolucion": "Proyecto de Resolución",
-  resolucion: "Resolución",
-  comunicacion: "Comunicación",
-};
-
-const estadoLabel: Record<string, string> = {
-  aprobada: "Aprobada",
-  "en-tratamiento": "En tratamiento",
-  "no-aprobada": "No aprobada",
-  "en-comision": "En comisión",
-  vetada: "Vetada",
-};
-
-const estadoIcono: Record<string, string> = {
-  aprobada: "fa-check",
-  "en-tratamiento": "fa-clock",
-  "no-aprobada": "fa-xmark",
-  "en-comision": "fa-people-arrows",
-  vetada: "fa-ban",
-};
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { 
+  GestionItem, 
+  TIPO_LABEL, 
+  ESTADO_LABEL, 
+  ESTADO_ICONO,
+  ESTADO_CLASES 
+} from "@/lib/types";
 
 function TarjetaGestion({ item }: { item: GestionItem }) {
   const tieneEnlace =
     item.enlacePdf && item.enlacePdf !== "" && item.enlacePdf !== "#";
   const estadoClass = `estado-${item.estado}`;
-  const icono = estadoIcono[item.estado] || "fa-circle-question";
+  const icono = ESTADO_ICONO[item.estado] || "fa-circle-question";
 
   return (
     <article
@@ -54,10 +25,10 @@ function TarjetaGestion({ item }: { item: GestionItem }) {
       }}
     >
       <div className="cabecera">
-        <span className="tipo">{tipoLabel[item.tipo] || item.tipo}</span>
+        <span className="tipo">{TIPO_LABEL[item.tipo] || item.tipo}</span>
         <span className={`estado ${estadoClass}`}>
           <i className={`fas ${icono} text-white text-[0.75rem]`}></i>
-          {estadoLabel[item.estado] || item.estado}
+          {ESTADO_LABEL[item.estado] || item.estado}
         </span>
       </div>
       <div className="fecha">
@@ -86,9 +57,16 @@ function TarjetaGestion({ item }: { item: GestionItem }) {
 export default function ProyectosPage() {
   const [proyectos, setProyectos] = useState<GestionItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [modo, setModo] = useState("institucional");
   const [vistaGrid, setVistaGrid] = useState(true);
   const [tema, setTema] = useState("claro");
+
+  // ✅ Filtros del panel
+  const [filtroAño, setFiltroAño] = useState("Todos");
+  const [filtroTipo, setFiltroTipo] = useState("Todos");
+  const [filtroEstado, setFiltroEstado] = useState("Todos");
+  const [busqueda, setBusqueda] = useState("");
 
   // ✅ Detectar cambios de modo y tema
   useEffect(() => {
@@ -130,12 +108,14 @@ export default function ProyectosPage() {
       try {
         const res = await fetch("/api/gestion");
         if (!res.ok) {
-          throw new Error(`Error HTTP: ${res.status}`);
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(errorData.error || `Error HTTP: ${res.status}`);
         }
         const data = await res.json();
         setProyectos(data);
       } catch (error) {
         console.error("Error cargando datos:", error);
+        setError("No se pudieron cargar los proyectos. Intentá nuevamente.");
         setProyectos([]);
       } finally {
         setLoading(false);
@@ -144,61 +124,61 @@ export default function ProyectosPage() {
     cargarDatos();
   }, []);
 
-  // ✅ Filtros del panel
-  const [filtroAño, setFiltroAño] = useState("Todos");
-  const [filtroTipo, setFiltroTipo] = useState("Todos");
-  const [filtroEstado, setFiltroEstado] = useState("Todos");
-  const [busqueda, setBusqueda] = useState("");
+  // ✅ Memoizar años únicos
+  const años = useMemo(() => {
+    return [
+      "Todos",
+      ...new Set(proyectos.map((p) => p.año).filter((a) => a > 0)),
+    ].sort((a, b) =>
+      a === "Todos" ? -1 : b === "Todos" ? 1 : Number(b) - Number(a)
+    );
+  }, [proyectos]);
 
-  // Obtener opciones únicas para filtros
-  const años = [
-    "Todos",
-    ...new Set(proyectos.map((p) => p.año).filter((a) => a > 0)),
-  ].sort((a, b) =>
-    a === "Todos" ? -1 : b === "Todos" ? 1 : Number(b) - Number(a),
-  );
+  // ✅ Memoizar tipos únicos
+  const tipos = useMemo(() => {
+    return [
+      "Todos",
+      ...new Set(
+        proyectos.map((p) => p.tipo).filter((t) => t && t !== "sin-tipo")
+      ),
+    ];
+  }, [proyectos]);
 
-  const tipos = [
-    "Todos",
-    ...new Set(
-      proyectos.map((p) => p.tipo).filter((t) => t && t !== "sin-tipo"),
-    ),
-  ];
-  const estados = [
-    "Todos",
-    ...new Set(
-      proyectos.map((p) => p.estado).filter((e) => e && e !== "sin-estado"),
-    ),
-  ];
+  // ✅ Memoizar estados únicos
+  const estados = useMemo(() => {
+    return [
+      "Todos",
+      ...new Set(
+        proyectos.map((p) => p.estado).filter((e) => e && e !== "sin-estado")
+      ),
+    ];
+  }, [proyectos]);
 
-  // Filtrar proyectos
-  const proyectosFiltrados = proyectos.filter((proyecto) => {
-    const matchAño =
-      filtroAño === "Todos" || proyecto.año === Number(filtroAño);
-    const matchTipo = filtroTipo === "Todos" || proyecto.tipo === filtroTipo;
-    const matchEstado =
-      filtroEstado === "Todos" || proyecto.estado === filtroEstado;
-    const matchBusqueda =
-      proyecto.titulo.toLowerCase().includes(busqueda.toLowerCase()) ||
-      proyecto.descripcion.toLowerCase().includes(busqueda.toLowerCase());
-    return matchAño && matchTipo && matchEstado && matchBusqueda;
-  });
+  // ✅ Filtrar proyectos con useMemo
+  const proyectosFiltrados = useMemo(() => {
+    return proyectos.filter((proyecto) => {
+      const matchAño =
+        filtroAño === "Todos" || proyecto.año === Number(filtroAño);
+      const matchTipo = filtroTipo === "Todos" || proyecto.tipo === filtroTipo;
+      const matchEstado =
+        filtroEstado === "Todos" || proyecto.estado === filtroEstado;
+      const matchBusqueda =
+        proyecto.titulo.toLowerCase().includes(busqueda.toLowerCase()) ||
+        proyecto.descripcion.toLowerCase().includes(busqueda.toLowerCase());
+      return matchAño && matchTipo && matchEstado && matchBusqueda;
+    });
+  }, [proyectos, filtroAño, filtroTipo, filtroEstado, busqueda]);
+
+  // ✅ Callback para limpiar filtros
+  const limpiarFiltros = useCallback(() => {
+    setFiltroAño("Todos");
+    setFiltroTipo("Todos");
+    setFiltroEstado("Todos");
+    setBusqueda("");
+  }, []);
 
   const getEstadoBadge = (estado: string) => {
-    switch (estado) {
-      case "aprobada":
-        return "bg-green-600 text-white font-bold"; // Verde claro sobre verde oscuro
-      case "en-tratamiento":
-        return "bg-yellow-600 text-white font-bold"; // Amarillo claro sobre amarillo oscuro
-      case "no-aprobada":
-        return "bg-red-600 text-white font-bold"; // Rojo claro sobre rojo oscuro
-      case "en-comision":
-        return "bg-blue-600 text-white font-bold"; // Azul claro sobre azul oscuro
-      case "vetada":
-        return "bg-purple-600 text-white font-bold"; // Púrpura claro sobre púrpura oscuro
-      default:
-        return "bg-gray-100 text-gray-600";
-    }
+    return ESTADO_CLASES[estado] || "bg-gray-100 text-gray-600";
   };
 
   // ✅ Función para obtener los estilos de los botones según el tema
@@ -234,6 +214,31 @@ export default function ProyectosPage() {
           <p className="mt-4" style={{ color: "var(--color-texto)" }}>
             Cargando proyectos...
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        className="flex items-center justify-center min-h-screen"
+        style={{ backgroundColor: "var(--color-fondo)" }}
+      >
+        <div className="text-center">
+          <p className="text-red-600" style={{ color: "var(--color-texto)" }}>
+            {error}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-6 py-2 rounded-full"
+            style={{
+              backgroundColor: "var(--color-destacado)",
+              color: "#ffffff",
+            }}
+          >
+            Reintentar
+          </button>
         </div>
       </div>
     );
@@ -285,9 +290,9 @@ export default function ProyectosPage() {
           </div>
         )}
 
-        {/* ✅ Panel optimizado: filtros horizontales en móvil, laterales en PC */}
+        {/* Panel de filtros */}
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* ✅ Filtros: con fondo más oscuro y mejor contraste */}
+          {/* Filtros */}
           <aside
             className="lg:w-72 shrink-0 p-4 rounded-xl"
             style={{
@@ -304,9 +309,8 @@ export default function ProyectosPage() {
                 Filtros
               </h3>
 
-              {/* En móvil: filtros en línea */}
               <div className="flex flex-wrap lg:flex-col gap-3 lg:gap-4">
-                {/* ✅ Búsqueda - con ícono */}
+                {/* Búsqueda */}
                 <div className="flex-1 min-w-30 lg:w-full">
                   <div className="relative">
                     <input
@@ -407,7 +411,7 @@ export default function ProyectosPage() {
                   >
                     {tipos.map((tipo) => (
                       <option key={tipo} value={tipo}>
-                        {tipoLabel[tipo] || tipo}
+                        {TIPO_LABEL[tipo] || tipo}
                       </option>
                     ))}
                   </select>
@@ -445,7 +449,7 @@ export default function ProyectosPage() {
                   >
                     {estados.map((estado) => (
                       <option key={estado} value={estado}>
-                        {estadoLabel[estado] || estado}
+                        {ESTADO_LABEL[estado] || estado}
                       </option>
                     ))}
                   </select>
@@ -453,12 +457,7 @@ export default function ProyectosPage() {
 
                 {/* Botón limpiar */}
                 <button
-                  onClick={() => {
-                    setFiltroAño("Todos");
-                    setFiltroTipo("Todos");
-                    setFiltroEstado("Todos");
-                    setBusqueda("");
-                  }}
+                  onClick={limpiarFiltros}
                   className="w-full py-2.5 rounded-lg text-sm font-medium mt-1 lg:mt-2 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_6px_0_0_var(--color-destacado)] hover:border-(--color-destacado) active:scale-95"
                   style={{
                     backgroundColor: "var(--color-fondo)",
@@ -487,7 +486,6 @@ export default function ProyectosPage() {
                 proyectos
               </p>
               <div className="flex gap-2">
-                {/* ✅ Botón Grid - con estilos adaptados al tema */}
                 <button
                   onClick={() => setVistaGrid(true)}
                   className={`p-2 rounded-lg border transition-all ${vistaGrid ? "shadow-sm" : ""}`}
@@ -495,7 +493,6 @@ export default function ProyectosPage() {
                 >
                   ⊞ Grid
                 </button>
-                {/* ✅ Botón Lista - con estilos adaptados al tema */}
                 <button
                   onClick={() => setVistaGrid(false)}
                   className={`p-2 rounded-lg border transition-all ${!vistaGrid ? "shadow-sm" : ""}`}
@@ -506,7 +503,7 @@ export default function ProyectosPage() {
               </div>
             </div>
 
-            {/* ✅ Vista Grid optimizada con Expediente consistente */}
+            {/* Vista Grid */}
             {vistaGrid && (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {proyectosFiltrados.map((proyecto) => {
@@ -524,11 +521,10 @@ export default function ProyectosPage() {
                       }}
                     >
                       <div className="flex items-start justify-between gap-2">
-                        {/* ✅ Badge con texto NEGRO */}
                         <span
                           className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap font-bold ${getEstadoBadge(proyecto.estado)}`}
                         >
-                          {estadoLabel[proyecto.estado] || proyecto.estado}
+                          {ESTADO_LABEL[proyecto.estado] || proyecto.estado}
                         </span>
                         <span
                           className="text-xs whitespace-nowrap"
@@ -557,7 +553,7 @@ export default function ProyectosPage() {
                           className="text-xs"
                           style={{ color: "var(--color-texto-sec)" }}
                         >
-                          {tipoLabel[proyecto.tipo] || proyecto.tipo}
+                          {TIPO_LABEL[proyecto.tipo] || proyecto.tipo}
                         </span>
                         {tieneEnlace ? (
                           <a
@@ -585,7 +581,7 @@ export default function ProyectosPage() {
               </div>
             )}
 
-            {/* ✅ Vista Lista optimizada con columnas adaptables */}
+            {/* Vista Lista */}
             {!vistaGrid && (
               <div
                 className="rounded-xl border overflow-x-auto"
@@ -669,7 +665,7 @@ export default function ProyectosPage() {
                             className="p-3 hidden sm:table-cell"
                             style={{ color: "var(--color-texto-sec)" }}
                           >
-                            {tipoLabel[proyecto.tipo] || proyecto.tipo}
+                            {TIPO_LABEL[proyecto.tipo] || proyecto.tipo}
                           </td>
                           <td
                             className="p-3 hidden md:table-cell"
@@ -678,11 +674,10 @@ export default function ProyectosPage() {
                             {proyecto.fecha}
                           </td>
                           <td className="p-3">
-                            {/* ✅ Badge con texto NEGRO */}
                             <span
                               className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap font-bold ${getEstadoBadge(proyecto.estado)}`}
                             >
-                              {estadoLabel[proyecto.estado] || proyecto.estado}
+                              {ESTADO_LABEL[proyecto.estado] || proyecto.estado}
                             </span>
                           </td>
                           <td className="p-3">
