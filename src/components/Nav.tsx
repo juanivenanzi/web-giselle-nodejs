@@ -18,7 +18,7 @@ export default function Nav() {
     setIsMounted(true);
   }, []);
 
-  // ✅ Detectar cambios de modo en el DOM
+  // Detectar cambios de modo en el DOM
   useEffect(() => {
     if (!isMounted) return;
     
@@ -59,7 +59,7 @@ export default function Nav() {
 
   const toggleMobile = () => setMobileOpen(!mobileOpen);
 
-  // ✅ Determinar si mostrar Propuestas (comparación segura)
+  // Determinar si mostrar Propuestas (comparación segura)
   const mostrarPropuestas = modoLocal === TIPO_MODO.CAMPANIA;
 
   if (!isMounted) {
@@ -203,6 +203,7 @@ export default function Nav() {
         }}
       >
         <div className="flex flex-col items-center py-4 gap-1">
+          {/* ✅ AGREGADO: Enlace a Inicio en menú móvil */}
           <Link
             href="/"
             className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
@@ -210,6 +211,7 @@ export default function Nav() {
           >
             Inicio
           </Link>
+          
           <Link
             href="/#sobre-mi"
             className="mobile-link w-full text-center py-3 text-sm font-medium rounded-lg"
