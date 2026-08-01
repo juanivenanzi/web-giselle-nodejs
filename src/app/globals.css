@@ -112,24 +112,31 @@
   --color-nav: rgba(15, 23, 42, 0.85);
   --color-nav-scrolled: #1a3352;
   --color-rol: #a8d4f0;
+  /* ✅ NUEVO: Colores suaves para tarjetas */
+  --color-tarjeta: #1a2332;
+  --color-tarjeta-hover: #243042;
+  --color-tarjeta-borde: #334155;
 }
 
-/* ── CAMPAÑA + CLARO (Mismos colores que institucional) ── */
-[data-modo="campaña"] {
-  --color-primario: #1e3a5f;
-  --color-primario-dark: #0f2744;
-  --color-destacado: #74acdf;
+/* ── CAMPAÑA + OSCURO (Mismos colores que institucional) ── */
+[data-modo="campaña"][data-tema="oscuro"] {
+  --color-primario: #1a3352;
+  --color-primario-dark: #0c1e35;
+  --color-destacado: #8fc4e8;
   --color-destacado-fondo: var(--color-destacado);
   --color-destacado-pastilla: var(--color-destacado);
-  --color-fondo: #ffffff;
-  --color-fondo-alt: #f8f9fa;
-  --color-texto: #1a1a2e;
-  --color-texto-sec: #4a4a6a;
-  --color-blanco-suave: rgba(255, 255, 255, 0.85);
-  --color-borde: #94a3b8;
-  --color-nav: rgba(255, 255, 255, 0.85);
-  --color-nav-scrolled: #1e3a5f;
-  --color-rol: #1a3a6a;
+  --color-fondo: #0f172a;
+  --color-fondo-alt: #1e293b;
+  --color-texto: #f1f5f9;
+  --color-texto-sec: #cbd5e1;
+  --color-borde: #64748b;
+  --color-nav: rgba(15, 23, 42, 0.85);
+  --color-nav-scrolled: #1a3352;
+  --color-rol: #a8d4f0;
+  /* ✅ NUEVO: Colores suaves para tarjetas */
+  --color-tarjeta: #1a2332;
+  --color-tarjeta-hover: #243042;
+  --color-tarjeta-borde: #334155;
 }
 
 /* ── CAMPAÑA + OSCURO (Mismos colores que institucional) ── */

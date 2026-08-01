@@ -1,11 +1,10 @@
-// src/app/propuestas/page.tsx - Versión KANBAN mejorada
+// src/app/propuestas/page.tsx - Con total arriba y línea separadora
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
 import { propuestas } from "@/data/propuestas";
 import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
-// ✅ Constantes extraídas
 const ICONOS_PILAR = {
   transparencia: "fa-balance-scale",
   libertad: "fa-chain-broken",
@@ -48,7 +47,6 @@ export default function PropuestasPage() {
 
   const esCampania = modo === TIPO_MODO.CAMPANIA;
 
-  // ✅ Agrupar propuestas por pilar con useMemo
   const propuestasPorPilar = useMemo(() => {
     return {
       transparencia: propuestas.filter(p => p.pilar === "transparencia"),
@@ -84,7 +82,7 @@ export default function PropuestasPage() {
 
   return (
     <section
-      className="pt-36 pb-25 px-4 sm:px-8"
+      className="pt-36 pb-25 px-4 sm:px-8 t-modo"
       style={{ backgroundColor: "var(--color-fondo)" }}
     >
       <div className="max-w-7xl mx-auto">
@@ -105,6 +103,20 @@ export default function PropuestasPage() {
           >
             Conocé nuestras propuestas organizadas por pilares.
           </p>
+
+          {/* ✅ TOTAL DE PROPUESTAS - Arriba, con línea separadora */}
+          <div className="mt-6 pt-4 border-t-2 t-modo" style={{ borderColor: "var(--color-destacado)" }}>
+            <p
+              className="text-sm"
+              style={{ color: "var(--color-texto-sec)" }}
+            >
+              <i className="fas fa-lightbulb mr-2" style={{ color: "var(--color-destacado)" }}></i>
+              Total de propuestas:{" "}
+              <strong style={{ color: "var(--color-texto)" }}>
+                {propuestas.length}
+              </strong>
+            </p>
+          </div>
         </div>
 
         {/* ✅ TABLERO KANBAN - Columnas */}
@@ -115,7 +127,7 @@ export default function PropuestasPage() {
             return (
               <div
                 key={pilar}
-                className="rounded-2xl p-4 flex flex-col"
+                className="rounded-2xl p-4 flex flex-col t-modo"
                 style={{
                   backgroundColor: "var(--color-fondo-alt)",
                   border: "2px solid var(--color-borde)",
@@ -123,7 +135,7 @@ export default function PropuestasPage() {
               >
                 {/* Cabecera de la columna */}
                 <div 
-                  className="flex items-center gap-3 mb-4 pb-3 border-b-2"
+                  className="flex items-center gap-3 mb-4 pb-3 border-b-2 t-modo"
                   style={{ borderColor: "var(--color-borde)" }}
                 >
                   <div
@@ -163,10 +175,10 @@ export default function PropuestasPage() {
                   {propuestasPilar.map((propuesta, index) => (
                     <div
                       key={index}
-                      className="p-3 rounded-xl border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
+                      className="p-3 rounded-xl border t-modo transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 group"
                       style={{
-                        backgroundColor: "var(--color-fondo)",
-                        borderColor: "var(--color-borde)",
+                        backgroundColor: "var(--color-tarjeta, var(--color-fondo))",
+                        borderColor: "var(--color-tarjeta-borde, var(--color-borde))",
                       }}
                     >
                       <div className="flex items-start gap-2">
@@ -196,7 +208,7 @@ export default function PropuestasPage() {
                 </div>
 
                 {/* Footer de la columna */}
-                <div className="mt-3 pt-2 text-center border-t" style={{ borderColor: "var(--color-borde)" }}>
+                <div className="mt-3 pt-2 text-center border-t t-modo" style={{ borderColor: "var(--color-borde)" }}>
                   <span
                     className="text-xs font-medium"
                     style={{ color: "var(--color-texto-sec)" }}
@@ -207,20 +219,6 @@ export default function PropuestasPage() {
               </div>
             );
           })}
-        </div>
-
-        {/* Footer de la página */}
-        <div className="text-center mt-12 pt-6 border-t" style={{ borderColor: "var(--color-borde)" }}>
-          <p
-            className="text-sm"
-            style={{ color: "var(--color-texto-sec)" }}
-          >
-            <i className="fas fa-lightbulb mr-2" style={{ color: "var(--color-destacado)" }}></i>
-            Total de propuestas:{" "}
-            <strong style={{ color: "var(--color-texto)" }}>
-              {propuestas.length}
-            </strong>
-          </p>
         </div>
       </div>
     </section>
