@@ -37,8 +37,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={`${inter.variable} ${dmSerif.variable}`}>
-      <head>{/* No se necesitan links externos de fuentes ni de Font Awesome */}</head>
-      <body className={`${inter.className} font-body bg-(--color-fondo) text-(--color-texto)`}>
+      <head>
+        {/* No se necesitan links externos de fuentes ni de Font Awesome */}
+      </head>
+      <body
+        className={`${inter.className} font-body bg-(--color-fondo) text-(--color-texto)`}
+      >
         <a href="#inicio" className="skip-link">
           Saltar al contenido
         </a>
