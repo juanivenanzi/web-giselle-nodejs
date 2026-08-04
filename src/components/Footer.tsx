@@ -1,36 +1,15 @@
-// src/components/Footer.tsx
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useApp } from "@/context/AppContext";
 
 export default function Footer() {
-  const [modo, setModo] = useState("institucional");
+  const { modo } = useApp();
 
-  useEffect(() => {
-    const modoGuardado = localStorage.getItem("gm-modo") || "institucional";
-    setModo(modoGuardado);
-
-    const observerModo = new MutationObserver(() => {
-      const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || "institucional";
-      setModo(nuevoModo);
-    });
-    observerModo.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-modo"],
-    });
-
-    return () => {
-      observerModo.disconnect();
-    };
-  }, []);
-
-  const getLogoPath = () => {
-    return modo === "campania"
+  const logoSrc =
+    modo === "campania"
       ? "/images/leon-amarillo.png"
       : "/images/sol-amarillo.png";
-  };
 
   return (
     <footer className="footer">
@@ -45,7 +24,7 @@ export default function Footer() {
         </p>
         <div className="h-12 md:h-14 flex items-center overflow-hidden">
           <Image
-            src={getLogoPath()}
+            src={logoSrc}
             alt={modo === "campania" ? "León - Campaña" : "Sol - Institucional"}
             width={56}
             height={56}

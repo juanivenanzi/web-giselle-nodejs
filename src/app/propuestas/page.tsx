@@ -1,58 +1,49 @@
-// src/app/propuestas/page.tsx - Con total arriba y línea separadora
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
 import { propuestas } from "@/data/propuestas";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
+import { useApp } from "@/context/AppContext";
+import { TIPO_MODO } from "@/config/modo";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBalanceScale,
+  faChainBroken,
+  faMapMarkedAlt,
+  faTreeCity,
+  faLightbulb,
+} from "@fortawesome/free-solid-svg-icons";
 
-const ICONOS_PILAR = {
-  transparencia: "fa-balance-scale",
-  libertad: "fa-chain-broken",
-  territorio: "fa-map-marked-alt",
-  orden: "fa-tree-city"
-} as const;
+const ICONOS_PILAR: Record<string, any> = {
+  transparencia: faBalanceScale,
+  libertad: faChainBroken,
+  territorio: faMapMarkedAlt,
+  orden: faTreeCity,
+};
 
 const COLORES_PILAR = {
   transparencia: "#3b82f6",
   libertad: "#8b5cf6",
   territorio: "#22c55e",
-  orden: "#f59e0b"
+  orden: "#f59e0b",
 } as const;
 
 const NOMBRES_PILAR = {
   transparencia: "Transparencia",
   libertad: "Libertad",
   territorio: "Territorio",
-  orden: "Orden"
+  orden: "Orden",
 } as const;
 
 export default function PropuestasPage() {
-  const [modo, setModo] = useState(MODO_ACTUAL);
-
-  useEffect(() => {
-    const modoActual = MODO_ACTUAL;
-    setModo(modoActual);
-
-    const observer = new MutationObserver(() => {
-      const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
-      setModo(nuevoModo);
-    });
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-modo"],
-    });
-    return () => observer.disconnect();
-  }, []);
-
+  const { modo } = useApp();
   const esCampania = modo === TIPO_MODO.CAMPANIA;
 
   const propuestasPorPilar = useMemo(() => {
     return {
-      transparencia: propuestas.filter(p => p.pilar === "transparencia"),
-      libertad: propuestas.filter(p => p.pilar === "libertad"),
-      territorio: propuestas.filter(p => p.pilar === "territorio"),
-      orden: propuestas.filter(p => p.pilar === "orden")
+      transparencia: propuestas.filter((p) => p.pilar === "transparencia"),
+      libertad: propuestas.filter((p) => p.pilar === "libertad"),
+      territorio: propuestas.filter((p) => p.pilar === "territorio"),
+      orden: propuestas.filter((p) => p.pilar === "orden"),
     };
   }, []);
 
@@ -99,18 +90,18 @@ export default function PropuestasPage() {
           </h1>
           <p
             className="mt-3 text-base max-w-2xl mx-auto"
-            style={{ color: "var(--color-texto-sec)" }}
+            style={{ color: "color-mix(in srgb, var(--color-texto) 85%, transparent)" }}
           >
             Conocé nuestras propuestas organizadas por pilares.
           </p>
 
-          {/* ✅ TOTAL DE PROPUESTAS - Arriba, con línea separadora */}
+          {/* Total de propuestas */}
           <div className="mt-6 pt-4 border-t-2 t-modo" style={{ borderColor: "var(--color-destacado)" }}>
             <p
               className="text-sm"
-              style={{ color: "var(--color-texto-sec)" }}
+              style={{ color: "color-mix(in srgb, var(--color-texto) 85%, transparent)" }}
             >
-              <i className="fas fa-lightbulb mr-2" style={{ color: "var(--color-destacado)" }}></i>
+              <FontAwesomeIcon icon={faLightbulb} className="mr-2" style={{ color: "var(--color-destacado)" }} />
               Total de propuestas:{" "}
               <strong style={{ color: "var(--color-texto)" }}>
                 {propuestas.length}
@@ -119,7 +110,7 @@ export default function PropuestasPage() {
           </div>
         </div>
 
-        {/* ✅ TABLERO KANBAN - Columnas */}
+        {/* Tablero Kanban */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           {Object.entries(propuestasPorPilar).map(([pilar, propuestasPilar]) => {
             if (propuestasPilar.length === 0) return null;
@@ -134,7 +125,7 @@ export default function PropuestasPage() {
                 }}
               >
                 {/* Cabecera de la columna */}
-                <div 
+                <div
                   className="flex items-center gap-3 mb-4 pb-3 border-b-2 t-modo"
                   style={{ borderColor: "var(--color-borde)" }}
                 >
@@ -145,11 +136,10 @@ export default function PropuestasPage() {
                         COLORES_PILAR[pilar as keyof typeof COLORES_PILAR],
                     }}
                   >
-                    <i
-                      className={`fas ${
-                        ICONOS_PILAR[pilar as keyof typeof ICONOS_PILAR]
-                      } text-white text-sm`}
-                    ></i>
+                    <FontAwesomeIcon
+                      icon={ICONOS_PILAR[pilar]}
+                      className="text-white text-sm"
+                    />
                   </div>
                   <h2
                     className="font-head text-base font-semibold capitalize flex-1"
@@ -161,7 +151,7 @@ export default function PropuestasPage() {
                     className="text-sm font-bold px-3 py-1 rounded-full"
                     style={{
                       backgroundColor: "var(--color-destacado)",
-                      color: "#ffffff",
+                      color: "#0f172a",
                       minWidth: "28px",
                       textAlign: "center",
                     }}
@@ -170,7 +160,7 @@ export default function PropuestasPage() {
                   </span>
                 </div>
 
-                {/* Lista de propuestas en la columna */}
+                {/* Lista de propuestas */}
                 <div className="space-y-3 flex-1">
                   {propuestasPilar.map((propuesta, index) => (
                     <div

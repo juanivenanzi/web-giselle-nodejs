@@ -1,0 +1,15 @@
+============================================================
+PROYECTO: [Nombre de tu proyecto]
+STACK: [Ej: Node.js + Express + React + MySQL]
+AUDITORÍA ENFOCADA EN: [Ej: Seguridad, rendimiento, buenas prácticas, inyección SQL, XSS, etc.]
+OBSERVACIONES GENERALES: [Acá podés poner contexto, dudas concretas, etc.]
+============================================================
+
+------------------------------------------------------------
+ARCHIVO: src/app.js
+DESCRIPCIÓN: Punto de entrada principal, configuración de Express
+------------------------------------------------------------
+```javascript
+const express = require('express');
+const app = express();
+// ... resto del código

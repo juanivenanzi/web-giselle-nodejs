@@ -5,14 +5,15 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useApp } from "@/context/AppContext";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
+import { TIPO_MODO } from "@/config/modo";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
 
 export default function Nav() {
-  const { tema, setTema } = useApp();
+  const { modo, tema, setTema } = useApp();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const [modoLocal, setModoLocal] = useState(MODO_ACTUAL);
 
   useEffect(() => {
     setIsMounted(true);
@@ -20,32 +21,8 @@ export default function Nav() {
 
   useEffect(() => {
     if (!isMounted) return;
-    const modoActual =
-      document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
-    setModoLocal(modoActual);
-
-    const observer = new MutationObserver(() => {
-      const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
-      setModoLocal(nuevoModo);
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-modo"],
-    });
-
-    return () => observer.disconnect();
-  }, [isMounted]);
-
-  useEffect(() => {
-    if (!isMounted) return;
     const handleScroll = () => {
-      if (tema === "oscuro") {
-        setScrolled(window.scrollY > 60);
-      } else {
-        setScrolled(false);
-      }
+      setScrolled(tema === "oscuro" ? window.scrollY > 60 : false);
     };
     window.addEventListener("scroll", handleScroll);
     handleScroll();
@@ -53,16 +30,11 @@ export default function Nav() {
   }, [tema, isMounted]);
 
   const toggleTema = () => {
-    const nuevo = tema === "claro" ? "oscuro" : "claro";
-    setTema(nuevo);
+    setTema(tema === "claro" ? "oscuro" : "claro");
   };
 
-  const toggleMobile = () => setMobileOpen(!mobileOpen);
+  const mostrarPropuestas = modo === TIPO_MODO.CAMPANIA;
 
-  // Determinar si mostrar Propuestas (comparación segura)
-  const mostrarPropuestas = modoLocal === TIPO_MODO.CAMPANIA;
-
-  // ✅ Lista única de opciones: institucional = 5, campaña = 6
   const navLinks = [
     { href: "/", label: "Inicio" },
     { href: "/#sobre-mi", label: "Sobre Mí" },
@@ -143,9 +115,10 @@ export default function Nav() {
             aria-label="Cambiar tema claro/oscuro"
             style={{ color: "var(--color-texto)" }}
           >
-            <i
-              className={`fas ${tema === "oscuro" ? "fa-sun" : "fa-moon"} text-sm`}
-            ></i>
+            <FontAwesomeIcon
+              icon={tema === "oscuro" ? faSun : faMoon}
+              className="text-sm"
+            />
           </button>
         </div>
 
@@ -156,16 +129,17 @@ export default function Nav() {
             aria-label="Cambiar tema claro/oscuro"
             style={{ color: "var(--color-texto)" }}
           >
-            <i
-              className={`fas ${tema === "oscuro" ? "fa-sun" : "fa-moon"} text-sm`}
-            ></i>
+            <FontAwesomeIcon
+              icon={tema === "oscuro" ? faSun : faMoon}
+              className="text-sm"
+            />
           </button>
 
           <button
-            onClick={toggleMobile}
+            onClick={() => setMobileOpen(!mobileOpen)}
             className="flex flex-col gap-1.5 p-1"
             aria-label="Abrir menú"
-            aria-expanded={mobileOpen ? "true" : "false"}
+            aria-expanded={mobileOpen}
             aria-controls="mobileMenu"
           >
             <span
@@ -197,9 +171,6 @@ export default function Nav() {
           {
             backgroundColor: "var(--color-fondo)",
             borderBottom: "1px solid var(--color-borde)",
-            // ✅ Le pasamos la cantidad real de opciones al CSS,
-            // así el alto/tamaño se puede calcular con esta variable
-            // en vez de un max-height fijo.
             "--nav-items": navLinks.length,
           } as React.CSSProperties
         }

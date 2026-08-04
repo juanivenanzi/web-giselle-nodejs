@@ -1,3 +1,6 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+
 export default function MapaPage() {
   return (
     <main
@@ -6,7 +9,6 @@ export default function MapaPage() {
     >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10">
-          {/* ✅ TEXTO PRINCIPAL - Más claro y legible */}
           <p
             className="text-xl max-w-2xl mx-auto font-medium"
             style={{ color: "var(--color-texto)" }}
@@ -14,7 +16,6 @@ export default function MapaPage() {
             Conocé los servicios, las obras y los puntos de interés más
             importantes de Santo Tomé.
           </p>
-          {/* ✅ TEXTO SECUNDARIO - Tono más suave */}
           <p
             className="text-sm max-w-xl mx-auto mt-3"
             style={{ color: "var(--color-texto-sec)" }}
@@ -39,7 +40,6 @@ export default function MapaPage() {
           className="text-center mt-10 pt-6 border-t"
           style={{ borderColor: "var(--color-borde)" }}
         >
-          {/* ✅ TEXTO DEL ENLACE - Más legible */}
           <p className="text-base" style={{ color: "var(--color-texto)" }}>
             ¿Querés sugerir un punto de interés o reportar algo?
             <a
@@ -47,7 +47,8 @@ export default function MapaPage() {
               className="inline-flex items-center gap-1 font-semibold hover:underline ml-1"
               style={{ color: "var(--color-destacado)" }}
             >
-              Contactanos <i className="fas fa-arrow-right text-xs"></i>
+              Contactanos{" "}
+              <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
             </a>
           </p>
         </div>

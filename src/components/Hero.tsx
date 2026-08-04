@@ -1,41 +1,18 @@
-// src/components/Hero.tsx - CORREGIDO
+// src/components/Hero.tsx
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
+import { useApp } from "@/context/AppContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
 export default function Hero() {
-  const [modo, setModo] = useState(MODO_ACTUAL);
-  const [heroBg, setHeroBg] = useState("/images/hero-bg-institucional.webp");
-
-  useEffect(() => {
-    const modoActual = document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
-    setModo(modoActual);
-    setHeroBg(
-      modoActual === "institucional"
-        ? "/images/hero-bg-institucional.webp"
-        : "/images/hero-bg-campana.webp",
-    );
-
-    const observer = new MutationObserver(() => {
-      const nuevoModo =
-        document.documentElement.getAttribute("data-modo") || MODO_ACTUAL;
-      setModo(nuevoModo);
-      setHeroBg(
-        nuevoModo === "institucional"
-          ? "/images/hero-bg-institucional.webp"
-          : "/images/hero-bg-campana.webp",
-      );
-    });
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-modo"],
-    });
-    return () => observer.disconnect();
-  }, []);
-
+  const { modo } = useApp();
   const esCampania = modo === "campania";
+
+  const heroBg = esCampania
+    ? "/images/hero-bg-campana.webp"
+    : "/images/hero-bg-institucional.webp";
 
   return (
     <section
@@ -98,7 +75,7 @@ export default function Hero() {
 
         <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
           <Link
-            href="/proyectos"
+            href={esCampania ? "/propuestas" : "/proyectos"}
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold shadow-lg t-modo hover:scale-105 hover:shadow-2xl transition-all"
             style={{
               backgroundColor: "#4a8db7",
@@ -121,33 +98,19 @@ export default function Hero() {
         </div>
       </div>
 
+      {/* Indicador de scroll */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5">
-        <a
-          href="https://www.microsoft.com/es-es/accessible-windows/accessibility-in-windows-11-22-05-30"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[0.65rem] tracking-widest uppercase hover:text-white/90 transition-colors inline-flex items-center justify-center gap-1.5"
-          style={{
-            color: "#9ca3af",
-          }}
-        >
-          <i className="fas fa-universal-access text-[0.65rem]"></i>
-          ¿Te cuesta leer esto? Probá "Alto contraste" en tu sistema.
-        </a>
         <span
           className="text-[0.65rem] tracking-widest uppercase"
-          style={{
-            color: "#9ca3af",
-          }}
+          style={{ color: "#9ca3af" }}
         >
           Bajá
         </span>
-        <i
-          className="fas fa-chevron-down text-sm animate-float"
-          style={{
-            color: "#9ca3af",
-          }}
-        ></i>
+        <FontAwesomeIcon
+          icon={faChevronDown}
+          className="text-sm animate-float"
+          style={{ color: "#9ca3af" }}
+        />
       </div>
     </section>
   );

@@ -1,13 +1,24 @@
+// src/app/layout.tsx
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { AppProvider } from "@/context/AppContext";
+import "@/lib/fontawesome"; // ← Carga estática de estilos de Font Awesome
 
+// Configuración de fuentes con next/font (auto-hospedadas, sin FOUC)
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
+  variable: "--font-inter",
+});
+
+const dmSerif = DM_Serif_Display({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-dm-serif",
 });
 
 export const metadata: Metadata = {
@@ -25,26 +36,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-        />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300..700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body
-        className={`${inter.className} font-body bg-(--color-fondo) text-(--color-texto)`}
-      >
+    <html lang="es" className={`${inter.variable} ${dmSerif.variable}`}>
+      <head>{/* No se necesitan links externos de fuentes ni de Font Awesome */}</head>
+      <body className={`${inter.className} font-body bg-(--color-fondo) text-(--color-texto)`}>
         <a href="#inicio" className="skip-link">
           Saltar al contenido
         </a>
