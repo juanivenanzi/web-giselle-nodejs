@@ -2,29 +2,20 @@
 
 import { useMemo } from "react";
 import { propuestas } from "@/data/propuestas";
-import { useApp } from "@/context/AppContext";
-import { TIPO_MODO } from "@/config/modo";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBalanceScale,
-  faChainBroken,
-  faMapMarkedAlt,
-  faTreeCity,
-  faLightbulb,
-} from "@fortawesome/free-solid-svg-icons";
+import { MODO_ACTUAL, TIPO_MODO } from "@/config/modo";
 
-const ICONOS_PILAR: Record<string, any> = {
-  transparencia: faBalanceScale,
-  libertad: faChainBroken,
-  territorio: faMapMarkedAlt,
-  orden: faTreeCity,
-};
+const ICONOS_PILAR = {
+  transparencia: "fa-balance-scale",
+  libertad: "fa-chain-broken",
+  territorio: "fa-map-marked-alt",
+  orden: "fa-tree-city"
+} as const;
 
 const COLORES_PILAR = {
   transparencia: "#3b82f6",
   libertad: "#8b5cf6",
   territorio: "#22c55e",
-  orden: "#f59e0b",
+  orden: "#f59e0b"
 } as const;
 
 const NOMBRES_PILAR = {
@@ -95,13 +86,13 @@ export default function PropuestasPage() {
             Conocé nuestras propuestas organizadas por pilares.
           </p>
 
-          {/* Total de propuestas */}
+          {/* ✅ TOTAL DE PROPUESTAS - Arriba, con línea separadora */}
           <div className="mt-6 pt-4 border-t-2 t-modo" style={{ borderColor: "var(--color-destacado)" }}>
             <p
               className="text-sm"
-              style={{ color: "color-mix(in srgb, var(--color-texto) 85%, transparent)" }}
+              style={{ color: "var(--color-texto-sec)" }}
             >
-              <FontAwesomeIcon icon={faLightbulb} className="mr-2" style={{ color: "var(--color-destacado)" }} />
+              <i className="fas fa-lightbulb mr-2" style={{ color: "var(--color-destacado)" }}></i>
               Total de propuestas:{" "}
               <strong style={{ color: "var(--color-texto)" }}>
                 {propuestas.length}
@@ -112,8 +103,9 @@ export default function PropuestasPage() {
 
         {/* Tablero Kanban */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          {Object.entries(propuestasPorPilar).map(([pilar, propuestasPilar]) => {
-            if (propuestasPilar.length === 0) return null;
+          {Object.entries(propuestasPorPilar).map(
+            ([pilar, propuestasPilar]) => {
+              if (propuestasPilar.length === 0) return null;
 
             return (
               <div
@@ -125,7 +117,7 @@ export default function PropuestasPage() {
                 }}
               >
                 {/* Cabecera de la columna */}
-                <div
+                <div 
                   className="flex items-center gap-3 mb-4 pb-3 border-b-2 t-modo"
                   style={{ borderColor: "var(--color-borde)" }}
                 >
@@ -136,10 +128,11 @@ export default function PropuestasPage() {
                         COLORES_PILAR[pilar as keyof typeof COLORES_PILAR],
                     }}
                   >
-                    <FontAwesomeIcon
-                      icon={ICONOS_PILAR[pilar]}
-                      className="text-white text-sm"
-                    />
+                    <i
+                      className={`fas ${
+                        ICONOS_PILAR[pilar as keyof typeof ICONOS_PILAR]
+                      } text-white text-sm`}
+                    ></i>
                   </div>
                   <h2
                     className="font-head text-base font-semibold capitalize flex-1"
@@ -151,7 +144,7 @@ export default function PropuestasPage() {
                     className="text-sm font-bold px-3 py-1 rounded-full"
                     style={{
                       backgroundColor: "var(--color-destacado)",
-                      color: "#0f172a",
+                      color: "#ffffff",
                       minWidth: "28px",
                       textAlign: "center",
                     }}
@@ -160,7 +153,7 @@ export default function PropuestasPage() {
                   </span>
                 </div>
 
-                {/* Lista de propuestas */}
+                {/* Lista de propuestas en la columna */}
                 <div className="space-y-3 flex-1">
                   {propuestasPilar.map((propuesta, index) => (
                     <div
@@ -197,18 +190,23 @@ export default function PropuestasPage() {
                   ))}
                 </div>
 
-                {/* Footer de la columna */}
-                <div className="mt-3 pt-2 text-center border-t t-modo" style={{ borderColor: "var(--color-borde)" }}>
-                  <span
-                    className="text-xs font-medium"
-                    style={{ color: "var(--color-texto-sec)" }}
+                  {/* Footer de la columna */}
+                  <div
+                    className="mt-3 pt-2 text-center border-t t-modo"
+                    style={{ borderColor: "var(--color-borde)" }}
                   >
-                    {propuestasPilar.length} propuesta{propuestasPilar.length > 1 ? "s" : ""}
-                  </span>
+                    <span
+                      className="text-xs font-medium"
+                      style={{ color: "var(--color-texto-sec)" }}
+                    >
+                      {propuestasPilar.length} propuesta
+                      {propuestasPilar.length > 1 ? "s" : ""}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            },
+          )}
         </div>
       </div>
     </section>

@@ -14,6 +14,7 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <div className="cinta-divisor" />
       <SobreMi />
       <Equipo />
       <Pilares />
